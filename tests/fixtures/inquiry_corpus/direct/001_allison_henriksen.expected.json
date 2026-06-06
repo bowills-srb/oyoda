@@ -1,0 +1,19 @@
+{
+  "fixture_id": "direct/001_allison_henriksen",
+  "description": "direct inquiry captured from live Beach Habitats inbound traffic",
+  "expected_route_contains": "direct",
+  "expected_pipeline_output": {
+    "platform": "direct",
+    "parser_source_contains": "",
+    "guest_name": "Guest 001",
+    "latest_guest_message_contains": [
+      "Good morning, I hate to inform you again, but felt like it is very important for"
+    ],
+    "requested_check_in": null,
+    "requested_check_out": null,
+    "requested_guests": null,
+    "platform_listing_id": "",
+    "platform_unit_id": "",
+    "property_reference_token": "Property_001"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "alembic_version": "082_knowledge_gap_drafts",
+  "captured_at_utc": "2026-05-18T15:10:00+00:00",
+  "columns": [
+    {"column_default": "nextval('canonical_property_link_reviews_review_id_seq'::regclass)", "column_name": "review_id", "data_type": "bigint", "is_nullable": false, "udt_name": "int8"},
+    {"column_default": null, "column_name": "tenant_id", "data_type": "uuid", "is_nullable": false, "udt_name": "uuid"},
+    {"column_default": null, "column_name": "canonical_property_code", "data_type": "text", "is_nullable": true, "udt_name": "text"},
+    {"column_default": "'internal'::text", "column_name": "provider", "data_type": "text", "is_nullable": false, "udt_name": "text"},
+    {"column_default": "'alias'::text", "column_name": "ref_kind", "data_type": "text", "is_nullable": false, "udt_name": "text"},
+    {"column_default": null, "column_name": "ref_value", "data_type": "text", "is_nullable": false, "udt_name": "text"},
+    {"column_default": null, "column_name": "normalized_ref_value", "data_type": "text", "is_nullable": false, "udt_name": "text"},
+    {"column_default": null, "column_name": "platform_listing_id", "data_type": "text", "is_nullable": true, "udt_name": "text"},
+    {"column_default": null, "column_name": "platform_unit_id", "data_type": "text", "is_nullable": true, "udt_name": "text"},
+    {"column_default": null, "column_name": "property_name", "data_type": "text", "is_nullable": true, "udt_name": "text"},
+    {"column_default": null, "column_name": "display_name", "data_type": "text", "is_nullable": true, "udt_name": "text"},
+    {"column_default": "0.0", "column_name": "confidence", "data_type": "numeric", "is_nullable": true, "udt_name": "numeric"},
+    {"column_default": "'pending'::text", "column_name": "status", "data_type": "text", "is_nullable": false, "udt_name": "text"},
+    {"column_default": "'[]'::jsonb", "column_name": "candidate_payload", "data_type": "jsonb", "is_nullable": true, "udt_name": "jsonb"},
+    {"column_default": "'{}'::jsonb", "column_name": "metadata", "data_type": "jsonb", "is_nullable": true, "udt_name": "jsonb"},
+    {"column_default": "now()", "column_name": "created_at", "data_type": "timestamp with time zone", "is_nullable": false, "udt_name": "timestamptz"},
+    {"column_default": "now()", "column_name": "updated_at", "data_type": "timestamp with time zone", "is_nullable": false, "udt_name": "timestamptz"}
+  ],
+  "indexes": [
+    {"columns": ["review_id"], "indexdef": "CREATE UNIQUE INDEX canonical_property_link_reviews_pkey ON public.canonical_property_link_reviews USING btree (review_id)", "indexname": "canonical_property_link_reviews_pkey", "is_unique": true},
+    {"columns": ["tenant_id", "status", "created_at"], "indexdef": "CREATE INDEX idx_canonical_property_link_reviews_status ON public.canonical_property_link_reviews USING btree (tenant_id, status, created_at DESC)", "indexname": "idx_canonical_property_link_reviews_status", "is_unique": false},
+    {"columns": ["tenant_id", "provider", "ref_kind", "normalized_ref_value", "status"], "indexdef": "CREATE UNIQUE INDEX canonical_property_link_reviews_tenant_id_provider_ref_kind_norma_key ON public.canonical_property_link_reviews USING btree (tenant_id, provider, ref_kind, normalized_ref_value, status)", "indexname": "canonical_property_link_reviews_tenant_id_provider_ref_kind_norma_key", "is_unique": true}
+  ],
+  "table": "canonical_property_link_reviews"
+}

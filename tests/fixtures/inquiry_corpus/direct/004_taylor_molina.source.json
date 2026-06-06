@@ -1,0 +1,33 @@
+{
+  "fixture_id": "direct/004_taylor_molina",
+  "platform": "direct",
+  "source_channel": "email",
+  "source_provider": "gmail",
+  "headers": {
+    "From": "Guest 004 <guest_004@example.test>",
+    "Reply-To": "guest_004@example.test",
+    "Message-ID": "19e3cc2cd42d186f",
+    "X-Thread-Id": "19e3cc2cd42d186f",
+    "X-Oyvoda-Parser-Used": "prebooking_request"
+  },
+  "subject": "",
+  "plain_text": "Hi, I was wondering if it would be possible to host some type of gathering at your location. My husband and I recently eloped, and we would love to celebrate with our family. This home would be absolutely amazing for something like this. Thank you so much, and I hope to hear from you soon!",
+  "raw_html": "",
+  "llm_extracted_fields": {
+    "latest_guest_message": "Hi, I was wondering if it would be possible to host some type of gathering at your location. My husband and I recently eloped, and we would love to celebrate with our family. This home would be absolutely amazing for something like this. Thank you so much, and I hope to hear from you soon!",
+    "property_code_or_name": "Property_004",
+    "sender_name": "Guest 004",
+    "sender_email": "guest_004@example.test",
+    "requested_guests": 8,
+    "requested_check_in": "2026-11-05",
+    "requested_check_out": "2026-11-08"
+  },
+  "provenance": {
+    "tenant_id": "e07980b2-a990-4b24-91d1-c8cb71ab70e1",
+    "draft_id": "INQ-F574484C",
+    "created_at": "2026-05-18 20:25:58.484844+00",
+    "gmail_message_id": "19e3cc2cd42d186f",
+    "parser_source_live": "llm_email_extractor_groq",
+    "parser_used_live": "prebooking_request"
+  }
+}

@@ -1,0 +1,80 @@
+Password reset + change-password flows + fix for Lanier's manual hash
+
+Builds the self-service password reset flow so admins never have to
+manually bcrypt-hash rows again. Also fixes a subtle bug where the
+manual hash generated for Lanier earlier tonight won't verify at login.
+
+CRITICAL FIX: Lanier's password hash
+────────────────────────────────────
+The app's verify_password() does SHA-256(password) → bcrypt, not raw
+bcrypt. The one-liner I gave to hash Lanier's temp password used raw
+bcrypt, so his hash won't match at login time. scripts/reset_lanier_
+password.py regenerates his hash using the SAME function the app uses.
+Before Lanier calls back, run:
+
+    # Edit LANIER_EMAIL in the script first
+    python scripts/reset_lanier_password.py
+
+Once he's in, he should change his password via Settings → Change
+Password (new in this commit).
+
+NEW FILES
+─────────
+db/migrations/versions/029_password_reset_tokens.py
+  password_reset_tokens table (operator_id FK, SHA-256 of token, 1hr
+  expiry, used_at for single-use enforcement, ip_address + user_agent
+  for audit). Unique index on token_hash WHERE used_at IS NULL enforces
+  no two active tokens can collide.
+
+scripts/reset_lanier_password.py
+  One-off script to fix Lanier's busted hash. Delete after use.
+
+MODIFIED
+────────
+app/api/v1/endpoints/operator_app.py
+  + POST /app/auth/forgot-password: email-enumeration-resistant. Always
+    returns 200. Rate-limited (5/email/hr, 20/IP/hr). Invalidates prior
+    unused tokens per operator. SendGrid email with reset link.
+  + POST /app/auth/reset-password: validates token, atomically marks it
+    used + updates password_hash + invalidates other pending resets.
+  + POST /app/auth/change-password: authenticated, requires current
+    password. For in-app password changes from Settings.
+  + GET  /app/forgot-password: public page (email entry form).
+  + GET  /app/reset-password?token=...: public page (new password form).
+  Login page "Forgot password?" link now points at /app/forgot-password
+  instead of mailto:info@oyvoda.com.
+
+app/static/dashboard/index.html
+  + "Change Password" card on Settings page.
+  Cache-buster bumped to ?v=2026-04-20-c.
+
+app/static/dashboard/js/main.js
+  + window.changePassword() wired to the Change Password card.
+
+SECURITY DETAILS
+────────────────
+- Reset tokens: 32 random bytes (secrets.token_urlsafe), stored as
+  SHA-256 hash only. DB dump can't impersonate resets.
+- Email enumeration: /forgot-password returns identical response for
+  valid and invalid emails. Rate limit returns same response too.
+- Token replay: used_at prevents re-use. Creating new token
+  invalidates all prior unused ones for same operator.
+- Expiry: 1 hour from creation. Validated on POST.
+- Brute force: change-password failures hit the existing _record_failure
+  rate limit (same as login attempts).
+- Password rules: min 8, max 200 chars. Enforced client + server.
+
+STILL TODO
+──────────
+- Refresh-token revocation on reset: we can't currently invalidate all
+  active JWT refresh tokens for an operator at reset time because JTIs
+  aren't tied to operator_id. Next session: add session audit table or
+  switch to stateful refresh tokens keyed by operator_id.
+- Migration 029 not yet applied — run `alembic upgrade head` after
+  deploy settles.
+
+MIGRATIONS TO RUN
+─────────────────
+    eval "export $(railway variables --kv | grep '^ALEMBIC_DATABASE_URL=')"
+    ALEMBIC_USE_DIRECT_URL=true alembic upgrade head
+    alembic current    # expect: 029_password_reset_tokens (head)

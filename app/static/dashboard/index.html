@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oyvoda — Operator Dashboard</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/dashboard/styles/tokens.css?v=2026-05-19-a">
+<link rel="stylesheet" href="/static/dashboard/styles/dashboard.css?v=2026-05-20-a">
+</head>
+<body>
+
+<!-- Super-admin impersonation banner (shown only while scoped into an operator) -->
+<div class="impersonation-banner" id="impersonation-banner">
+  <div id="impersonation-copy"></div>
+  <button onclick="exitImpersonation()">Exit Operator View</button>
+</div>
+
+<!-- Onboarding banner — shown when a critical setup step is incomplete (e.g. inbox not connected). Populated by main.js loadOnboardingStatus(). -->
+<div id="onboarding-banner" style="display:none;background:linear-gradient(90deg,rgba(200,120,50,0.18),rgba(200,120,50,0.08));border-bottom:1px solid rgba(200,120,50,0.35);padding:12px 20px;color:#f0ebe3;font-size:13px;display:none;align-items:center;justify-content:space-between;gap:16px;position:sticky;top:0;z-index:100">
+  <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
+    <div style="min-width:0">
+      <div id="onboarding-banner-title" style="font-weight:600;color:#f0ebe3;margin-bottom:2px">Finish setting up your account</div>
+      <div id="onboarding-banner-detail" style="font-size:12px;color:rgba(240,235,227,0.65);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">One more step and guest inquiries will start flowing in.</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;flex-shrink:0;align-items:center">
+    <a id="onboarding-banner-cta" href="/app/connect-gmail" class="btn btn-primary" style="font-size:12px;padding:8px 14px;text-decoration:none;white-space:nowrap">Connect now</a>
+    <button onclick="dismissOnboardingBanner()" style="background:none;border:none;color:rgba(240,235,227,0.5);cursor:pointer;font-size:12px;padding:4px 8px" title="Dismiss until next reload">Close</button>
+  </div>
+</div>
+
+<!-- ── TOPBAR ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <a href="/" class="topbar-logo">oyvoda</a>
+    <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Sidebar expands on hover" title="Sidebar expands on hover">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4.5L7 10l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+  <div class="topbar-center">
+    <span class="topbar-breadcrumb" id="breadcrumb">Today</span>
+  </div>
+  <div class="topbar-right">
+    <button class="scope-pill" type="button" aria-label="Tenant scope">
+      Beach Habitats 30A
+    </button>
+    <button class="command-trigger" type="button" onclick="openCommandPaletteStub()" aria-label="Open command search">
+      <span>⌘K</span>
+      <span>Search</span>
+    </button>
+    <div class="topbar-status">
+      <div class="status-dot" id="sys-dot"></div>
+      <span id="sys-label">Loading...</span>
+    </div>
+    <div style="width:1px;height:20px;background:var(--border)"></div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end">
+      <span class="topbar-op-name" id="op-name">—</span>
+      <span class="topbar-op-badge" id="op-badge">—</span>
+    </div>
+    <div class="tooltip">
+      <button class="btn-icon topbar-icon-btn" onclick="toggleNotifs()" aria-label="Notifications" title="Notifications" style="position:relative">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3.75a3 3 0 0 0-3 3v1.05c0 .68-.2 1.34-.58 1.91L5.2 11.5c-.32.49.03 1.15.62 1.15h8.36c.59 0 .94-.66.62-1.15l-1.22-1.79A3.38 3.38 0 0 1 13 7.8V6.75a3 3 0 0 0-3-3zM8.35 14.4a1.75 1.75 0 0 0 3.3 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span id="notif-badge" style="display:none;position:absolute;top:-2px;right:-2px;min-width:14px;height:14px;padding:0 3px;background:var(--red);border-radius:7px;font-size:9px;font-weight:600;color:#fff;display:none;align-items:center;justify-content:center"></span>
+      </button>
+      <span class="tooltip-text">Notifications</span>
+    </div>
+    <div class="tooltip">
+      <button class="btn-icon topbar-icon-btn" onclick="navigate('settings')" aria-label="Settings" title="Settings">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 6.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 2.75v2M10 15.25v2M17.25 10h-2M4.75 10h-2M14.85 5.15l-1.4 1.4M6.55 13.45l-1.4 1.4M14.85 14.85l-1.4-1.4M6.55 6.55l-1.4-1.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+      <span class="tooltip-text">Settings</span>
+    </div>
+    <div class="tooltip">
+      <button class="btn-icon topbar-icon-btn" onclick="doLogout()" aria-label="Sign out" title="Sign out">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 4.5H5.75A1.75 1.75 0 0 0 4 6.25v7.5c0 .97.78 1.75 1.75 1.75H8M11.25 7l3 3-3 3M7.5 10h6.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <span class="tooltip-text">Sign out</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── NOTIFICATION PANEL ── -->
+<div class="notif-panel" id="notif-panel">
+  <div style="padding:12px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+    <span style="font-size:12px;font-weight:500;color:var(--white)">Notifications</span>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button id="notif-mark-read" onclick="markNotifsRead()" style="background:none;border:none;color:var(--amber);cursor:pointer;font-size:11px;display:none">Mark all read</button>
+      <button onclick="toggleNotifs()" style="background:none;border:none;color:var(--dim);cursor:pointer;font-size:12px">Close</button>
+    </div>
+  </div>
+  <div id="notif-list">
+    <div class="empty" style="padding:32px 20px">
+      <div class="empty-title">No notifications</div>
+      <div class="empty-sub">You'll see alerts for escalations, pre-booking drafts, and KB gaps here.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── APP LAYOUT ── -->
+<div class="app-layout">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="op-card">
+      <div class="op-card-name" id="sb-op-name">Loading...</div>
+      <div class="op-card-meta" id="sb-op-meta">—</div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-label">Guest Messaging</div>
+      <button class="nav-item active" data-view="today" onclick="navigate('today')">
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M3.5 10L10 4.5 16.5 10V16H3.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 16v-4h4v4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></span><span class="nav-label">Today</span>
+      </button>
+      <button class="nav-item" data-view="prebooking" onclick="navigate('prebooking')">
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><rect x="3.5" y="4" width="13" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6 7.25h8M6 10h8M6 12.75h5.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span><span class="nav-label">Pre-Booking</span>
+        <span class="nav-badge nb-amber" id="nb-pb" style="display:none"></span>
+      </button>
+      <button class="nav-item" data-view="prearrival" onclick="navigate('prearrival')">
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M4.5 5.5h11v9h-11z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M4.5 8.5h11M7 3.75v3.5M13 3.75v3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span><span class="nav-label">Pre-Arrival</span>
+      </button>
+      <button class="nav-item" data-view="instay" onclick="navigate('instay')">
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 6.5h10a1.5 1.5 0 0 1 1.5 1.5v5A1.5 1.5 0 0 1 15 14.5H8l-3.5 2V8A1.5 1.5 0 0 1 6 6.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 9.5h4M8 11.75h6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span><span class="nav-label">In-Stay</span>
+        <span class="nav-badge nb-green" id="nb-sess" style="display:none"></span>
+      </button>
+      <button class="nav-item" data-view="poststay" onclick="navigate('poststay')">
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 5.5h10v9H5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M7.5 10h5M10 7.5v5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span><span class="nav-label">Post-Stay</span>
+      </button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="nav-section">
+      <div class="nav-section-label">Your Properties</div>
+      <button class="nav-item" data-view="properties" onclick="navigate('properties')">
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M4.5 15.5h11V8L10 4 4.5 8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 15.5v-4h4v4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></span><span class="nav-label">Properties</span>
+        <span class="nav-badge nb-dim" id="nb-props" style="display:none"></span>
+      </button>
+      <button class="nav-item" data-view="vendors" onclick="navigate('vendors')">
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M4.5 8.5h11v7h-11zM6.5 8.5V6a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></span><span class="nav-label">Vendors</span>
+        <span class="nav-badge nb-dim" id="nb-vendors" style="display:none"></span>
+      </button>
+      <button class="nav-item" data-view="knowledge" onclick="navigate('knowledge')">
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 4.5h8a2.5 2.5 0 0 1 2.5 2.5v8H7a2 2 0 0 0-2 2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M5 4.5v12.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 8h5M8 10.75h5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span><span class="nav-label">Knowledge Base</span>
+        <span class="nav-badge nb-amber" id="nb-gaps-kb" style="display:none"></span>
+      </button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="nav-section">
+      <div class="nav-section-label">Operations</div>
+      <button class="nav-item" data-view="escalations" onclick="navigate('escalations')">
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M10 3.5l7 12H3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 7.5v4.25M10 14h.01" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span><span class="nav-label">Escalations</span>
+        <span class="nav-badge nb-red" id="nb-esc" style="display:none"></span>
+      </button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="nav-section">
+      <div class="nav-section-label">Account</div>
+      <button class="nav-item" data-view="analytics" onclick="navigate('analytics')">
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M4.5 15.5V11M10 15.5V7.5M15.5 15.5V4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3.5 15.5h13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span><span class="nav-label">Analytics</span>
+      </button>
+      <button class="nav-item" data-view="audit" onclick="navigate('audit')">
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M6 4.5h8l2 2v9H6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M14 4.5v2h2M8 9h6M8 11.75h6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span><span class="nav-label">Audit Log</span>
+      </button>
+      <button class="nav-item" data-view="settings" onclick="navigate('settings')">
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M10 6.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 2.75v2M10 15.25v2M17.25 10h-2M4.75 10h-2M14.85 5.15l-1.4 1.4M6.55 13.45l-1.4 1.4M14.85 14.85l-1.4-1.4M6.55 6.55l-1.4-1.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span><span class="nav-label">Settings</span>
+      </button>
+    </div>
+
+    <!-- Super-admin only: shown/hidden by auth.js -->
+    <div class="sidebar-divider" id="super-admin-divider" style="display:none"></div>
+    <div class="nav-section" id="super-admin-nav" style="display:none">
+      <div class="nav-section-label">Admin</div>
+      <a class="nav-item" href="/app/admin/operators" style="text-decoration:none">
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M10 4.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM5 15.5a5 5 0 0 1 10 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span><span class="nav-label">Operators</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ── MAIN CONTENT ── -->
+  <main class="main" id="main">
+
+    <!-- ═══════════════════════════════════════════════ OVERVIEW ══ -->
+    <div id="view-today">
+      <div class="page-header">
+        <div class="page-title-group">
+          <div class="page-eyebrow" id="today-greeting-eyebrow">Good morning</div>
+          <div class="page-title" id="today-greeting">Today</div>
+          <div class="page-sub" id="today-sub">Loading your morning briefing…</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary" onclick="refreshToday()">↻ Refresh</button>
+        </div>
+      </div>
+
+      <!-- Setup Checklist — shown only when onboarding is incomplete. Populated by main.js loadOnboardingStatus(). -->
+      <div class="card" id="onboarding-card" style="display:none;margin-bottom:16px;border-color:rgba(200,120,50,0.25);background:linear-gradient(180deg,rgba(200,120,50,0.04),rgba(13,18,32,0.82))">
+        <div class="card-header" style="align-items:flex-start">
+          <div>
+            <div class="card-title" style="color:#c87832">Finish setting up Oyvoda</div>
+            <div class="card-sub" id="onboarding-card-sub">Complete these steps to start receiving and responding to guest inquiries.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+            <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--amber)" id="onboarding-percent">0%</div>
+            <div style="width:80px;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden">
+              <div id="onboarding-progress-bar" style="width:0%;height:100%;background:var(--amber);transition:width 0.4s"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body p0" id="onboarding-steps-list">
+          <div class="empty" style="padding:24px">
+            <div class="empty-sub">Loading setup status...</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="today-band today-interrupts" id="today-interrupts-band">
+        <div class="today-band-header">
+          <div class="today-band-label">Needs you now</div>
+          <div class="today-band-meta" id="today-interrupts-meta">—</div>
+        </div>
+        <div class="today-interrupts-list" id="today-interrupts-list">
+          <div class="empty-state">
+            <div class="empty-state-title">Loading…</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="today-band today-insights" id="today-insights-band">
+        <div class="today-band-header">
+          <div class="today-band-label">Patterns worth seeing</div>
+          <div class="today-band-meta" id="today-insights-meta">—</div>
+        </div>
+        <div class="today-insights-list" id="today-insights-list">
+          <div class="empty-state">
+            <div class="empty-state-title">Loading insights…</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="today-band today-lifecycle">
+        <div class="today-band-header">
+          <div class="today-band-label">Where guests are today</div>
+        </div>
+        <div class="today-lifecycle-strip">
+          <button class="today-lifecycle-cell" onclick="navigate('prebooking')">
+            <div class="today-lifecycle-label">Pre-Booking</div>
+            <div class="today-lifecycle-value" id="today-lc-prebooking">—</div>
+            <div class="today-lifecycle-sub" id="today-lc-prebooking-sub">pending review</div>
+          </button>
+          <button class="today-lifecycle-cell" onclick="navigate('prearrival')">
+            <div class="today-lifecycle-label">Pre-Arrival</div>
+            <div class="today-lifecycle-value" id="today-lc-prearrival">—</div>
+            <div class="today-lifecycle-sub" id="today-lc-prearrival-sub">arriving soon</div>
+          </button>
+          <button class="today-lifecycle-cell" onclick="navigate('instay')">
+            <div class="today-lifecycle-label">In-Stay</div>
+            <div class="today-lifecycle-value" id="today-lc-instay">—</div>
+            <div class="today-lifecycle-sub" id="today-lc-instay-sub">active now</div>
+          </button>
+          <button class="today-lifecycle-cell" onclick="navigate('poststay')">
+            <div class="today-lifecycle-label">Post-Stay</div>
+            <div class="today-lifecycle-value" id="today-lc-poststay">—</div>
+            <div class="today-lifecycle-sub" id="today-lc-poststay-sub">follow-up</div>
+          </button>
+        </div>
+      </div>
+
+      <div class="today-band today-glance">
+        <div class="today-band-header">
+          <div class="today-band-label">Portfolio at a glance</div>
+        </div>
+        <div class="today-glance-row">
+          <div class="today-glance-cell">
+            <div class="today-glance-label">Properties</div>
+            <div class="today-glance-value" id="today-glance-properties">—</div>
+          </div>
+          <div class="today-glance-cell">
+            <div class="today-glance-label">Open escalations</div>
+            <div class="today-glance-value red" id="today-glance-escalations">—</div>
+          </div>
+          <div class="today-glance-cell">
+            <div class="today-glance-label">Messages handled (30d)</div>
+            <div class="today-glance-value green" id="today-glance-messages">—</div>
+          </div>
+          <div class="today-glance-cell">
+            <div class="today-glance-label">Inbox status</div>
+            <div class="today-glance-value" id="today-glance-inbox">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-pre-arrival" style="display:none">
+      <div class="page-header">
+        <div class="page-title-group">
+          <div class="page-eyebrow">Lifecycle</div>
+          <div class="page-title">Pre-Arrival</div>
+          <div class="page-sub">Pre-arrival workflows will land as a dedicated lifecycle view in a later ship.</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <div class="empty-state">
+            <div class="empty-state-title">Coming next</div>
+            <div class="empty-state-description">This lane will become the arrival-readiness surface once the lifecycle views are split out of the current sessions workspace.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-post-stay" style="display:none">
+      <div class="page-header">
+        <div class="page-title-group">
+          <div class="page-eyebrow">Lifecycle</div>
+          <div class="page-title">Post-Stay</div>
+          <div class="page-sub">Post-stay follow-up and retention workflows will land in a later ship.</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <div class="empty-state">
+            <div class="empty-state-title">Coming next</div>
+            <div class="empty-state-description">This lane will hold review recovery, repeat-guest follow-up, and closeout work once the lifecycle-specific surface is built.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════ PRE-BOOKING ═══════════════
+         Focused queue for inbound booking inquiries only.
+         Secondary filters: inquiry status + Property filter
+         View ID kept as "prebooking" for router/API compatibility (see router.js). -->
+    <div id="view-prebooking" class="pb-shell" style="display:none">
+      <div class="pb-shell-header">
+        <div class="pb-shell-title-row">
+          <div class="pb-shell-title-block">
+            <div class="page-eyebrow">Guest Messaging</div>
+            <div class="page-title">Pre-Booking</div>
+            <div class="pb-momentum-line" id="pb-momentum-line" aria-live="polite">
+              <span class="pb-momentum-segment" id="pb-momentum-awaiting"><strong>—</strong><span>drafts awaiting your review</span></span>
+              <span class="pb-momentum-dot">·</span>
+              <span class="pb-momentum-segment" id="pb-momentum-replied"><strong>—</strong><span>replied in last 30 days</span></span>
+              <span class="pb-momentum-dot">·</span>
+              <span class="pb-momentum-segment" id="pb-momentum-total"><strong>—</strong><span>total in last 30 days</span></span>
+            </div>
+          </div>
+          <div class="pb-shell-counters" aria-label="Queue summary">
+            <button class="pb-counter pb-counter-action" id="msg-metric-awaiting-chip" type="button" data-msg-counter="awaiting">
+              <strong id="msg-metric-awaiting">—</strong><span>Awaiting you</span>
+            </button>
+            <button class="pb-counter pb-counter-action" id="msg-metric-knowledge-chip" type="button" data-msg-counter="knowledge">
+              <strong id="msg-metric-knowledge">—</strong><span>Waiting on knowledge</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="pb-shell-filter-row">
+          <div class="tab-bar pb-status-tabs" id="msg-status-tabs" data-status-visible="1">
+            <button class="tab active" data-msg-viewfilter="pending">Action queue</button>
+            <button class="tab" data-msg-viewfilter="sent">Sent</button>
+            <button class="tab" data-msg-viewfilter="held">Held</button>
+            <button class="tab" data-msg-viewfilter="closed">Closed</button>
+          </div>
+          <div class="pb-filter-spacer"></div>
+          <div class="pb-filter-control">
+            <span class="pb-filter-label">Property</span>
+            <select class="form-select" id="msg-property-filter" style="width:220px;padding:6px 10px;font-size:12px">
+              <option value="">All properties</option>
+            </select>
+          </div>
+        </div>
+        <div class="pb-filter-indicator" id="msg-filter-indicator" hidden>
+          <span>Showing unbound only</span>
+          <button type="button" id="msg-filter-clear">Show all</button>
+        </div>
+        <div class="pb-resolution-header" id="pb-resolution-header">
+          <span class="pb-rh-segment"><strong id="pb-rh-resolved">—</strong><span>sent</span></span>
+          <span class="pb-rh-sep">·</span>
+          <span class="pb-rh-segment"><strong id="pb-rh-pending">—</strong><span>pending</span></span>
+          <span class="pb-rh-sep">·</span>
+          <span class="pb-rh-segment"><strong id="pb-rh-escalations">—</strong><span>escalations</span></span>
+          <span class="pb-rh-sep">·</span>
+          <span class="pb-rh-segment pb-rh-inbox" id="pb-rh-inbox">inbox status loading…</span>
+        </div>
+        <section class="pb-ops-band pb-band-confidence" id="pb-band-confidence">
+          <div class="pb-band-header">
+            <div class="pb-band-eyebrow">Confidence health</div>
+            <div class="pb-band-window-control">
+              <select class="form-select form-select-sm" id="pb-confidence-window">
+                <option value="24h">24h</option>
+                <option value="7d" selected>7d</option>
+                <option value="30d">30d</option>
+              </select>
+            </div>
+          </div>
+          <div class="pb-band-body" id="pb-band-confidence-body">
+            <div class="pb-band-empty">Loading…</div>
+          </div>
+        </section>
+      </div>
+
+      <div class="pb-workshop">
+        <div class="pb-queue-pane" id="msg-list-pane">
+          <div class="empty-state" style="padding:48px 20px">
+            <div class="empty-state-title">Loading messages...</div>
+          </div>
+        </div>
+      </div>
+      <section class="pb-ops-band pb-band-analytics" id="pb-band-analytics">
+        <div class="pb-band-header">
+          <div class="pb-band-eyebrow">Pre-Booking patterns</div>
+          <div class="pb-band-meta">last <span id="pb-analytics-window">7</span> days</div>
+        </div>
+        <div class="pb-band-body" id="pb-band-analytics-body">
+          <div class="pb-band-empty">Loading…</div>
+        </div>
+      </section>
+      <div id="msg-status-line" class="pb-status-footer">Loading pre-booking queue…</div>
+    </div>
+
+    <!-- ══════════════════════════════════════ GUEST SESSIONS ══ -->
+    <div id="view-sessions" style="display:none">
+      <div class="page-header">
+        <div class="page-title-group">
+          <div class="page-eyebrow">Stay Operations</div>
+          <div class="page-title">Guest Sessions Command</div>
+          <div class="page-sub">Arrivals, in-stay issues, proactive touches, and handoff state in one operating view built for both boutique and portfolio teams.</div>
+        </div>
+        <div class="page-actions">
+          <div class="tab-bar" id="sess-tabs">
+            <button class="tab active" data-sess-filter="all">All</button>
+            <button class="tab" data-sess-filter="in_stay">In-Stay</button>
+            <button class="tab" data-sess-filter="arriving">Arriving</button>
+            <button class="tab" data-sess-filter="post_stay">Post-Stay</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="ops-metric-grid">
+        <div class="ops-metric-card">
+          <div class="ops-metric-label">Arrivals / Prep</div>
+          <div class="ops-metric-value amber" id="sess-metric-arriving">—</div>
+          <div class="ops-metric-sub">Pre-arrival and arrival-day sessions</div>
+        </div>
+        <div class="ops-metric-card">
+          <div class="ops-metric-label">In Stay Active</div>
+          <div class="ops-metric-value green" id="sess-metric-instay">—</div>
+          <div class="ops-metric-sub">Guests currently in house</div>
+        </div>
+        <div class="ops-metric-card">
+          <div class="ops-metric-label">Open Escalations</div>
+          <div class="ops-metric-value red" id="sess-metric-escalations">—</div>
+          <div class="ops-metric-sub">Needs human coordination</div>
+        </div>
+        <div class="ops-metric-card">
+          <div class="ops-metric-label">Post-Stay Follow-Up</div>
+          <div class="ops-metric-value" id="sess-metric-poststay">—</div>
+          <div class="ops-metric-sub">Recovery, reviews, and closeout</div>
+        </div>
+      </div>
+
+      <div class="ops-toolbar">
+        <div class="ops-toolbar-copy">
+          <div class="ops-toolbar-title">Operational views</div>
+          <div class="ops-toolbar-sub">Scale by operating lane: arrivals, issues, proactive touches, and owner-attention exceptions.</div>
+        </div>
+        <div class="ops-chip-row" id="sess-workviews">
+          <button type="button" class="ops-chip ops-chip-active" data-sess-view="live_sessions">Live sessions</button>
+          <button type="button" class="ops-chip" data-sess-view="arrival_team">Arrival team</button>
+          <button type="button" class="ops-chip" data-sess-view="issue_desk">Issue desk</button>
+          <button type="button" class="ops-chip" data-sess-view="proactive_desk">Proactive desk</button>
+          <button type="button" class="ops-chip" data-sess-view="autonomy_exceptions">Autonomy exceptions</button>
+          <button type="button" class="ops-chip" data-sess-view="post_stay">Post-stay</button>
+        </div>
+      </div>
+      <div class="ops-scope-bar" id="sess-scopebar">
+        <div class="ops-scope-copy">
+          <div class="ops-scope-title">Operating mode</div>
+          <div class="ops-scope-sub" id="sess-mode-copy">Auto keeps the shell calm for smaller teams and expands the task desk as stay operations get busier.</div>
+        </div>
+        <div class="ops-chip-row" id="sess-modes">
+          <button type="button" class="ops-chip ops-chip-active" data-sess-mode="auto">Auto</button>
+          <button type="button" class="ops-chip" data-sess-mode="simple">Simple</button>
+          <button type="button" class="ops-chip" data-sess-mode="manager">Manager</button>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin:-4px 0 12px;flex-wrap:wrap">
+        <span style="font-size:10px;font-family:'DM Mono',monospace;color:var(--dim);text-transform:uppercase;letter-spacing:0.1em">Scope:</span>
+        <select class="form-select" id="sess-scope-filter" style="width:220px;padding:6px 10px;font-size:12px">
+          <option value="all">All live work</option>
+          <option value="mine">My handoffs</option>
+        </select>
+        <span style="font-size:10px;font-family:'DM Mono',monospace;color:var(--dim);text-transform:uppercase;letter-spacing:0.1em">Desk:</span>
+        <select class="form-select" id="sess-view-select" style="width:220px;padding:6px 10px;font-size:12px">
+          <option value="live_sessions">Live sessions</option>
+          <option value="arrival_team">Arrival team</option>
+          <option value="issue_desk">Issue desk</option>
+          <option value="proactive_desk">Proactive desk</option>
+          <option value="autonomy_exceptions">Autonomy exceptions</option>
+          <option value="post_stay">Post-stay</option>
+        </select>
+      </div>
+      <div class="card" style="margin-bottom:14px;background:rgba(255,255,255,0.02);border:1px solid var(--border)">
+        <div class="card-body" id="sess-autonomy-posture">
+          <div class="empty">
+            <div class="empty-sub">Loading stay autonomy posture…</div>
+          </div>
+        </div>
+      </div>
+      <div class="ops-task-strip" id="sess-task-strip"></div>
+      <div id="sess-status-line" style="margin:-4px 0 14px;font-size:11px;color:var(--dim);font-family:'DM Mono',monospace">Loading session queue…</div>
+
+      <div class="card" style="overflow:hidden">
+        <div class="ops-shell ops-shell-sessions" style="height:calc(100vh - 330px)">
+          <div class="pane-border-r split-pane ops-queue-pane" id="sess-list">
+            <div class="empty" style="padding:48px 20px">
+              <div class="empty-title">Loading sessions...</div>
+            </div>
+          </div>
+
+          <div class="pane-border-r split-pane ops-workspace-pane" id="sess-thread">
+            <div class="empty" style="padding:48px 20px">
+              <div class="empty-sub">Select a session to view the conversation.</div>
+            </div>
+          </div>
+
+          <div class="split-pane ops-rail-pane" id="sess-meta" style="padding:18px">
+            <div style="font-size:12px;color:var(--dim);font-weight:300">No session selected.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════ ESCALATIONS ══ -->
+    <div id="view-escalations" style="display:none">
+      <div class="page-header">
+        <div class="page-title-group">
+          <div class="page-eyebrow">Alert Management</div>
+          <div class="page-title">Escalations</div>
+          <div class="page-sub">Issues that require human attention. Keep the primary owner, guest context, and dispatch vendors in one place.</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
+        <div class="stat-card"><div class="stat-card-label">Open</div><div class="stat-card-value red" id="esc-stat-open">—</div><div class="stat-card-sub">Requires attention</div></div>
+        <div class="stat-card"><div class="stat-card-label">Resolved (30d)</div><div class="stat-card-value green" id="esc-stat-resolved">—</div><div class="stat-card-sub">Closed this month</div></div>
+        <div class="stat-card"><div class="stat-card-label">Acknowledged</div><div class="stat-card-value" id="esc-stat-ack">—</div><div class="stat-card-sub">In progress</div></div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
+        <div class="tab-bar" id="esc-status-tabs">
+          <button class="tab active" type="button" data-esc-status="open" onclick="window.setEscalationStatusFilter && window.setEscalationStatusFilter('open', this)">Open</button>
+          <button class="tab" type="button" data-esc-status="pending" onclick="window.setEscalationStatusFilter && window.setEscalationStatusFilter('pending', this)">Pending</button>
+          <button class="tab" type="button" data-esc-status="acknowledged" onclick="window.setEscalationStatusFilter && window.setEscalationStatusFilter('acknowledged', this)">Acknowledged</button>
+          <button class="tab" type="button" data-esc-status="resolved" onclick="window.setEscalationStatusFilter && window.setEscalationStatusFilter('resolved', this)">Resolved</button>
+          <button class="tab" type="button" data-esc-status="all" onclick="window.setEscalationStatusFilter && window.setEscalationStatusFilter('all', this)">All</button>
+        </div>
+        <div style="flex:1"></div>
+        <div style="font-size:11px;color:var(--dim)">
+          Dispatch vendors stay separate from guest-experience vendors here.
+        </div>
+      </div>
+      <div id="esc-status-line" style="margin:-4px 0 14px;font-size:11px;color:var(--dim);font-family:'DM Mono',monospace">Loading escalation queue…</div>
+
+      <div class="card" style="overflow:hidden">
+        <div class="split split-2" style="height:calc(100vh - 280px)">
+          <div class="pane-border-r split-pane" id="esc-list-pane">
+            <div class="empty" style="padding:32px">
+              <div class="empty-title">Loading escalations...</div>
+            </div>
+          </div>
+          <div class="split-pane" id="esc-detail-pane" style="padding:18px;display:flex;flex-direction:column;gap:14px;overflow-y:auto">
+            <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(240,235,227,0.5)">Select an escalation</div>
+            <div class="card" style="flex:1;background:rgba(255,255,255,0.02);border:1px solid var(--border);padding:18px;display:flex;align-items:center;justify-content:center">
+              <div class="empty">
+                <div class="empty-title">No escalation selected</div>
+                <div class="empty-sub">Choose a ticket on the left to review guest context, assign ownership, and see dispatch vendors.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════ KNOWLEDGE BASE ══ -->
+    <div id="view-knowledge" style="display:none">
+      <div class="page-header">
+        <div class="page-title-group">
+          <div class="page-eyebrow">THINK Layer</div>
+          <div class="page-title">Knowledge Base</div>
+          <div class="page-sub">Property-specific Q&A your AI reads before answering guest questions. The more complete this is, the more accurate the AI.</div>
+        </div>
+        <div class="page-actions">
+          <div class="tab-bar">
+            <button class="tab active" onclick="setKbTab('entries',this)">Entries <span id="kb-entries-count" style="font-size:10px;background:rgba(200,120,50,0.2);color:var(--amber);border-radius:4px;padding:1px 5px;margin-left:2px">—</span></button>
+            <button class="tab" onclick="setKbTab('gaps',this)">Gaps <span id="kb-gaps-count" style="font-size:10px;background:rgba(200,120,50,0.2);color:var(--amber);border-radius:4px;padding:1px 5px;margin-left:2px">—</span></button>
+          </div>
+          <button class="btn btn-primary" onclick="showModal('add-kb-modal')">+ Add Entry</button>
+        </div>
+      </div>
+
+      <div id="kb-inquiries-waiting" class="kb-waiting-shell">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Inquiries waiting on knowledge</div>
+              <div class="card-sub">Questions blocked on missing property knowledge route here instead of sitting in Pre-Booking.</div>
+            </div>
+          </div>
+          <div class="card-body" id="kb-inquiries-waiting-list">
+            <div class="empty" style="padding:24px">
+              <div class="empty-title">Loading waiting inquiries...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="kb-entries-section">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header"><div class="card-title">Test a Guest Question</div><div class="card-sub">See exactly what your AI would retrieve and respond — grounding score included</div></div>
+          <div class="card-body">
+            <div style="display:flex;gap:10px">
+              <input class="form-input" id="test-q" placeholder="e.g. Is there a kayak nearby? What time is checkout?" style="flex:1">
+              <button class="btn btn-primary" onclick="testQuestion()">Ask AI</button>
+            </div>
+            <div id="test-result" style="display:none;margin-top:14px">
+              <div class="draft-box">
+                <div class="draft-header"><span class="draft-chip">AI RESPONSE</span><div class="confidence-track"><div class="confidence-fill" id="test-conf-bar" style="width:0%"></div></div><span class="confidence-label" id="test-conf-label">—</span></div>
+                <div class="draft-text" id="test-answer"></div>
+                <div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--dim);padding-top:8px" id="test-sources"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="kb-entries-list">
+          <div class="empty" style="padding:48px">
+            <div class="empty-title">Loading knowledge base...</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="kb-gaps-section" style="display:none">
+        <div id="kb-gaps-list">
+          <div class="empty" style="padding:48px">
+            <div class="empty-title">Loading gaps...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════ VENDORS ══ -->
+    <div id="view-vendors" style="display:none">
+      <div class="page-header">
+        <div class="page-title-group">
+          <div class="page-eyebrow">Local Intelligence</div>
+          <div class="page-title">Vendors & Local Partners</div>
+          <div class="page-sub">Local businesses your AI recommends to guests. Add multiple per category — the AI falls back to the next if the first is unavailable.</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary" onclick="showModal('add-vendor-modal')">+ Add Vendor</button>
+        </div>
+      </div>
+
+      <div id="vendor-stats" class="stat-grid" style="margin-bottom:20px">
+        <div class="stat-card"><div class="stat-card-label">Total Vendors</div><div class="stat-card-value" id="vnd-stat-total">—</div><div class="stat-card-sub">Across all categories</div></div>
+        <div class="stat-card"><div class="stat-card-label">Guest Referrals (30d)</div><div class="stat-card-value green" id="vnd-stat-referrals">—</div><div class="stat-card-sub">AI recommendations sent</div></div>
+        <div class="stat-card"><div class="stat-card-label">Categories</div><div class="stat-card-value" id="vnd-stat-cats">—</div><div class="stat-card-sub">With at least one vendor</div></div>
+        <div class="stat-card"><div class="stat-card-label">With Fallbacks</div><div class="stat-card-value amber" id="vnd-stat-fallbacks">—</div><div class="stat-card-sub">Have 2+ vendors</div></div>
+      </div>
+
+      <div id="vendor-categories-grid">
+        <div class="empty" style="padding:48px">
+          <div class="empty-title">Loading vendors...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════ TEAM ══ -->
+    <div id="view-team" style="display:none">
+      <div class="page-header">
+        <div class="page-title-group">
+          <div class="page-eyebrow">Account Management</div>
+          <div class="page-title">Team & Escalation Routing</div>
+          <div class="page-sub">Invite team members, define portfolio visibility, and control who can assign work, manage vendors, or edit settings within each operating area.</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary" onclick="showModal('invite-modal')">+ Invite Team Member</button>
+        </div>
+      </div>
+
+      <div class="team-grid" id="team-grid">
+        <div class="empty" style="padding:48px;grid-column:1/-1">
+          <div class="empty-title">Loading team...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════ PROPERTIES ══ -->
+    <div id="view-properties" style="display:none">
+      <div class="page-header">
+        <div class="page-title-group">
+          <div class="page-eyebrow">Portfolio</div>
+          <div class="page-title">Properties</div>
+          <div class="page-sub">All properties in your portfolio with their PMS sync status.</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn" onclick="navigate('settings')">PMS Settings</button>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-card-label">Total Properties</div><div class="stat-card-value" id="prop-total">—</div><div class="stat-card-sub">Across portfolio</div></div>
+        <div class="stat-card"><div class="stat-card-label">PMS Synced</div><div class="stat-card-value amber" id="prop-pms-count">—</div><div class="stat-card-sub" id="prop-pms-sub">Loading...</div></div>
+        <div class="stat-card"><div class="stat-card-label">KB Entries</div><div class="stat-card-value" id="prop-kb-count">—</div><div class="stat-card-sub">Across portfolio</div></div>
+        <div class="stat-card"><div class="stat-card-label">Active Sessions</div><div class="stat-card-value green" id="prop-active-sess">—</div><div class="stat-card-sub">Guests in-stay now</div></div>
+      </div>
+
+      <!-- AI Response Mode panel — lets the operator control per-property
+           whether AI replies go out automatically (Auto) or wait for review
+           (Review). Summary + bulk actions sit up top; row-level toggles live
+           inside the property list below. -->
+      <div class="card" style="margin-bottom:16px;border-color:rgba(200,120,50,0.2);background:linear-gradient(180deg,rgba(200,120,50,0.03),rgba(13,18,32,0.82))">
+        <div class="card-header" style="align-items:flex-start">
+          <div>
+            <div class="card-title" style="color:#c87832">AI Response Mode</div>
+            <div class="card-sub">Control autonomy by lifecycle lane. Batch the visible slice, or tune properties one row at a time without turning this into a giant spreadsheet.</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
+            <select id="prop-autonomy-stage-scope" class="form-select" style="min-width:180px">
+              <option value="all">All messaging</option>
+              <option value="pre_booking">Pre-booking</option>
+              <option value="guest_sessions">Guest sessions</option>
+            </select>
+            <select id="prop-portfolio-filter" class="form-select" style="min-width:180px">
+              <option value="">All portfolios</option>
+            </select>
+            <button class="btn btn-sm" onclick="bulkSetAutonomy('required')" title="Visible properties wait for operator review before AI replies are sent">Apply visible → Review</button>
+            <button class="btn btn-sm btn-primary" onclick="bulkSetAutonomy('auto')" title="Visible properties can auto-send when confidence is high">Apply visible → Auto</button>
+          </div>
+        </div>
+        <div class="card-body" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+          <div class="stat-card" style="padding:14px">
+            <div class="stat-card-label" style="font-size:9px">Review Required</div>
+            <div class="stat-card-value amber" style="font-size:26px" id="autonomy-review-count">—</div>
+            <div class="stat-card-sub" id="autonomy-review-sub">Drafts wait for you</div>
+          </div>
+          <div class="stat-card" style="padding:14px">
+            <div class="stat-card-label" style="font-size:9px">Auto-Send</div>
+            <div class="stat-card-value green" style="font-size:26px" id="autonomy-auto-count">—</div>
+            <div class="stat-card-sub" id="autonomy-auto-sub">AI replies immediately when confident</div>
+          </div>
+          <div class="stat-card" style="padding:14px">
+            <div class="stat-card-label" style="font-size:9px" id="autonomy-scope-label">All messaging</div>
+            <div class="stat-card-value" style="font-size:26px" id="autonomy-default-count">—</div>
+            <div class="stat-card-sub" id="autonomy-default-sub">Falls back to Review</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Property List</div>
+          <div style="display:flex;gap:8px">
+            <input class="form-input" id="prop-search-input" placeholder="Search properties..." style="width:200px;padding:6px 12px;font-size:12px">
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="prop-list-container">
+            <div class="empty"><div class="empty-title">Loading properties...</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════ ANALYTICS ══ -->
+    <div id="view-analytics" style="display:none">
+      <div class="page-header">
+        <div class="page-title-group">
+          <div class="page-eyebrow">Performance</div>
+          <div class="page-title">Analytics</div>
+          <div class="page-sub">AI performance, guest experience metrics, and knowledge base health.</div>
+        </div>
+        <div class="page-actions">
+          <a href="/api/v1/audit/export?format=csv&days=30" class="btn">Export CSV</a>
+          <a href="/api/v1/audit/export?format=json&days=30" class="btn btn-primary">Export JSON</a>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-card-label">Guest Sessions (30d)</div><div class="stat-card-value" id="an-sessions">—</div><div class="stat-card-sub">Total started</div></div>
+        <div class="stat-card"><div class="stat-card-label">AI Messages (30d)</div><div class="stat-card-value green" id="an-messages">—</div><div class="stat-card-sub">Outbound AI responses</div></div>
+        <div class="stat-card"><div class="stat-card-label">Pre-Booking Sent</div><div class="stat-card-value amber" id="an-pb">—</div><div class="stat-card-sub">Drafts approved</div></div>
+        <div class="stat-card"><div class="stat-card-label">Open Escalations</div><div class="stat-card-value red" id="an-esc">—</div><div class="stat-card-sub">Need attention</div></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Knowledge Base Health</div></div>
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div class="stat-card" style="padding:14px"><div class="stat-card-label" style="font-size:9px">KB Entries</div><div class="stat-card-value" style="font-size:26px" id="an-kb-entries">—</div></div>
+              <div class="stat-card" style="padding:14px"><div class="stat-card-label" style="font-size:9px">Open Gaps</div><div class="stat-card-value amber" style="font-size:26px" id="an-kb-gaps">—</div></div>
+              <div class="stat-card" style="padding:14px"><div class="stat-card-label" style="font-size:9px">Vendors</div><div class="stat-card-value" style="font-size:26px" id="an-vendors">—</div></div>
+              <div class="stat-card" style="padding:14px"><div class="stat-card-label" style="font-size:9px">Properties</div><div class="stat-card-value" style="font-size:26px" id="an-props">—</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Pre-Booking Performance</div></div>
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div class="stat-card" style="padding:14px"><div class="stat-card-label" style="font-size:9px">Pending</div><div class="stat-card-value amber" style="font-size:26px" id="an-pb-pending">—</div></div>
+              <div class="stat-card" style="padding:14px"><div class="stat-card-label" style="font-size:9px">Sent (30d)</div><div class="stat-card-value green" style="font-size:26px" id="an-pb-sent">—</div></div>
+              <div class="stat-card" style="padding:14px"><div class="stat-card-label" style="font-size:9px">In-Stay</div><div class="stat-card-value" style="font-size:26px" id="an-in-stay">—</div></div>
+              <div class="stat-card" style="padding:14px"><div class="stat-card-label" style="font-size:9px">Arriving</div><div class="stat-card-value" style="font-size:26px" id="an-arriving">—</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-section-header">
+        <div class="analytics-section-title">Operating posture</div>
+        <div class="analytics-section-sub">How the system is configured, how the team is covering it, and how healthy the live workspace feels.</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="card" id="ov-ops-card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Operating Posture</div>
+              <div class="card-sub">What should a manager or owner pay attention to right now?</div>
+            </div>
+          </div>
+          <div class="card-body" id="ov-ops-body">
+            <div class="empty">
+              <div class="empty-sub">Loading operating posture…</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" id="ov-boundary-card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Workstream Boundaries</div>
+              <div class="card-sub">Active queues stay clean; retained history stays searchable.</div>
+            </div>
+          </div>
+          <div class="card-body" id="ov-boundary-body">
+            <div class="empty">
+              <div class="empty-sub">Loading queue boundaries…</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" id="ov-manager-card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Manager Coverage</div>
+              <div class="card-sub">Who owns the work, how wide the portfolio is, and whether autonomy is shrinking touch labor.</div>
+            </div>
+          </div>
+          <div class="card-body" id="ov-manager-body">
+            <div class="empty">
+              <div class="empty-sub">Loading team and portfolio coverage…</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" id="ov-retention-card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Retention & Follow-Up</div>
+              <div class="card-sub">Keep relationship value while keeping raw message history out of the live operator workspace.</div>
+            </div>
+          </div>
+          <div class="card-body" id="ov-retention-body">
+            <div class="empty">
+              <div class="empty-sub">Loading retention posture…</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title">Operator Health</div><div class="card-sub">What matters for inbox, properties, AI, and your live workspace</div></div>
+            <span class="badge badge-green" id="ov-sys-badge">● HEALTHY</span>
+          </div>
+          <div class="card-body">
+            <table class="data-table">
+              <tbody id="ov-sys-table">
+                <tr><td><span class="badge badge-green">●</span></td><td><strong>Platform</strong></td><td id="ov-api-ver" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--dim)">—</td></tr>
+                <tr><td><span class="badge" id="ov-db-badge">●</span></td><td><strong>Properties Loaded</strong></td><td id="ov-db-val" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--dim)">Checking...</td></tr>
+                <tr><td><span class="badge" id="ov-poller-badge">●</span></td><td><strong>Last Inbox Poll</strong></td><td id="ov-poller-val" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--dim)">Checking...</td></tr>
+                <tr><td><span class="badge" id="ov-msgobs-badge">●</span></td><td><strong>Messaging Watch</strong></td><td id="ov-msgobs-val" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--dim)">Checking...</td></tr>
+                <tr><td><span class="badge badge-green" id="ov-mcp-badge">●</span></td><td><strong>AI Drafting</strong></td><td id="ov-mcp-val" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--dim)">Checking...</td></tr>
+                <tr><td><span class="badge" id="ov-redis-badge">●</span></td><td><strong>Operator Session</strong></td><td id="ov-redis-val" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--dim)">Checking...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card" id="slo-card" style="display:none">
+          <div class="card-header">
+            <div><div class="card-title">SLO Metrics</div><div class="card-sub">Service level objectives — current targets</div></div>
+          </div>
+          <div class="card-body">
+            <div class="slo-grid" id="slo-grid">
+              <div><div class="slo-label">API Latency</div><div class="slo-track"><div class="slo-fill" id="slo-api-bar"></div></div><div class="slo-values"><span id="slo-api-cur">—</span><span id="slo-api-target">target</span></div></div>
+              <div><div class="slo-label">KB Latency</div><div class="slo-track"><div class="slo-fill"></div></div><div class="slo-values"><span id="slo-kb-cur">—</span><span id="slo-kb-target">target</span></div></div>
+              <div><div class="slo-label">Error Rate</div><div class="slo-track"><div class="slo-fill"></div></div><div class="slo-values"><span id="slo-err-cur">—</span><span id="slo-err-target">ceiling</span></div></div>
+              <div><div class="slo-label">Voice Latency</div><div class="slo-track"><div class="slo-fill"></div></div><div class="slo-values"><span id="slo-v-cur">—</span><span id="slo-v-target">target</span></div></div>
+              <div><div class="slo-label">Empty Retrieval</div><div class="slo-track"><div class="slo-fill"></div></div><div class="slo-values"><span id="slo-ret-cur">—</span><span id="slo-ret-target">ceiling</span></div></div>
+              <div><div class="slo-label">Esc. Backlog</div><div class="slo-track"><div class="slo-fill" id="slo-esc-bar"></div></div><div class="slo-values"><span id="slo-esc-cur">0</span><span id="slo-esc-target">max</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:0">
+        <div class="card">
+          <div class="card-header"><div class="card-title">PMS Integration</div><button class="btn btn-sm" onclick="navigate('settings')">Manage →</button></div>
+          <div class="card-body p0">
+            <table class="data-table">
+              <thead><tr><th>System</th><th>Status</th><th>Properties</th></tr></thead>
+              <tbody id="ov-pms-body">
+                <tr><td colspan="3" style="text-align:center;padding:24px;color:var(--dim);font-size:12px">Loading PMS status...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Active Channels</div></div>
+          <div class="card-body p0">
+            <table class="data-table">
+              <thead><tr><th>Channel</th><th>Status</th></tr></thead>
+              <tbody id="ov-channels-body">
+                <tr><td colspan="2" style="text-align:center;padding:24px;color:var(--dim);font-size:12px">Loading channels...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════ LLM USAGE ══ -->
+    <div id="view-llm-usage" style="display:none">
+      <div class="page-header">
+        <div class="page-title-group">
+          <div class="page-eyebrow">Admin Observability</div>
+          <div class="page-title">LLM Usage</div>
+          <div class="page-sub">Cross-provider spend, recent calls, and current burn rate for Oyvoda-operated model traffic.</div>
+        </div>
+        <div class="page-actions">
+          <select class="form-select" id="llm-usage-window" style="width:120px">
+            <option value="24h" selected>24 hours</option>
+            <option value="7d">7 days</option>
+            <option value="30d">30 days</option>
+          </select>
+          <button class="btn btn-primary" id="llm-usage-refresh">Refresh</button>
+        </div>
+      </div>
+
+      <div class="stat-grid three">
+        <div class="stat-card">
+          <div class="stat-card-label">Spend (24h)</div>
+          <div class="stat-card-value" id="llm-usage-24h">$0.00</div>
+          <div class="stat-card-sub" id="llm-usage-24h-sub">0 calls</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Spend (7d)</div>
+          <div class="stat-card-value amber" id="llm-usage-7d">$0.00</div>
+          <div class="stat-card-sub" id="llm-usage-7d-sub">0 calls</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Current Hourly Burn</div>
+          <div class="stat-card-value green" id="llm-usage-burn">$0.00</div>
+          <div class="stat-card-sub" id="llm-usage-burn-sub">No hourly data yet</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">By Service</div>
+              <div class="card-sub">Which runtime surfaces are spending and how reliably they complete.</div>
+            </div>
+          </div>
+          <div class="card-body p0">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Service</th>
+                  <th>Calls</th>
+                  <th>Cost</th>
+                  <th>Latency</th>
+                  <th>Success</th>
+                </tr>
+              </thead>
+              <tbody id="llm-usage-service-body">
+                <tr><td colspan="5" style="text-align:center;color:var(--dim);padding:24px;font-size:12px">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">By Provider & Model</div>
+              <div class="card-sub">Compare provider routing, model mix, and per-call token shape.</div>
+            </div>
+          </div>
+          <div class="card-body p0">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Provider</th>
+                  <th>Model</th>
+                  <th>Calls</th>
+                  <th>Cost</th>
+                </tr>
+              </thead>
+              <tbody id="llm-usage-provider-body">
+                <tr><td colspan="4" style="text-align:center;color:var(--dim);padding:24px;font-size:12px">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Per-Tenant Breakdown</div>
+            <div class="card-sub">Useful now for attribution structure, and more useful once multiple operators are active.</div>
+          </div>
+        </div>
+        <div class="card-body p0">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Tenant</th>
+                <th>Calls</th>
+                <th>Cost</th>
+                <th>Failures</th>
+              </tr>
+            </thead>
+            <tbody id="llm-usage-tenant-body">
+              <tr><td colspan="4" style="text-align:center;color:var(--dim);padding:24px;font-size:12px">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Recent Calls</div>
+            <div class="card-sub">Most recent 50 tracked model calls with attribution and fallback position.</div>
+          </div>
+        </div>
+        <div class="card-body p0">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>When</th>
+                <th>Service</th>
+                <th>Provider</th>
+                <th>Model</th>
+                <th>Cost</th>
+                <th>Status</th>
+                <th>Tenant</th>
+              </tr>
+            </thead>
+            <tbody id="llm-usage-recent-body">
+              <tr><td colspan="7" style="text-align:center;color:var(--dim);padding:24px;font-size:12px">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ MARKET INTELLIGENCE ══ -->
+    <div id="view-market" style="display:none">
+      <div class="page-header">
+        <div class="page-title-group">
+          <div class="page-eyebrow">Local Intelligence</div>
+          <div class="page-title">Market Intelligence</div>
+          <div class="page-sub" id="mkt-sub">Loading market data...</div>
+        </div>
+        <div class="page-actions">
+          <div class="tab-bar" id="mkt-window-tabs">
+            <button class="tab active" onclick="loadMarket(30,this)">30 days</button>
+            <button class="tab" onclick="loadMarket(60,this)">60 days</button>
+            <button class="tab" onclick="loadMarket(90,this)">90 days</button>
+          </div>
+          <button class="btn btn-primary" onclick="loadMarket(30)">Refresh</button>
+        </div>
+      </div>
+
+      <div class="stat-grid" style="margin-bottom:16px">
+        <div class="stat-card">
+          <div class="stat-card-label">Demand Level</div>
+          <div class="stat-card-value" id="mkt-demand-level" style="font-size:24px">—</div>
+          <div class="stat-card-sub" id="mkt-demand-sub">Loading...</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Upcoming Events</div>
+          <div class="stat-card-value amber" id="mkt-event-count">—</div>
+          <div class="stat-card-sub">In your window</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">High-Impact Events</div>
+          <div class="stat-card-value red" id="mkt-high-impact">—</div>
+          <div class="stat-card-sub">Major demand drivers</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Last Scraped</div>
+          <div class="stat-card-value" id="mkt-scraped" style="font-size:16px">—</div>
+          <div class="stat-card-sub">Data freshness</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 320px;gap:16px">
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header">
+              <div><div class="card-title">Peak Demand Dates</div><div class="card-sub">Dates with highest event density — book cleaners and prep properties</div></div>
+            </div>
+            <div class="card-body p0" id="mkt-peaks">
+              <div class="empty" style="padding:32px"><div class="empty-title">Loading...</div></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div><div class="card-title">Upcoming Events</div><div class="card-sub">What's driving demand in your market</div></div>
+            </div>
+            <div class="card-body p0" id="mkt-events">
+              <div class="empty" style="padding:48px"><div class="empty-title" id="mkt-events-title">Loading market data...</div><div class="empty-sub" id="mkt-events-sub">Checking for local events and demand signals.</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Demand Signals</div></div>
+            <div class="card-body" id="mkt-signals">
+              <div style="font-size:12px;color:var(--dim);text-align:center;padding:16px">Signals populate after the event scraper runs</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title">Event Mix</div></div>
+            <div class="card-body" id="mkt-categories">
+              <div style="font-size:12px;color:var(--dim);text-align:center;padding:16px">Loading...</div>
+            </div>
+          </div>
+
+          <div class="card" style="background:rgba(200,120,50,0.04);border-color:rgba(200,120,50,0.15)">
+            <div class="card-header"><div class="card-title" style="color:var(--amber)">What This Means for You</div></div>
+            <div class="card-body">
+              <div style="font-size:12px;color:var(--ghost);line-height:1.7;font-weight:300" id="mkt-insight">
+                Market intelligence data will appear here once the event scraper runs.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ AUDIT ══ -->
+    <div id="view-audit" style="display:none">
+      <div class="page-header">
+        <div class="page-title-group">
+          <div class="page-eyebrow">Compliance & Records</div>
+          <div class="page-title">Audit Log</div>
+          <div class="page-sub">Retained history, operator decisions, and structured learning signals. Searchable for a bounded window, exportable for compliance, and kept separate from live operations.</div>
+        </div>
+        <div class="page-actions">
+          <select class="form-select" id="audit-days-select" style="width:140px">
+            <option value="7">Last 7 days</option>
+            <option value="30" selected>Last 30 days</option>
+            <option value="90">Last 90 days</option>
+            <option value="180">Last 180 days</option>
+          </select>
+          <a href="/api/v1/audit/export?format=csv&days=30" class="btn" data-audit-export="csv">CSV (window)</a>
+          <a href="/api/v1/audit/export?format=json&days=30" class="btn btn-primary" data-audit-export="json">JSON Export</a>
+        </div>
+      </div>
+
+      <div class="stat-grid" id="audit-stats">
+        <div class="stat-card"><div class="stat-card-label">Guest Sessions</div><div class="stat-card-value" id="aud-sess">—</div></div>
+        <div class="stat-card"><div class="stat-card-label">Messages Logged</div><div class="stat-card-value" id="aud-msgs">—</div></div>
+        <div class="stat-card"><div class="stat-card-label">Pre-Booking Records</div><div class="stat-card-value" id="aud-pb">—</div></div>
+        <div class="stat-card"><div class="stat-card-label">KB Changes</div><div class="stat-card-value" id="aud-kb">—</div></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Audit Posture</div>
+              <div class="card-sub">What is still active work, what has moved into retained history, and how that impacts a manager’s daily touch pattern.</div>
+            </div>
+          </div>
+          <div class="card-body" id="audit-posture-body">
+            <div class="empty">
+              <div class="empty-sub">Loading audit posture…</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Search & Retention Boundaries</div>
+              <div class="card-sub">Bounded searchability for raw history, longer-lived relationship memory, and post-stay follow-up windows.</div>
+            </div>
+          </div>
+          <div class="card-body" id="audit-retention-body">
+            <div class="empty">
+              <div class="empty-sub">Loading retention boundaries…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Manager & Portfolio Readout</div>
+            <div class="card-sub">How many people and portfolios are covering the live operation, and how much of the tenant should stay out of a team member’s daily view.</div>
+          </div>
+        </div>
+        <div class="card-body" id="audit-coverage-body">
+          <div class="empty">
+            <div class="empty-sub">Loading team and portfolio coverage…</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="audit-composer-card" style="margin-bottom:16px">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Composer Compare Mode</div>
+            <div class="card-sub">LLM composer candidate output alongside the live drafting path. Validate before promoting past compare-mode.</div>
+          </div>
+        </div>
+        <div class="card-body" id="audit-composer-body">
+          <div class="empty">
+            <div class="empty-sub">Loading composer compare-mode rows…</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">Export Datasets</div></div>
+        <div class="card-body p0">
+          <table class="data-table">
+            <thead><tr><th>Dataset</th><th>Fields Included</th><th>Format</th><th>Export</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Guest Sessions</strong></td><td style="color:var(--dim)">ID, guest, phone, property, check-in/out, status, phase, messages</td><td><span class="badge badge-dim">CSV / JSON</span></td><td><div style="display:flex;gap:6px"><a href="/api/v1/audit/export?format=csv&days=30&include=sessions" class="btn btn-sm" data-audit-export="csv-sessions">CSV</a><a href="/api/v1/audit/export?format=json&days=30&include=sessions" class="btn btn-sm" data-audit-export="json-sessions">JSON</a></div></td></tr>
+              <tr><td><strong>Message History</strong></td><td style="color:var(--dim)">Role, content, intent, confidence, latency, timestamp</td><td><span class="badge badge-dim">CSV / JSON</span></td><td><div style="display:flex;gap:6px"><a href="/api/v1/audit/export?format=csv&days=30&include=messages" class="btn btn-sm" data-audit-export="csv-messages">CSV</a><a href="/api/v1/audit/export?format=json&days=30&include=messages" class="btn btn-sm" data-audit-export="json-messages">JSON</a></div></td></tr>
+              <tr><td><strong>Knowledge Base</strong></td><td style="color:var(--dim)">Question, answer, source, approved by, confidence, usage count, timestamps</td><td><span class="badge badge-dim">CSV / JSON</span></td><td><div style="display:flex;gap:6px"><a href="/api/v1/audit/export?format=csv&days=30&include=kb" class="btn btn-sm" data-audit-export="csv-kb">CSV</a></div></td></tr>
+              <tr><td><strong>Pre-Booking Records</strong></td><td style="color:var(--dim)">Inquiry, AI draft, edits, final sent, confidence, timestamps</td><td><span class="badge badge-dim">CSV / JSON</span></td><td><div style="display:flex;gap:6px"><a href="/api/v1/audit/export?format=csv&days=30&include=prebooking" class="btn btn-sm" data-audit-export="csv-prebooking">CSV</a></div></td></tr>
+              <tr><td><strong>Full Export</strong></td><td style="color:var(--dim)">All datasets combined</td><td><span class="badge badge-amber">JSON</span></td><td><a href="/api/v1/audit/export?format=json&days=30" class="btn btn-sm btn-primary" data-audit-export="json-full">Full JSON</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════ SETTINGS ══ -->
+    <div id="view-settings" style="display:none">
+      <div class="page-header">
+        <div class="page-title-group">
+          <div class="page-eyebrow">Configuration</div>
+          <div class="page-title">Settings</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary" id="settings-save-btn" onclick="saveAllSettings()">Save All Changes</button>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <!-- Account -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">Account</div></div>
+          <div class="card-body">
+            <div class="form-row two">
+              <div class="form-group"><div class="form-label">Company Name</div><input class="form-input" id="set-company" readonly style="opacity:0.7"></div>
+              <div class="form-group"><div class="form-label">Contact Email</div><input class="form-input" id="set-email" readonly style="opacity:0.7"></div>
+            </div>
+            <div class="form-row two">
+              <div class="form-group"><div class="form-label">AI Concierge Name</div><input class="form-input" id="set-ai-name" placeholder="Your Concierge"><div class="form-hint">What guests see in messages</div></div>
+              <div class="form-group"><div class="form-label">Plan</div><input class="form-input" id="set-plan" readonly style="opacity:0.6"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inbox -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">Inbox Connections</div></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;gap:12px">
+                <div>
+                  <div style="font-size:13px;font-weight:500;color:var(--white)">Google Workspace / Gmail</div>
+                  <div style="font-size:11px;color:var(--dim)" id="gmail-status">Checking connection...</div>
+                </div>
+                <a href="/app/connect-gmail" class="btn btn-sm btn-primary" style="text-decoration:none">Connect / Reconnect</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" id="super-admin-tools" style="display:none">
+          <div class="card-header"><div class="card-title">Super Admin Tools</div></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;gap:12px">
+                <div>
+                  <div style="font-size:13px;font-weight:500;color:var(--white)">Operator Directory</div>
+                  <div style="font-size:11px;color:var(--dim)">Lookup tenant IDs, relink imported properties.</div>
+                </div>
+                <a href="/app/admin/operators" class="btn btn-sm btn-primary" style="text-decoration:none">Open Directory</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PMS -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">PMS Connection</div></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:12px" id="settings-pms-list">
+              <div style="font-size:12px;color:var(--dim);text-align:center;padding:16px">Loading PMS status...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI confidence thresholds -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">AI Confidence Thresholds</div><div class="card-sub">Operator-level thresholds for routing, review, escalation, and knowledge-gap detection</div></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div><div style="font-size:13px;color:var(--white)">Pre-booking auto-send threshold</div><div style="font-size:11px;color:var(--dim)">Heuristic draft score needed before a property in <strong>Auto</strong> mode can send without review.</div></div>
+                <div style="display:flex;align-items:center;gap:8px"><input type="range" min="50" max="99" id="set-pb-thr" style="width:80px"><span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--amber);width:36px" id="set-pb-thr-val">—</span></div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div><div style="font-size:13px;color:var(--white)">Escalation urgency threshold</div><div style="font-size:11px;color:var(--dim)">Urgency score at which issues page you immediately instead of waiting for a digest.</div></div>
+                <div style="display:flex;align-items:center;gap:8px"><input type="range" min="30" max="90" id="set-esc-thr" style="width:80px"><span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--amber);width:36px" id="set-esc-thr-val">—</span></div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div><div style="font-size:13px;color:var(--white)">KB gap detection threshold</div><div style="font-size:11px;color:var(--dim)">If the system feels less confident than this, it flags the question as a knowledge gap for improvement.</div></div>
+                <div style="display:flex;align-items:center;gap:8px"><input type="range" min="10" max="60" id="set-gap-thr" style="width:80px"><span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--amber);width:36px" id="set-gap-thr-val">—</span></div>
+              </div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.6;border-top:1px solid rgba(255,255,255,0.06);padding-top:10px">
+                These are routing thresholds, not factual correctness guarantees. The pre-booking threshold only matters for properties set to <strong>Auto</strong>; properties in <strong>Review</strong> mode still hold every draft for approval.
+              </div>
+              <div id="settings-threshold-summary" style="font-size:11px;color:rgba(240,235,227,0.58);line-height:1.6"></div>
+              <div id="settings-save-status" style="font-size:11px;color:var(--dim);font-family:'DM Mono',monospace">Loading saved settings…</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Proactive Guest Policy</div><div class="card-sub">Control cadence, allowed outreach categories, and how escalation-state guest updates are handled.</div></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div class="form-row two">
+                <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.76)"><input type="checkbox" id="pro-touch-welcome"> Pre-arrival welcome</label>
+                <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.76)"><input type="checkbox" id="pro-touch-arrival-info"> Arrival info / WiFi</label>
+              </div>
+              <div class="form-row two">
+                <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.76)"><input type="checkbox" id="pro-touch-dinner"> Concierge planning / dining</label>
+                <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.76)"><input type="checkbox" id="pro-touch-instay"> In-stay gentle check-in</label>
+              </div>
+              <div class="form-row two">
+                <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.76)"><input type="checkbox" id="pro-touch-checkout"> Checkout prep</label>
+                <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.76)"><input type="checkbox" id="pro-touch-extend"> Extend-stay offers</label>
+              </div>
+              <div class="form-row two">
+                <div class="form-group"><div class="form-label">Min hours between proactive touches</div><input class="form-input" id="pro-cadence-hours" type="number" min="1" max="72" step="1"></div>
+                <div class="form-group"><div class="form-label">Max notifications per stay window</div><input class="form-input" id="pro-max-notifications" type="number" min="1" max="20" step="1"></div>
+              </div>
+              <div class="form-row two">
+                <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.76)"><input type="checkbox" id="pro-allow-escalation-updates"> Allow controlled service updates during escalation</label>
+                <div class="form-group"><div class="form-label">Min hours between service updates</div><input class="form-input" id="pro-service-update-hours" type="number" min="1" max="24" step="1"></div>
+              </div>
+              <div style="height:1px;background:rgba(255,255,255,0.06)"></div>
+              <div class="form-row two">
+                <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.76)"><input type="checkbox" id="esc-allow-eta"> Allow ETA updates to guests</label>
+                <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.76)"><input type="checkbox" id="esc-allow-reassure"> Allow reassurance without ETA</label>
+              </div>
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.76)"><input type="checkbox" id="esc-approval-required"> Require operator approval before sending escalation status updates</label>
+              <div class="form-hint">These rules govern orchestration behavior, not just UI. They affect how the stay workflow decides whether to initiate, pause, or safely update a guest during live issues.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Stay Operations Policy</div><div class="card-sub">Choose how deeply Oyvoda should participate in access, rentals, maintenance, turnover, and optional post-checkout documentation.</div></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div class="form-group">
+                <div class="form-label">Workflow depth</div>
+                <select class="form-select" id="ops-workflow-profile">
+                  <option value="messaging_only">Messaging only</option>
+                  <option value="assisted_ops">Assisted ops</option>
+                  <option value="full_ops">Full ops</option>
+                </select>
+              </div>
+              <div class="form-row two">
+                <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.76)"><input type="checkbox" id="ops-enable-access"> Access / arrival workflows</label>
+                <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.76)"><input type="checkbox" id="ops-enable-rentals"> Rentals / concierge vendor flows</label>
+              </div>
+              <div class="form-row two">
+                <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.76)"><input type="checkbox" id="ops-enable-turnover"> Turnover / housekeeping workflows</label>
+                <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.76)"><input type="checkbox" id="ops-enable-maintenance"> Maintenance workflows</label>
+              </div>
+              <div class="form-row two">
+                <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.76)"><input type="checkbox" id="ops-enable-walkthrough"> Post-checkout documentation / walkthrough</label>
+                <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.76)"><input type="checkbox" id="ops-walkthrough-required"> Documentation required before archive</label>
+              </div>
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.76)"><input type="checkbox" id="ops-auto-archive"> Auto-archive completed stays when turnover is ready</label>
+              <div class="form-hint">Use this to match your operating model. Some teams only want guest messaging and escalation notifications. Others want Oyvoda to help drive maintenance, turnover, vendor rhythm, and optional iPhone-style documentation after housekeeping.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Retention Policy</div><div class="card-sub">Keep live desks small, preserve a post-stay follow-up window, and automatically clean up old guest content.</div></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div class="form-row two">
+                <div class="form-group"><div class="form-label">Default searchable window</div><input class="form-input" id="ret-active-search" type="number" min="7" max="90" step="1"><div class="form-hint">How much recent history the operator should work inside by default.</div></div>
+                <div class="form-group"><div class="form-label">Post-stay follow-up window</div><input class="form-input" id="ret-post-stay-followup" type="number" min="3" max="60" step="1"><div class="form-hint">How long after checkout a stay should remain available for thank-you and return-stay outreach.</div></div>
+              </div>
+              <div class="form-row two">
+                <div class="form-group"><div class="form-label">Raw guest content retention</div><input class="form-input" id="ret-raw-guest" type="number" min="30" max="180" step="1"><div class="form-hint">After this window, raw guest message bodies and pre-booking text are scrubbed.</div></div>
+                <div class="form-group"><div class="form-label">Pre-booking record retention</div><input class="form-input" id="ret-prebooking" type="number" min="45" max="365" step="1"><div class="form-hint">Resolved pre-booking records can be fully removed after this many days.</div></div>
+              </div>
+              <div class="form-row two">
+                <div class="form-group"><div class="form-label">Guest session shell retention</div><input class="form-input" id="ret-session-shells" type="number" min="90" max="730" step="1"><div class="form-hint">Keep lightweight archived stay shells this long before deletion.</div></div>
+                <div class="form-group"><div class="form-label">Structured audit signal retention</div><input class="form-input" id="ret-signals" type="number" min="90" max="730" step="1"><div class="form-hint">Keep non-body routing and quality signals for audit and improvement.</div></div>
+              </div>
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.76)"><input type="checkbox" id="ret-auto-cleanup"> Enable automatic daily cleanup</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.76)"><input type="checkbox" id="ret-preserve-identity"> Preserve guest identity for repeat-stay memory</label>
+              <div class="form-hint">This is the safety rail that keeps Oyvoda from turning into a giant messaging warehouse. Raw conversation text gets cleaned up on schedule, but repeat-guest memory and relationship context can stay intact.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Guidance / House Rules — operator-authored free-form policy
+             the AI follows when drafting guest replies. Stored in
+             operator_ai_guidance (migration 030); injected into the draft
+             generator's system prompt at runtime. Spans both columns because
+             the textarea benefits from the extra width. -->
+        <div class="card" style="grid-column:1/-1;border-color:rgba(200,120,50,0.25);background:linear-gradient(180deg,rgba(200,120,50,0.04),rgba(13,18,32,0.82))">
+          <div class="card-header" style="align-items:flex-start">
+            <div>
+              <div class="card-title" style="color:var(--amber)">House Rules & AI Guidance</div>
+              <div class="card-sub">Write the rules the AI should follow when replying to guests. Things like discounts you offer, pet policy, minimum stays, brand voice — in plain English. The AI reads this verbatim before drafting every reply.</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+              <span id="ai-guidance-status" style="font-size:11px;color:var(--dim);font-family:'DM Mono',monospace">—</span>
+              <button class="btn btn-sm btn-primary" id="ai-guidance-save" onclick="saveAiGuidance()">Save Rules</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <textarea class="form-textarea" id="ai-guidance-text"
+              rows="10"
+              maxlength="8000"
+              style="min-height:220px;font-family:'DM Mono',monospace;font-size:12.5px;line-height:1.6"
+              placeholder="Example:
+• Offer 20% off for stays of 7+ nights when booked directly (not through Airbnb/Vrbo).
+• No pets allowed — no exceptions, even service animals must be pre-approved in writing.
+• Check-out is strict 11am. Late check-out is $75/hour if the property is available.
+• Minimum stay is 3 nights year-round, 7 nights during holiday weeks.
+• Our tone is warm and casual — like a friend who owns a beach house. Never corporate.
+• Never negotiate nightly rates. The posted price is the price."></textarea>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+              <div class="form-hint" id="ai-guidance-hint">The AI treats this as authoritative policy. Be specific — "offer 20% off" is better than "we sometimes give discounts".</div>
+              <div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--dim)" id="ai-guidance-count">0 / 8000</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alert Routing -->
+        <div class="card" style="grid-column:1/-1">
+          <div class="card-header" style="align-items:flex-start">
+            <div>
+              <div class="card-title">Alert Routing</div>
+              <div class="card-sub">Who gets urgent alerts, in what order, and whether coverage is healthy before a real escalation fires.</div>
+            </div>
+            <div id="alert-routing-status" style="font-size:11px;color:var(--dim);font-family:'DM Mono',monospace">Loading alert routing…</div>
+          </div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:14px">
+            <div id="alert-routing-coverage" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px"></div>
+            <div style="display:grid;grid-template-columns:1.15fr 0.85fr;gap:14px;align-items:start">
+              <div>
+                <div style="font-size:10px;color:rgba(240,235,227,0.45);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">Current chain</div>
+                <div id="alert-routing-list" style="display:flex;flex-direction:column;gap:10px">
+                  <div style="font-size:12px;color:var(--dim)">Loading contacts…</div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div style="font-size:10px;color:rgba(240,235,227,0.45);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.1em">Add contact</div>
+                <div class="form-row two">
+                  <div class="form-group">
+                    <div class="form-label">Alert type</div>
+                    <select class="form-select" id="alert-route-type"></select>
+                  </div>
+                  <div class="form-group">
+                    <div class="form-label">Property scope</div>
+                    <select class="form-select" id="alert-route-property">
+                      <option value="">All properties</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-row two">
+                  <div class="form-group"><div class="form-label">Contact name</div><input class="form-input" id="alert-route-name" placeholder="On-call name"></div>
+                  <div class="form-group"><div class="form-label">Escalation order</div><input class="form-input" id="alert-route-order" type="number" min="1" step="1" value="1"></div>
+                </div>
+                <div class="form-row two">
+                  <div class="form-group"><div class="form-label">Phone</div><input class="form-input" id="alert-route-phone" placeholder="+1 555 555 5555"></div>
+                  <div class="form-group"><div class="form-label">Email</div><input class="form-input" id="alert-route-email" placeholder="ops@example.com"></div>
+                </div>
+                <div class="form-row two">
+                  <div class="form-group"><div class="form-label">Ack timeout (minutes)</div><input class="form-input" id="alert-route-timeout" type="number" min="1" step="1" value="30"></div>
+                  <div class="form-group"><div class="form-label">Availability hours</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><input class="form-input" id="alert-route-start" type="time"><input class="form-input" id="alert-route-end" type="time"></div></div>
+                </div>
+                <div class="form-group"><div class="form-label">Notes</div><textarea class="form-textarea" id="alert-route-notes" rows="3" placeholder="Optional routing notes or responsibilities"></textarea></div>
+                <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.72)">
+                  <input type="checkbox" id="alert-route-primary" checked />
+                  Primary contact for this alert type / scope
+                </label>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+                  <div id="alert-routing-form-status" style="font-size:11px;color:var(--dim);font-family:'DM Mono',monospace">Add or adjust coverage without leaving Settings.</div>
+                  <button class="btn btn-primary" id="alert-routing-add-btn">Add Contact</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">Notification Preferences</div></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:13px;color:var(--white)">Emergency escalations</div><div style="font-size:11px;color:var(--dim)">SMS + email immediately</div></div><button class="toggle" id="tog-emerg" onclick="this.classList.toggle('on')"></button></div>
+              <div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:13px;color:var(--white)">Maintenance escalations</div><div style="font-size:11px;color:var(--dim)">Email within 30 min</div></div><button class="toggle" id="tog-maint" onclick="this.classList.toggle('on')"></button></div>
+              <div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:13px;color:var(--white)">New pre-booking drafts</div><div style="font-size:11px;color:var(--dim)">Email digest every 2 hrs</div></div><button class="toggle" id="tog-pb" onclick="this.classList.toggle('on')"></button></div>
+              <div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:13px;color:var(--white)">Knowledge gap alerts</div><div style="font-size:11px;color:var(--dim)">Daily digest</div></div><button class="toggle" id="tog-gaps" onclick="this.classList.toggle('on')"></button></div>
+              <div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:13px;color:var(--white)">Weekly analytics report</div><div style="font-size:11px;color:var(--dim)">Every Monday 8am</div></div><button class="toggle" id="tog-weekly" onclick="this.classList.toggle('on')"></button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Change password -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">Change Password</div><div class="card-sub">Update your sign-in password. You'll stay signed in on this device.</div></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div class="form-group"><div class="form-label">Current password</div><input class="form-input" id="cp-current" type="password" autocomplete="current-password"></div>
+              <div class="form-group"><div class="form-label">New password</div><input class="form-input" id="cp-new" type="password" autocomplete="new-password"><div class="form-hint">At least 8 characters.</div></div>
+              <div class="form-group"><div class="form-label">Confirm new password</div><input class="form-input" id="cp-confirm" type="password" autocomplete="new-password"></div>
+              <div id="cp-msg" style="font-size:12px;padding:8px 0;display:none"></div>
+              <button class="btn btn-primary" id="cp-btn" onclick="changePassword()" style="align-self:flex-start">Update password</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Danger zone -->
+        <div class="card" style="border-color:rgba(239,68,68,0.15)">
+          <div class="card-header"><div class="card-title" style="color:var(--red)">Danger Zone</div></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div><div style="font-size:13px;color:var(--white)">Pause AI concierge</div><div style="font-size:11px;color:var(--dim)" id="ai-pause-status">AI stops responding — you handle all guest messages manually</div></div>
+                <button class="btn btn-sm btn-danger" id="ai-pause-btn" onclick="toggleAiPause()">Pause AI</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Portfolio Modal -->
+<div class="modal-overlay" id="team-portfolio-modal" style="display:none" onclick="if(event.target===this)closeModal('team-portfolio-modal')">
+  <div class="modal-card" style="max-width:720px">
+    <button class="modal-close" onclick="closeModal('team-portfolio-modal')">Close</button>
+    <div class="modal-title" id="team-portfolio-title">Create Portfolio</div>
+    <div class="modal-sub">Group properties into an operating area so scopes, vendors, assignments, and escalation routing all follow the same boundary.</div>
+    <div class="form-grid" style="margin-top:20px">
+      <label style="display:flex;flex-direction:column;gap:6px">
+        <span class="form-label">Portfolio key</span>
+        <input class="form-input" id="team-portfolio-key" placeholder="panama_city_beach" />
+      </label>
+      <label style="display:flex;flex-direction:column;gap:6px">
+        <span class="form-label">Display name</span>
+        <input class="form-input" id="team-portfolio-name" placeholder="Panama City Beach" />
+      </label>
+    </div>
+    <label style="display:flex;flex-direction:column;gap:6px;margin-top:14px">
+      <span class="form-label">Description</span>
+      <textarea class="form-input" id="team-portfolio-description" rows="3" placeholder="Optional notes about this operating area"></textarea>
+    </label>
+    <div style="margin-top:16px">
+      <div class="form-label" style="margin-bottom:8px">Mapped properties</div>
+      <div id="team-portfolio-properties" style="max-height:280px;overflow:auto;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('team-portfolio-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="savePortfolio()">Save Portfolio</button>
+    </div>
+  </div>
+</div>
+
+<!-- Team Scope Modal -->
+<div class="modal-overlay" id="team-scope-modal" style="display:none" onclick="if(event.target===this)closeModal('team-scope-modal')">
+  <div class="modal-card" style="max-width:860px">
+    <button class="modal-close" onclick="closeModal('team-scope-modal')">Close</button>
+    <div class="modal-title" id="team-scope-title">Manage Scope</div>
+    <div class="modal-sub">Decide what this person can see and whether they can assign work, manage vendors, or change settings within that scope.</div>
+    <div id="team-scope-rows" style="display:flex;flex-direction:column;gap:12px;margin-top:20px"></div>
+    <div style="margin-top:14px">
+      <button class="btn btn-sm" onclick="addScopeRow()">+ Add Scope Row</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('team-scope-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveScopeModal()">Save Scope</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ MODALS ══ -->
+
+<!-- Add KB Entry -->
+<div class="modal-overlay" id="add-kb-modal" style="display:none" onclick="if(event.target===this)closeModal('add-kb-modal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('add-kb-modal')">Close</button>
+    <div class="modal-title">Add Knowledge Entry</div>
+    <div class="modal-sub">Add a Q&A pair that your AI will use to answer guest questions.</div>
+    <div class="form-group" style="margin-bottom:14px"><div class="form-label">Guest Question</div><input class="form-input" id="new-kb-q" placeholder="e.g. Is there a kayak rental nearby?"></div>
+    <div class="form-group" style="margin-bottom:14px"><div class="form-label">Answer</div><textarea class="form-textarea" id="new-kb-a" rows="3" placeholder="e.g. Yes — Sunrise Watersports is 5 min away."></textarea></div>
+    <div class="form-row two">
+      <div class="form-group"><div class="form-label">Apply To</div><select class="form-select" id="new-kb-property"><option value="">All Properties</option></select></div>
+      <div class="form-group"><div class="form-label">Category</div><select class="form-select" id="new-kb-category"><option>General</option><option>Amenities</option><option>Local</option><option>Policies</option><option>Access</option></select></div>
+    </div>
+    <div id="new-kb-retry-preview" style="display:none;margin-top:-2px;margin-bottom:14px;font-size:11px;color:rgba(240,235,227,0.68);font-family:'DM Mono',monospace;letter-spacing:0.04em;text-transform:uppercase"></div>
+    <div class="modal-footer"><button class="btn" onclick="closeModal('add-kb-modal')">Cancel</button><button class="btn btn-primary" onclick="saveKbEntry()">Save Entry</button></div>
+  </div>
+</div>
+
+<!-- Add Vendor -->
+<div class="modal-overlay" id="add-vendor-modal" style="display:none" onclick="if(event.target===this)closeModal('add-vendor-modal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('add-vendor-modal')">Close</button>
+    <div class="modal-title" id="vendor-modal-title">Add Vendor</div>
+    <div class="modal-sub">Add a local business your AI can recommend, dispatch, or route into maintenance workflows with the right warranty, emergency, and property context.</div>
+    <input type="hidden" id="new-vendor-id">
+    <div class="form-row two">
+      <div class="form-group"><div class="form-label">Business Name</div><input class="form-input" id="new-vendor-name" placeholder="e.g. Sunrise Watersports"></div>
+      <div class="form-group"><div class="form-label">Category</div><select class="form-select" id="new-vendor-category"></select></div>
+    </div>
+    <div class="form-row two">
+      <div class="form-group"><div class="form-label">Phone Number</div><input class="form-input" id="new-vendor-phone" placeholder="(850) 555-0192"></div>
+      <div class="form-group"><div class="form-label">Website (optional)</div><input class="form-input" id="new-vendor-website" placeholder="https://..."></div>
+    </div>
+    <div class="form-group" style="margin-bottom:14px"><div class="form-label">Description / AI Script</div><textarea class="form-textarea" id="new-vendor-script" rows="2" placeholder="What the AI says to guests"></textarea><div class="form-hint">This is what the AI tells guests when recommending this vendor.</div></div>
+    <div class="form-row two">
+      <div class="form-group"><div class="form-label">Priority (1 = first)</div><input class="form-input" id="new-vendor-priority" type="number" value="1" min="1" max="10"></div>
+      <div class="form-group"><div class="form-label">Active</div><select class="form-select" id="new-vendor-active"><option value="true">Yes — recommend to guests</option><option value="false">No — inactive</option></select></div>
+    </div>
+    <div class="form-row two">
+      <div class="form-group"><div class="form-label">Scope</div><select class="form-select" id="new-vendor-apply-scope"><option value="all">All properties</option><option value="property_specific">Property specific</option></select></div>
+      <div class="form-group"><div class="form-label">Property codes (comma separated)</div><input class="form-input" id="new-vendor-property-ids" placeholder="beach_101, beach_102"></div>
+    </div>
+    <div class="form-group" style="margin-bottom:14px"><div class="form-label">Internal Notes (not shown to guests)</div><input class="form-input" id="new-vendor-notes" placeholder="e.g. Best for families, 10% guest discount"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+      <div class="form-group"><div class="form-label">Supported issues</div><input class="form-input" id="new-vendor-supported-issues" placeholder="hvac, plumbing, housekeeping"></div>
+      <div class="form-group"><div class="form-label">Manufacturer / system tags</div><input class="form-input" id="new-vendor-manufacturers" placeholder="carrier, trane, nest"></div>
+      <div class="form-group"><div class="form-label">Warranty providers</div><input class="form-input" id="new-vendor-warranty-providers" placeholder="carrier, home_shield"></div>
+      <div class="form-group"><div class="form-label">Preferred properties</div><input class="form-input" id="new-vendor-preferred-properties" placeholder="beach_101, beach_202"></div>
+    </div>
+    <div class="form-row two">
+      <div class="form-group"><div class="form-label">Backup tier</div><input class="form-input" id="new-vendor-backup-rank" type="number" value="0" min="0" step="1"></div>
+      <div class="form-group"><div class="form-label">Response SLA (minutes)</div><input class="form-input" id="new-vendor-response-sla" type="number" value="0" min="0" step="5"></div>
+    </div>
+    <div class="form-row two">
+      <div class="form-group"><div class="form-label">Approval mode</div><select class="form-select" id="new-vendor-approval-mode"><option value="standard">Standard</option><option value="operator_required">Operator required</option><option value="manager_required">Manager required</option></select></div>
+      <div class="form-group"><div class="form-label">Cost tier</div><select class="form-select" id="new-vendor-cost-tier"><option value="standard">Standard</option><option value="premium">Premium</option><option value="economy">Economy</option></select></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.76)"><input type="checkbox" id="new-vendor-warranty-capable"> Warranty-safe</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.76)"><input type="checkbox" id="new-vendor-warranty-only"> Warranty only</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.76)"><input type="checkbox" id="new-vendor-emergency-capable"> Emergency capable</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.76)"><input type="checkbox" id="new-vendor-emergency-override-only"> Emergency override only</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(240,235,227,0.76)"><input type="checkbox" id="new-vendor-after-hours"> After-hours available</label>
+    </div>
+    <div class="modal-footer"><button class="btn" onclick="closeModal('add-vendor-modal')">Cancel</button><button class="btn btn-primary" onclick="saveVendor()">Save Vendor</button></div>
+  </div>
+</div>
+
+<!-- Invite Team Member -->
+<div class="modal-overlay" id="invite-modal" style="display:none" onclick="if(event.target===this)closeModal('invite-modal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('invite-modal')">Close</button>
+    <div class="modal-title">Invite Team Member</div>
+    <div class="modal-sub">They'll receive an email with a magic link to set up their account.</div>
+    <div class="form-row two">
+      <div class="form-group"><div class="form-label">Full Name</div><input class="form-input" id="inv-name" placeholder="e.g. Sarah Johnson"></div>
+      <div class="form-group"><div class="form-label">Email</div><input class="form-input" id="inv-email" type="email" placeholder="sarah@yourcompany.com"></div>
+    </div>
+    <div class="form-row two">
+      <div class="form-group"><div class="form-label">Role</div><select class="form-select" id="inv-role"><option value="manager">Manager — can manage queue, sessions, KB</option><option value="staff">Staff — escalations only</option></select></div>
+    </div>
+    <div class="modal-footer"><button class="btn" onclick="closeModal('invite-modal')">Cancel</button><button class="btn btn-primary" onclick="sendInvite()">Send Invite</button></div>
+  </div>
+</div>
+
+<!-- Resolve KB Gap -->
+<div class="modal-overlay" id="resolve-gap-modal" style="display:none" onclick="if(event.target===this)closeModal('resolve-gap-modal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('resolve-gap-modal')">Close</button>
+    <div class="modal-title">Resolve Knowledge Gap</div>
+    <div class="modal-sub" id="gap-modal-question">—</div>
+    <input type="hidden" id="gap-modal-id">
+    <div class="form-group" style="margin-bottom:14px"><div class="form-label">Your Answer</div><textarea class="form-textarea" id="gap-modal-answer" rows="3" placeholder="The answer your AI should give going forward..."></textarea></div>
+    <div class="modal-footer"><button class="btn" onclick="closeModal('resolve-gap-modal')">Cancel</button><button class="btn" onclick="resolveGap(false)">Resolve Without Adding</button><button class="btn btn-primary" onclick="resolveGap(true)">Save & Add to KB</button></div>
+  </div>
+</div>
+
+<aside class="detail-panel" id="detail-panel" aria-hidden="true">
+  <div class="detail-panel-header" id="detail-panel-header">
+    <div>
+      <div class="detail-panel-section-label">Detail Panel</div>
+      <div class="card-title" id="detail-panel-title">Context panel</div>
+    </div>
+    <button class="detail-panel-close" type="button" onclick="closeDetailPanel()" aria-label="Close detail panel">×</button>
+  </div>
+  <div class="detail-panel-body" id="detail-panel-body">
+    <div class="detail-panel-section">
+      <div class="empty-state" style="padding:32px 20px">
+        <div class="empty-state-title">No item selected</div>
+        <div class="empty-state-description">Sections will begin using this contextual detail rail in later ships.</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="modal-overlay command-modal" id="command-modal" style="display:none" onclick="if(event.target===this)closeCommandPaletteStub()">
+  <div class="modal command-modal-card">
+    <button class="modal-close" onclick="closeCommandPaletteStub()">Close</button>
+    <div class="modal-title">Command Search</div>
+    <div class="modal-sub">Command search ships in Ship E.</div>
+    <div class="empty-state" style="padding:12px 0 4px;text-align:left">
+      <div class="empty-state-description">The trigger is wired now so the new shell has the right command posture, but the actual cross-entity search and action palette lands in the next dedicated ship.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeCommandPaletteStub()">Got it</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Dashboard app — ES modules, loads progressively. Query string busts Cloudflare / browser cache on each JS deploy. -->
+<script type="module" src="/static/dashboard/js/main.js?v=2026-05-19-i"></script>
+
+</body>
+</html>

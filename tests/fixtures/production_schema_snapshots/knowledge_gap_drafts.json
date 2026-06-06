@@ -1,0 +1,41 @@
+{
+  "alembic_version": "082_knowledge_gap_drafts",
+  "captured_at_utc": "2026-05-18T15:00:00+00:00",
+  "columns": [
+    {"column_default": null, "column_name": "draft_id", "data_type": "text", "is_nullable": false, "udt_name": "text"},
+    {"column_default": null, "column_name": "tenant_id", "data_type": "uuid", "is_nullable": false, "udt_name": "uuid"},
+    {"column_default": null, "column_name": "property_code", "data_type": "text", "is_nullable": true, "udt_name": "text"},
+    {"column_default": null, "column_name": "operator_id", "data_type": "text", "is_nullable": true, "udt_name": "text"},
+    {"column_default": null, "column_name": "question", "data_type": "text", "is_nullable": false, "udt_name": "text"},
+    {"column_default": null, "column_name": "answer_hint", "data_type": "text", "is_nullable": true, "udt_name": "text"},
+    {"column_default": "'[]'::jsonb", "column_name": "gap_ids", "data_type": "jsonb", "is_nullable": false, "udt_name": "jsonb"},
+    {"column_default": "1", "column_name": "occurrence_count", "data_type": "integer", "is_nullable": false, "udt_name": "int4"},
+    {"column_default": "'pending_review'::text", "column_name": "status", "data_type": "text", "is_nullable": false, "udt_name": "text"},
+    {"column_default": null, "column_name": "indexed_doc_id", "data_type": "text", "is_nullable": true, "udt_name": "text"},
+    {"column_default": null, "column_name": "reviewed_by", "data_type": "text", "is_nullable": true, "udt_name": "text"},
+    {"column_default": null, "column_name": "reviewed_at", "data_type": "timestamp with time zone", "is_nullable": true, "udt_name": "timestamptz"},
+    {"column_default": null, "column_name": "rejection_reason", "data_type": "text", "is_nullable": true, "udt_name": "text"},
+    {"column_default": "now()", "column_name": "created_at", "data_type": "timestamp with time zone", "is_nullable": false, "udt_name": "timestamptz"}
+  ],
+  "indexes": [
+    {
+      "columns": ["draft_id"],
+      "indexdef": "CREATE UNIQUE INDEX knowledge_gap_drafts_pkey ON public.knowledge_gap_drafts USING btree (draft_id)",
+      "indexname": "knowledge_gap_drafts_pkey",
+      "is_unique": true
+    },
+    {
+      "columns": ["property_code", "status"],
+      "indexdef": "CREATE INDEX ix_knowledge_gap_drafts_property_status ON public.knowledge_gap_drafts USING btree (property_code, status) WHERE (status = 'pending_review'::text)",
+      "indexname": "ix_knowledge_gap_drafts_property_status",
+      "is_unique": false
+    },
+    {
+      "columns": ["tenant_id", "status", "occurrence_count"],
+      "indexdef": "CREATE INDEX ix_knowledge_gap_drafts_tenant_status ON public.knowledge_gap_drafts USING btree (tenant_id, status, occurrence_count)",
+      "indexname": "ix_knowledge_gap_drafts_tenant_status",
+      "is_unique": false
+    }
+  ],
+  "table": "knowledge_gap_drafts"
+}

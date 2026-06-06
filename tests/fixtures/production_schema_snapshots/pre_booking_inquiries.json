@@ -1,0 +1,368 @@
+{
+  "alembic_version": "080_operator_policies_market_id_corrective",
+  "captured_at_utc": "2026-05-18T11:23:24.582667+00:00",
+  "columns": [
+    {
+      "column_default": "gen_random_uuid()",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": false,
+      "udt_name": "uuid"
+    },
+    {
+      "column_default": null,
+      "column_name": "draft_id",
+      "data_type": "text",
+      "is_nullable": false,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "thread_id",
+      "data_type": "text",
+      "is_nullable": false,
+      "udt_name": "text"
+    },
+    {
+      "column_default": "''::text",
+      "column_name": "message_id",
+      "data_type": "text",
+      "is_nullable": false,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "company_id",
+      "data_type": "uuid",
+      "is_nullable": true,
+      "udt_name": "uuid"
+    },
+    {
+      "column_default": "'unknown'::text",
+      "column_name": "platform",
+      "data_type": "text",
+      "is_nullable": false,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "guest_name",
+      "data_type": "text",
+      "is_nullable": false,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "message_text",
+      "data_type": "text",
+      "is_nullable": false,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "requested_check_in",
+      "data_type": "date",
+      "is_nullable": true,
+      "udt_name": "date"
+    },
+    {
+      "column_default": null,
+      "column_name": "requested_check_out",
+      "data_type": "date",
+      "is_nullable": true,
+      "udt_name": "date"
+    },
+    {
+      "column_default": null,
+      "column_name": "requested_guests",
+      "data_type": "integer",
+      "is_nullable": true,
+      "udt_name": "int4"
+    },
+    {
+      "column_default": "''::text",
+      "column_name": "property_external_id",
+      "data_type": "text",
+      "is_nullable": false,
+      "udt_name": "text"
+    },
+    {
+      "column_default": "'general'::text",
+      "column_name": "intent",
+      "data_type": "text",
+      "is_nullable": false,
+      "udt_name": "text"
+    },
+    {
+      "column_default": "0",
+      "column_name": "confidence",
+      "data_type": "numeric",
+      "is_nullable": true,
+      "udt_name": "numeric"
+    },
+    {
+      "column_default": null,
+      "column_name": "draft_text",
+      "data_type": "text",
+      "is_nullable": false,
+      "udt_name": "text"
+    },
+    {
+      "column_default": "'[]'::jsonb",
+      "column_name": "policy_flags",
+      "data_type": "jsonb",
+      "is_nullable": true,
+      "udt_name": "jsonb"
+    },
+    {
+      "column_default": "'[]'::jsonb",
+      "column_name": "policy_warnings",
+      "data_type": "jsonb",
+      "is_nullable": true,
+      "udt_name": "jsonb"
+    },
+    {
+      "column_default": "'pending_review'::text",
+      "column_name": "status",
+      "data_type": "text",
+      "is_nullable": false,
+      "udt_name": "text"
+    },
+    {
+      "column_default": "'review'::text",
+      "column_name": "send_decision",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": "'required'::text",
+      "column_name": "approval_mode",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "final_reply",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "replied_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": true,
+      "udt_name": "timestamptz"
+    },
+    {
+      "column_default": null,
+      "column_name": "resolution_note",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": "false",
+      "column_name": "was_edited",
+      "data_type": "boolean",
+      "is_nullable": true,
+      "udt_name": "bool"
+    },
+    {
+      "column_default": null,
+      "column_name": "edit_analysis",
+      "data_type": "jsonb",
+      "is_nullable": true,
+      "udt_name": "jsonb"
+    },
+    {
+      "column_default": "now()",
+      "column_name": "received_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": false,
+      "udt_name": "timestamptz"
+    },
+    {
+      "column_default": "now()",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": false,
+      "udt_name": "timestamptz"
+    },
+    {
+      "column_default": null,
+      "column_name": "gmail_thread_id",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "gmail_message_id",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "guest_email",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": "false",
+      "column_name": "reply_via_gmail",
+      "data_type": "boolean",
+      "is_nullable": true,
+      "udt_name": "bool"
+    },
+    {
+      "column_default": null,
+      "column_name": "guest_thread_id",
+      "data_type": "uuid",
+      "is_nullable": true,
+      "udt_name": "uuid"
+    },
+    {
+      "column_default": null,
+      "column_name": "parser_source",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": "'[]'::jsonb",
+      "column_name": "extracted_asks",
+      "data_type": "jsonb",
+      "is_nullable": true,
+      "udt_name": "jsonb"
+    },
+    {
+      "column_default": null,
+      "column_name": "platform_listing_id",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "platform_unit_id",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "tenant_id",
+      "data_type": "uuid",
+      "is_nullable": true,
+      "udt_name": "uuid"
+    },
+    {
+      "column_default": "'{}'::jsonb",
+      "column_name": "property_external_id_source",
+      "data_type": "jsonb",
+      "is_nullable": false,
+      "udt_name": "jsonb"
+    },
+    {
+      "column_default": null,
+      "column_name": "archived_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": true,
+      "udt_name": "timestamptz"
+    },
+    {
+      "column_default": null,
+      "column_name": "archive_reason",
+      "data_type": "character varying",
+      "is_nullable": true,
+      "udt_name": "varchar"
+    }
+  ],
+  "indexes": [
+    {
+      "columns": [
+        "company_id",
+        "status"
+      ],
+      "indexdef": "CREATE INDEX idx_inquiries_company_status ON public.pre_booking_inquiries USING btree (company_id, status) WHERE (status = 'pending_review'::text)",
+      "indexname": "idx_inquiries_company_status",
+      "is_unique": false
+    },
+    {
+      "columns": [
+        "platform",
+        "received_at"
+      ],
+      "indexdef": "CREATE INDEX idx_inquiries_platform ON public.pre_booking_inquiries USING btree (platform, received_at DESC)",
+      "indexname": "idx_inquiries_platform",
+      "is_unique": false
+    },
+    {
+      "columns": [
+        "property_external_id",
+        "created_at"
+      ],
+      "indexdef": "CREATE INDEX idx_inquiries_property ON public.pre_booking_inquiries USING btree (property_external_id, created_at DESC)",
+      "indexname": "idx_inquiries_property",
+      "is_unique": false
+    },
+    {
+      "columns": [
+        "guest_thread_id"
+      ],
+      "indexdef": "CREATE INDEX idx_pre_booking_inquiries_guest_thread ON public.pre_booking_inquiries USING btree (guest_thread_id)",
+      "indexname": "idx_pre_booking_inquiries_guest_thread",
+      "is_unique": false
+    },
+    {
+      "columns": [
+        "tenant_id",
+        "gmail_thread_id"
+      ],
+      "indexdef": "CREATE INDEX ix_pre_booking_inquiries_tenant_gmail_thread ON public.pre_booking_inquiries USING btree (tenant_id, gmail_thread_id) WHERE (reply_via_gmail = true)",
+      "indexname": "ix_pre_booking_inquiries_tenant_gmail_thread",
+      "is_unique": false
+    },
+    {
+      "columns": [
+        "tenant_id",
+        "status",
+        "created_at"
+      ],
+      "indexdef": "CREATE INDEX ix_pre_booking_inquiries_tenant_status_created_at ON public.pre_booking_inquiries USING btree (tenant_id, status, created_at DESC)",
+      "indexname": "ix_pre_booking_inquiries_tenant_status_created_at",
+      "is_unique": false
+    },
+    {
+      "columns": [
+        "draft_id"
+      ],
+      "indexdef": "CREATE UNIQUE INDEX pre_booking_inquiries_draft_id_key ON public.pre_booking_inquiries USING btree (draft_id)",
+      "indexname": "pre_booking_inquiries_draft_id_key",
+      "is_unique": true
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "indexdef": "CREATE UNIQUE INDEX pre_booking_inquiries_pkey ON public.pre_booking_inquiries USING btree (id)",
+      "indexname": "pre_booking_inquiries_pkey",
+      "is_unique": true
+    },
+    {
+      "columns": [
+        "thread_id",
+        "message_id"
+      ],
+      "indexdef": "CREATE UNIQUE INDEX pre_booking_inquiries_thread_id_message_id_key ON public.pre_booking_inquiries USING btree (thread_id, message_id)",
+      "indexname": "pre_booking_inquiries_thread_id_message_id_key",
+      "is_unique": true
+    }
+  ],
+  "table": "pre_booking_inquiries"
+}

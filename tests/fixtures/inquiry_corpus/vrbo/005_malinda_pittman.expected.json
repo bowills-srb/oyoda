@@ -1,0 +1,19 @@
+{
+  "fixture_id": "vrbo/005_malinda_pittman",
+  "description": "vrbo inquiry captured from live Beach Habitats inbound traffic",
+  "expected_route_contains": "vrbo",
+  "expected_pipeline_output": {
+    "platform": "vrbo",
+    "parser_source_contains": "",
+    "guest_name": "Guest 019",
+    "latest_guest_message_contains": [
+      "Can you send me a number to call please?"
+    ],
+    "requested_check_in": null,
+    "requested_check_out": null,
+    "requested_guests": null,
+    "platform_listing_id": "",
+    "platform_unit_id": "",
+    "property_reference_token": ""
+  }
+}

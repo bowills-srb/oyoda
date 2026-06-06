@@ -1,0 +1,33 @@
+{
+  "fixture_id": "direct/001_allison_henriksen",
+  "platform": "direct",
+  "source_channel": "email",
+  "source_provider": "gmail",
+  "headers": {
+    "From": "Guest 001 <guest_001@example.test>",
+    "Reply-To": "guest_001@example.test",
+    "Message-ID": "19e4573c5398589b",
+    "X-Thread-Id": "19e4573c5398589b",
+    "X-Oyvoda-Parser-Used": "prebooking_request"
+  },
+  "subject": "",
+  "plain_text": "Good morning, I hate to inform you again, but felt like it is very important for you to know that my Daughter and one of her friends were preparing to try and sleep in the bunk beds again, after they were cleaned yesterday. And they found another chewed piece of jolly rancher and a Zyn nicotine pouch in the cracks of the mattress. These items were obviously in someone else’s mouth! This is again, something no guest should find in a rented house. The cleaning ladies must move these mattress and clean in between the bed frame and mattress. This should not be difficult for anyone to do. Again this is embarrassing for our guest that we invited to come with us and assumed they would be sleeping in a clean environment.",
+  "raw_html": "",
+  "llm_extracted_fields": {
+    "latest_guest_message": "Good morning, I hate to inform you again, but felt like it is very important for you to know that my Daughter and one of her friends were preparing to try and sleep in the bunk beds again, after they were cleaned yesterday. And they found another chewed piece of jolly rancher and a Zyn nicotine pouch in the cracks of the mattress. These items were obviously in someone else’s mouth! This is again, something no guest should find in a rented house. The cleaning ladies must move these mattress and clean in between the bed frame and mattress. This should not be difficult for anyone to do. Again this is embarrassing for our guest that we invited to come with us and assumed they would be sleeping in a clean environment.",
+    "property_code_or_name": "Property_001",
+    "sender_name": "Guest 001",
+    "sender_email": "guest_001@example.test",
+    "requested_guests": null,
+    "requested_check_in": null,
+    "requested_check_out": null
+  },
+  "provenance": {
+    "tenant_id": "e07980b2-a990-4b24-91d1-c8cb71ab70e1",
+    "draft_id": "INQ-5C43DFD6",
+    "created_at": "2026-05-20 14:01:09.493841+00",
+    "gmail_message_id": "19e4573c5398589b",
+    "parser_source_live": "llm_email_extractor_groq",
+    "parser_used_live": "prebooking_request"
+  }
+}

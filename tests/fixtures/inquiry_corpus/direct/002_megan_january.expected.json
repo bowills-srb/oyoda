@@ -1,0 +1,19 @@
+{
+  "fixture_id": "direct/002_megan_january",
+  "description": "direct inquiry captured from live Beach Habitats inbound traffic",
+  "expected_route_contains": "direct",
+  "expected_pipeline_output": {
+    "platform": "direct",
+    "parser_source_contains": "",
+    "guest_name": "Guest 002",
+    "latest_guest_message_contains": [
+      "Hi, just checking in on instructions for our rental. We have not received any re"
+    ],
+    "requested_check_in": "2026-05-21",
+    "requested_check_out": "2026-05-30",
+    "requested_guests": null,
+    "platform_listing_id": "",
+    "platform_unit_id": "",
+    "property_reference_token": "Property_002"
+  }
+}

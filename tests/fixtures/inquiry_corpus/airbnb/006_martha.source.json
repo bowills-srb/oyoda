@@ -1,0 +1,33 @@
+{
+  "fixture_id": "airbnb/006_martha",
+  "platform": "airbnb",
+  "source_channel": "email",
+  "source_provider": "gmail",
+  "headers": {
+    "From": "Airbnb <express@airbnb.com>",
+    "Reply-To": "reply@reply.airbnb.com",
+    "Message-ID": "19e21750d4f2d1ba",
+    "X-Thread-Id": "19e212c89906aace",
+    "X-Oyvoda-Parser-Used": "pre_booking_transport_adapter"
+  },
+  "subject": "",
+  "plain_text": "[Guest, 2026-05-13 11:55]:\nDoes this include beach chairs and an umbrella for the beach at the beach club or would I have to reserve those? Also, are there extra beach chairs at the home and bikes?? One other question, can you drive the golf cart over to the beach club and park it there for the day at the beach?",
+  "raw_html": "",
+  "llm_extracted_fields": {
+    "latest_guest_message": "Is there a charge for the beach set ups or are they a part of the use of the beach club?",
+    "property_code_or_name": "unit_017",
+    "sender_name": "Guest 017",
+    "sender_email": "unit_017",
+    "requested_guests": 8,
+    "requested_check_in": "2026-07-11",
+    "requested_check_out": "2026-07-18"
+  },
+  "provenance": {
+    "tenant_id": "e07980b2-a990-4b24-91d1-c8cb71ab70e1",
+    "draft_id": "INQ-7EA358B0",
+    "created_at": "2026-05-13 13:10:33.447032+00",
+    "gmail_message_id": "19e21750d4f2d1ba",
+    "parser_source_live": "llm_email_extractor_groq",
+    "parser_used_live": "pre_booking_transport_adapter"
+  }
+}

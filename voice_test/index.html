@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beach Habitats Voice Concierge</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: #1a365d; font-size: 24px; }
+        .header p { color: #718096; margin-top: 8px; font-size: 14px; }
+        .property-badge {
+            background: #ebf8ff;
+            color: #2b6cb0;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: inline-block;
+            margin-top: 12px;
+        }
+        .mic-button {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px auto;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 40px rgba(66, 153, 225, 0.4);
+        }
+        .mic-button:hover { transform: scale(1.05); }
+        .mic-button.listening {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            animation: pulse 1.5s infinite;
+        }
+        .mic-button.processing {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+        }
+        .mic-button.speaking {
+            background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+            animation: pulse 0.8s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+        .mic-button svg { width: 48px; height: 48px; }
+        .status { text-align: center; color: #4a5568; font-size: 16px; }
+        .transcript-container { margin-top: 30px; max-height: 300px; overflow-y: auto; }
+        .message { padding: 12px 16px; border-radius: 16px; margin-bottom: 12px; font-size: 14px; }
+        .message.guest { background: #edf2f7; margin-left: 40px; }
+        .message.concierge { background: #ebf8ff; color: #2b6cb0; margin-right: 40px; }
+        .message-label { font-size: 11px; font-weight: 600; opacity: 0.7; margin-bottom: 4px; }
+        .config-section { margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0; }
+        .config-section label { display: block; font-size: 12px; color: #4a5568; margin-bottom: 6px; }
+        .config-section input { width: 100%; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 12px; }
+        .error { background: #fed7d7; color: #c53030; padding: 12px; border-radius: 8px; margin-top: 20px; }
+        .powered-by { text-align: center; margin-top: 30px; font-size: 12px; color: #a0aec0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏖️ Beach Habitats</h1>
+            <p>Voice Concierge</p>
+            <div class="property-badge" id="propertyBadge">134MC</div>
+        </div>
+        
+        <button class="mic-button" id="micButton" onclick="toggleListening()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+            </svg>
+        </button>
+        
+        <div class="status" id="status">Tap to speak</div>
+        <div class="transcript-container" id="transcriptContainer"></div>
+        <div id="errorContainer"></div>
+        
+        <div class="config-section">
+            <label>Property Code</label>
+            <input type="text" id="propertyCode" value="134MC" onchange="document.getElementById('propertyBadge').textContent=this.value">
+            <label>Backend URL</label>
+            <input type="text" id="backendUrl" value="http://localhost:8000">
+        </div>
+        
+        <div class="powered-by">Deepgram + Claude + ElevenLabs</div>
+    </div>
+
+    <script>
+        let isListening = false;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        
+        async function toggleListening() {
+            if (isListening) stopListening();
+            else await startListening();
+        }
+        
+        async function startListening() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                isListening = true;
+                document.getElementById('micButton').classList.add('listening');
+                document.getElementById('status').textContent = 'Listening...';
+                document.getElementById('errorContainer').innerHTML = '';
+                
+                mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+                audioChunks = [];
+                
+                mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    await processAudio(audioBlob);
+                    stream.getTracks().forEach(t => t.stop());
+                };
+                
+                mediaRecorder.start();
+                setTimeout(() => { if (isListening) stopListening(); }, 10000);
+            } catch (e) {
+                showError('Could not access microphone. Allow mic access and try again.');
+            }
+        }
+        
+        function stopListening() {
+            isListening = false;
+            document.getElementById('micButton').classList.remove('listening');
+            document.getElementById('micButton').classList.add('processing');
+            document.getElementById('status').textContent = 'Processing...';
+            if (mediaRecorder?.state !== 'inactive') mediaRecorder.stop();
+        }
+        
+        async function processAudio(audioBlob) {
+            const micButton = document.getElementById('micButton');
+            const status = document.getElementById('status');
+            try {
+                const arrayBuffer = await audioBlob.arrayBuffer();
+                const base64 = btoa(new Uint8Array(arrayBuffer).reduce((d, b) => d + String.fromCharCode(b), ''));
+                
+                const response = await fetch(`${document.getElementById('backendUrl').value}/api/v1/voice/process`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        audio_data: base64, 
+                        property_code: document.getElementById('propertyCode').value, 
+                        mime_type: 'audio/webm' 
+                    })
+                });
+                
+                if (!response.ok) throw new Error(`Server error: ${response.status}`);
+                const data = await response.json();
+                
+                if (data.transcript) addMessage('guest', data.transcript);
+                if (data.response_text) addMessage('concierge', data.response_text);
+                
+                if (data.audio_data) {
+                    micButton.classList.remove('processing');
+                    micButton.classList.add('speaking');
+                    status.textContent = 'Speaking...';
+                    await playAudio(data.audio_data);
+                    micButton.classList.remove('speaking');
+                }
+                status.textContent = 'Tap to speak';
+            } catch (e) {
+                showError(`Error: ${e.message}`);
+                micButton.classList.remove('processing', 'speaking');
+            }
+        }
+        
+        async function playAudio(base64) {
+            return new Promise((resolve, reject) => {
+                const data = atob(base64);
+                const arr = new Uint8Array(data.length);
+                for (let i = 0; i < data.length; i++) arr[i] = data.charCodeAt(i);
+                const blob = new Blob([arr], { type: 'audio/mpeg' });
+                const audio = new Audio(URL.createObjectURL(blob));
+                audio.onended = resolve;
+                audio.onerror = reject;
+                audio.play();
+            });
+        }
+        
+        function addMessage(speaker, text) {
+            const div = document.createElement('div');
+            div.className = `message ${speaker}`;
+            div.innerHTML = `<div class="message-label">${speaker === 'guest' ? 'You' : 'Concierge'}</div><div>${text}</div>`;
+            document.getElementById('transcriptContainer').appendChild(div);
+            document.getElementById('transcriptContainer').scrollTop = 99999;
+        }
+        
+        function showError(msg) {
+            document.getElementById('errorContainer').innerHTML = `<div class="error">${msg}</div>`;
+            document.getElementById('status').textContent = 'Tap to speak';
+            document.getElementById('micButton').classList.remove('listening', 'processing', 'speaking');
+        }
+    </script>
+</body>
+</html>

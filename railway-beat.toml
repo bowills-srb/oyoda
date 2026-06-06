@@ -1,0 +1,8 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "docker/Dockerfile.worker"
+
+[deploy]
+startCommand = "python3 scripts/railway_bootstrap.py --role beat --service-name oyvoda-beat -- celery -A app.workers.celery_app:celery_app beat --loglevel=INFO"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3

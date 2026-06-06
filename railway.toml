@@ -1,0 +1,11 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "docker/Dockerfile.api"
+
+[deploy]
+startCommand = "python3 scripts/railway_bootstrap.py --role api --service-name oyvoda -- uvicorn app.main:app --host 0.0.0.0 --port 8080 --workers 1"
+preDeployCommand = "env ALEMBIC_USE_DIRECT_URL=true alembic upgrade head"
+healthcheckPath = "/health"
+healthcheckTimeout = 300
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3

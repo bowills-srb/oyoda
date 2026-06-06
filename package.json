@@ -1,0 +1,43 @@
+{
+  "name": "oyvoda",
+  "version": "0.1.0",
+  "description": "Oyvoda — AI-powered RCS-first guest experience platform for STR and boutique hotel operators",
+  "private": true,
+  "scripts": {
+    "build:dashboard": "node scripts/build-dashboard.js",
+    "build:dashboard-v2": "vite build --config app/static/dashboard-v2/vite.config.ts",
+    "test:dashboard-v2-boundaries": "node scripts/run-dashboard-v2-boundaries.mjs",
+    "test:dashboard-smoke": "node scripts/dashboard_smoke.mjs",
+    "dev": "docker compose up",
+    "down": "docker compose down"
+  },
+  "dependencies": {
+    "@fontsource/inter": "^5.0.17",
+    "@fontsource/jetbrains-mono": "^5.0.17",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@tanstack/react-query": "^5.100.14",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.17.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.3",
+    "tailwind-merge": "^3.6.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.23.0",
+    "@babel/core": "^7.23.0",
+    "@babel/preset-env": "^7.23.0",
+    "@babel/preset-react": "^7.23.0",
+    "@types/node": "^22.19.19",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10"
+  }
+}

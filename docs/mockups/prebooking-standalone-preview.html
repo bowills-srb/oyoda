@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Standalone Pre-Booking Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0a0d13;
+      --chrome:#101623;
+      --surface:#171d24;
+      --surface-2:#1b232c;
+      --border:rgba(255,255,255,0.08);
+      --muted:rgba(240,235,227,0.58);
+      --text:#f0ebe3;
+      --amber:#c87832;
+      --amber-soft:rgba(200,120,50,0.11);
+      --green:#7ed9a0;
+      --green-soft:rgba(126,217,160,0.14);
+      --red:#f09797;
+      --red-soft:rgba(240,151,151,0.14);
+      --blue:#7eb4e8;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.02), transparent 220px),
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.02) 0 1px, transparent 1px 44px),
+        repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0 1px, transparent 1px 44px),
+        var(--bg);
+      color:var(--text);
+      font-family:'DM Sans',sans-serif;
+    }
+
+    .topnav{
+      height:58px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 28px;
+      background:rgba(11,15,22,0.94);
+      border-bottom:1px solid var(--border);
+      position:sticky;
+      top:0;
+    }
+
+    .logo{
+      font-family:'Cormorant Garamond',serif;
+      font-size:25px;
+      color:var(--text);
+      text-decoration:none;
+    }
+
+    .topnav a{
+      text-decoration:none;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .shell{
+      max-width:1240px;
+      margin:0 auto;
+      padding:28px 22px 40px;
+    }
+
+    .page-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:16px;
+    }
+
+    .eyebrow{
+      font-family:'DM Mono',monospace;
+      font-size:10px;
+      letter-spacing:0.14em;
+      color:var(--muted);
+      text-transform:uppercase;
+      margin-bottom:8px;
+    }
+
+    h1{
+      margin:0;
+      font-size:28px;
+      font-weight:600;
+    }
+
+    .sub{
+      margin-top:8px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.55;
+      max-width:760px;
+    }
+
+    .mode-chip{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,0.03);
+      border-radius:14px;
+    }
+
+    .mode-chip span{
+      font-family:'DM Mono',monospace;
+      text-transform:uppercase;
+      font-size:10px;
+      letter-spacing:0.12em;
+      color:var(--muted);
+    }
+
+    .seg{
+      display:flex;
+      gap:6px;
+    }
+
+    .seg button{
+      border:none;
+      border-radius:999px;
+      padding:6px 10px;
+      background:rgba(255,255,255,0.04);
+      color:var(--muted);
+      font:inherit;
+      font-size:11px;
+    }
+
+    .seg button.active{
+      background:var(--amber-soft);
+      color:var(--amber);
+      border:1px solid rgba(200,120,50,0.22);
+    }
+
+    .toolbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      margin-bottom:14px;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,0.03);
+      padding:9px 12px;
+      min-height:40px;
+    }
+
+    .pill strong{
+      font-family:'Cormorant Garamond',serif;
+      font-size:23px;
+      line-height:1;
+      font-weight:600;
+    }
+
+    .pill span{
+      font-family:'DM Mono',monospace;
+      font-size:10px;
+      letter-spacing:0.08em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+
+    .pill.active{
+      background:var(--amber-soft);
+      border-color:rgba(200,120,50,0.22);
+    }
+
+    .toolbar .spacer{flex:1}
+
+    .filter{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .filter label{
+      font-family:'DM Mono',monospace;
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:0.1em;
+    }
+
+    .filter select{
+      background:rgba(255,255,255,0.04);
+      border:1px solid var(--border);
+      color:var(--text);
+      border-radius:10px;
+      padding:8px 10px;
+      font:inherit;
+      min-width:180px;
+    }
+
+    .tabs{
+      display:flex;
+      gap:8px;
+      margin-bottom:10px;
+    }
+
+    .tabs button{
+      border:none;
+      background:transparent;
+      color:var(--muted);
+      padding:0;
+      font-size:12px;
+    }
+
+    .tabs button.active{
+      color:var(--text);
+      font-weight:600;
+    }
+
+    .status{
+      font-family:'DM Mono',monospace;
+      font-size:11px;
+      color:var(--muted);
+      margin-bottom:12px;
+    }
+
+    .queue{
+      background:linear-gradient(180deg, rgba(24,31,39,0.98), rgba(17,22,28,0.98));
+      border:1px solid rgba(255,255,255,0.06);
+      border-radius:18px;
+      overflow:hidden;
+      box-shadow:0 20px 60px rgba(0,0,0,0.28);
+    }
+
+    .queue-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:11px 16px;
+      border-bottom:1px solid rgba(255,255,255,0.06);
+      background:rgba(255,255,255,0.02);
+      position:sticky;
+      top:58px;
+    }
+
+    .queue-head div:first-child{
+      font-family:'DM Mono',monospace;
+      font-size:10px;
+      letter-spacing:0.12em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+
+    .count{
+      font-family:'DM Mono',monospace;
+      color:rgba(240,235,227,0.42);
+      font-size:11px;
+    }
+
+    .row{
+      padding:12px 16px 14px;
+      border-bottom:1px solid rgba(255,255,255,0.05);
+    }
+
+    .row:last-child{border-bottom:none}
+
+    .row-meta{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-bottom:8px;
+    }
+
+    .row-meta .name{
+      font-weight:600;
+      font-size:13px;
+    }
+
+    .badge{
+      border-radius:999px;
+      padding:3px 8px;
+      font-size:10px;
+      font-family:'DM Mono',monospace;
+      letter-spacing:0.04em;
+      border:1px solid transparent;
+    }
+
+    .badge.dim{background:rgba(255,255,255,0.05); color:var(--muted)}
+    .badge.amber{background:var(--amber-soft); color:var(--amber); border-color:rgba(200,120,50,0.22)}
+    .badge.red{background:var(--red-soft); color:var(--red); border-color:rgba(240,151,151,0.22)}
+    .badge.green{background:var(--green-soft); color:var(--green); border-color:rgba(126,217,160,0.22)}
+
+    .meta-time{
+      margin-left:auto;
+      font-family:'DM Mono',monospace;
+      font-size:10px;
+      color:rgba(240,235,227,0.42);
+    }
+
+    .submeta{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      color:var(--muted);
+      font-size:11px;
+      margin-bottom:9px;
+    }
+
+    .line{
+      display:grid;
+      grid-template-columns:44px minmax(0,1fr) auto;
+      gap:10px;
+      align-items:flex-start;
+      margin-bottom:8px;
+    }
+
+    .line.guest{grid-template-columns:44px minmax(0,1fr)}
+
+    .label{
+      font-family:'DM Mono',monospace;
+      font-size:9px;
+      letter-spacing:0.08em;
+      text-transform:uppercase;
+      color:rgba(240,235,227,0.48);
+      padding-top:3px;
+    }
+
+    .text{
+      font-size:12px;
+      line-height:1.45;
+      color:rgba(240,235,227,0.92);
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+    }
+
+    .draft{
+      background:rgba(200,120,50,0.08);
+      border:1px solid rgba(200,120,50,0.16);
+      border-radius:12px;
+      padding:8px 10px;
+    }
+
+    .draft.review{
+      background:rgba(255,190,92,0.08);
+      border-color:rgba(255,190,92,0.16);
+    }
+
+    .draft .label{color:var(--amber)}
+
+    .actions{
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .actions button{
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,0.09);
+      background:rgba(255,255,255,0.05);
+      color:rgba(240,235,227,0.86);
+      padding:6px 9px;
+      font-family:'DM Mono',monospace;
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:0.04em;
+    }
+
+    .actions button.primary{
+      background:var(--green-soft);
+      border-color:rgba(126,217,160,0.24);
+      color:#bdf4cb;
+    }
+
+    .expand{
+      margin-left:54px;
+      margin-top:4px;
+      display:grid;
+      grid-template-columns:1fr 320px;
+      gap:12px;
+    }
+
+    .panel{
+      background:rgba(255,255,255,0.035);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:12px;
+      padding:12px;
+    }
+
+    .panel h3{
+      margin:0 0 7px;
+      font-family:'DM Mono',monospace;
+      font-size:9px;
+      letter-spacing:0.1em;
+      text-transform:uppercase;
+      color:rgba(240,235,227,0.5);
+    }
+
+    .panel p{
+      margin:0;
+      font-size:12px;
+      line-height:1.58;
+      color:rgba(240,235,227,0.92);
+    }
+
+    .analysis-grid{
+      display:grid;
+      grid-template-columns:92px 1fr;
+      gap:8px 10px;
+      font-size:11px;
+    }
+
+    .analysis-grid .k{
+      color:rgba(240,235,227,0.48);
+      font-family:'DM Mono',monospace;
+      font-size:10px;
+    }
+
+    .analysis-grid .v{
+      color:rgba(240,235,227,0.9);
+      line-height:1.45;
+    }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <a href="#">← Dashboard</a>
+    <a href="#" class="logo">oyvoda</a>
+    <a href="#">Signed in</a>
+  </nav>
+
+  <main class="shell">
+    <section class="page-head">
+      <div>
+        <div class="eyebrow">Revenue queue</div>
+        <h1>Pre-Booking Inbox</h1>
+        <div class="sub">Same standalone destination, but reworked as a dense approval inbox: guest message first, AI draft directly below, diagnostics hidden behind a question-mark popout, and no routing rail competing with the actual work.</div>
+      </div>
+      <div class="mode-chip">
+        <span>Operating mode</span>
+        <div class="seg">
+          <button class="active">Auto</button>
+          <button>Simple</button>
+          <button>Manager</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="toolbar">
+      <div class="pill active"><span>Needs action</span><strong>12</strong></div>
+      <div class="pill"><span>Revenue sensitive</span><strong>4</strong></div>
+      <div class="pill"><span>Knowledge gaps</span><strong>2</strong></div>
+      <div class="pill"><span>Draft ready</span><strong>7</strong></div>
+      <div class="spacer"></div>
+      <div class="filter">
+        <label>Property</label>
+        <select>
+          <option>All properties</option>
+          <option>Unknown property</option>
+          <option>Beach Habitats 30A</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="tabs">
+      <button class="active">All</button>
+      <button>Pending</button>
+      <button>Sent</button>
+      <button>Rejected</button>
+    </section>
+
+    <div class="status">18 inquiries · 12 pending · 7 draft-ready · 2 manual review · refreshed just now</div>
+
+    <section class="queue">
+      <div class="queue-head">
+        <div>Standalone pre-booking queue</div>
+        <div class="count">10 visible</div>
+      </div>
+
+      <article class="row">
+        <div class="row-meta">
+          <div class="name">Debi Carstens</div>
+          <span class="badge dim">Airbnb</span>
+          <span class="badge amber">Draft ready</span>
+          <span class="badge red">Revenue sensitive</span>
+          <div class="meta-time">14m ago</div>
+        </div>
+        <div class="submeta">
+          <div>Unknown property</div>
+          <div>May 16 → May 19</div>
+          <div>4 guests</div>
+        </div>
+        <div class="line guest">
+          <div class="label">Guest</div>
+          <div class="text">We are coming for my daughter’s graduation weekend. Is there any flexibility on late checkout, and is the clutter issue in the email I received something we should be worried about?</div>
+        </div>
+        <div class="line draft">
+          <div class="label">Draft</div>
+          <div class="text">Thanks for reaching out, Debi. We’d be glad to help with late checkout if availability allows, and there is no immediate safety concern tied to that earlier message. We can confirm checkout flexibility once we verify the reservation details.</div>
+          <div class="actions">
+            <button class="primary">Send</button>
+            <button>Edit</button>
+            <button>Reject</button>
+            <button>?</button>
+          </div>
+        </div>
+        <div class="expand">
+          <div class="panel">
+            <h3>Expanded draft edit</h3>
+            <p>In the real page this area becomes editable in place. The operator can see the full guest turn, full AI draft, and send the edited version without leaving the queue or opening a separate detail panel.</p>
+          </div>
+          <div class="panel">
+            <h3>Message analysis popout</h3>
+            <div class="analysis-grid">
+              <div class="k">Parser</div><div class="v">Airbnb · latest-turn isolated</div>
+              <div class="k">Route</div><div class="v">Review queue</div>
+              <div class="k">Warnings</div><div class="v">Conflicting prior message, graduation-weekend pricing sensitivity</div>
+              <div class="k">Binding</div><div class="v">No confirmed property binding yet</div>
+              <div class="k">Refs</div><div class="v">gmail 18fe2... · thread airbnb-8392</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="row">
+        <div class="row-meta">
+          <div class="name">Lanier Marshall</div>
+          <span class="badge dim">Vrbo</span>
+          <span class="badge amber">Draft ready</span>
+          <div class="meta-time">22m ago</div>
+        </div>
+        <div class="submeta">
+          <div>The Dunes 4B</div>
+          <div>Jul 2 → Jul 6</div>
+          <div>6 guests</div>
+        </div>
+        <div class="line guest">
+          <div class="label">Guest</div>
+          <div class="text">Does this home have a grill and is the beach access walkable for grandparents?</div>
+        </div>
+        <div class="line draft review">
+          <div class="label">Review</div>
+          <div class="text">Held for operator review until the property amenities and access details are verified against the property profile.</div>
+          <div class="actions">
+            <button class="primary">Send</button>
+            <button>Edit</button>
+            <button>Reject</button>
+            <button>?</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="row">
+        <div class="row-meta">
+          <div class="name">Sarah Chen</div>
+          <span class="badge dim">Airbnb</span>
+          <span class="badge red">Knowledge gap</span>
+          <div class="meta-time">31m ago</div>
+        </div>
+        <div class="submeta">
+          <div>Unknown property</div>
+          <div>Aug 8 → Aug 11</div>
+          <div>2 guests</div>
+        </div>
+        <div class="line guest">
+          <div class="label">Guest</div>
+          <div class="text">We need EV charging and easy beach access. Can you tell me if both are available?</div>
+        </div>
+        <div class="line draft review">
+          <div class="label">Review</div>
+          <div class="text">The current draft is held because the property profile does not yet confirm EV charging or the access path type.</div>
+          <div class="actions">
+            <button class="primary">Send</button>
+            <button>Edit</button>
+            <button>Reject</button>
+            <button>?</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="row">
+        <div class="row-meta">
+          <div class="name">Michael Soto</div>
+          <span class="badge dim">Vrbo</span>
+          <span class="badge amber">Draft ready</span>
+          <div class="meta-time">45m ago</div>
+        </div>
+        <div class="submeta">
+          <div>Beach Habitats 30A</div>
+          <div>Sep 3 → Sep 6</div>
+          <div>8 guests</div>
+        </div>
+        <div class="line guest">
+          <div class="label">Guest</div>
+          <div class="text">We’re traveling for a birthday weekend. Is there parking for three cars and a quiet hours policy we should know about?</div>
+        </div>
+        <div class="line draft">
+          <div class="label">Draft</div>
+          <div class="text">Thanks for checking. The home accommodates up to three vehicles, and we do ask all guests to respect quiet hours in the evening to keep the neighborhood peaceful.</div>
+          <div class="actions">
+            <button class="primary">Send</button>
+            <button>Edit</button>
+            <button>Reject</button>
+            <button>?</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="row">
+        <div class="row-meta">
+          <div class="name">Ava Reynolds</div>
+          <span class="badge dim">Airbnb</span>
+          <span class="badge green">Sent</span>
+          <div class="meta-time">1h ago</div>
+        </div>
+        <div class="submeta">
+          <div>Seabreeze Cottage</div>
+          <div>Jun 14 → Jun 18</div>
+        </div>
+        <div class="line guest">
+          <div class="label">Guest</div>
+          <div class="text">Can you tell me how far the property is from Rosemary Beach shops?</div>
+        </div>
+        <div class="line draft">
+          <div class="label">Sent</div>
+          <div class="text">The home is a short drive from Rosemary Beach dining and shopping, and we’d be happy to share favorite nearby spots once your stay is confirmed.</div>
+          <div class="actions">
+            <button>?</button>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

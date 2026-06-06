@@ -1,0 +1,142 @@
+{
+  "alembic_version": "080_operator_policies_market_id_corrective",
+  "captured_at_utc": "2026-05-18T11:23:23.815904+00:00",
+  "columns": [
+    {
+      "column_default": "gen_random_uuid()",
+      "column_name": "gap_id",
+      "data_type": "uuid",
+      "is_nullable": false,
+      "udt_name": "uuid"
+    },
+    {
+      "column_default": null,
+      "column_name": "tenant_id",
+      "data_type": "uuid",
+      "is_nullable": false,
+      "udt_name": "uuid"
+    },
+    {
+      "column_default": null,
+      "column_name": "property_id",
+      "data_type": "uuid",
+      "is_nullable": true,
+      "udt_name": "uuid"
+    },
+    {
+      "column_default": null,
+      "column_name": "property_external_id",
+      "data_type": "character varying",
+      "is_nullable": true,
+      "udt_name": "varchar"
+    },
+    {
+      "column_default": null,
+      "column_name": "question_text",
+      "data_type": "text",
+      "is_nullable": false,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "stage",
+      "data_type": "character varying",
+      "is_nullable": true,
+      "udt_name": "varchar"
+    },
+    {
+      "column_default": "'text'::character varying",
+      "column_name": "channel",
+      "data_type": "character varying",
+      "is_nullable": false,
+      "udt_name": "varchar"
+    },
+    {
+      "column_default": "'concierge'::character varying",
+      "column_name": "source",
+      "data_type": "character varying",
+      "is_nullable": false,
+      "udt_name": "varchar"
+    },
+    {
+      "column_default": null,
+      "column_name": "detected_intent",
+      "data_type": "character varying",
+      "is_nullable": true,
+      "udt_name": "varchar"
+    },
+    {
+      "column_default": null,
+      "column_name": "confidence_score",
+      "data_type": "double precision",
+      "is_nullable": true,
+      "udt_name": "float8"
+    },
+    {
+      "column_default": "false",
+      "column_name": "resolved",
+      "data_type": "boolean",
+      "is_nullable": false,
+      "udt_name": "bool"
+    },
+    {
+      "column_default": null,
+      "column_name": "resolution_notes",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": "'{}'::jsonb",
+      "column_name": "metadata",
+      "data_type": "jsonb",
+      "is_nullable": false,
+      "udt_name": "jsonb"
+    },
+    {
+      "column_default": "now()",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": false,
+      "udt_name": "timestamptz"
+    }
+  ],
+  "indexes": [
+    {
+      "columns": [
+        "gap_id"
+      ],
+      "indexdef": "CREATE UNIQUE INDEX concierge_knowledge_gaps_pkey ON public.concierge_knowledge_gaps USING btree (gap_id)",
+      "indexname": "concierge_knowledge_gaps_pkey",
+      "is_unique": true
+    },
+    {
+      "columns": [
+        "tenant_id",
+        "created_at"
+      ],
+      "indexdef": "CREATE INDEX ix_concierge_knowledge_gaps_tenant_created ON public.concierge_knowledge_gaps USING btree (tenant_id, created_at)",
+      "indexname": "ix_concierge_knowledge_gaps_tenant_created",
+      "is_unique": false
+    },
+    {
+      "columns": [
+        "tenant_id",
+        "property_external_id"
+      ],
+      "indexdef": "CREATE INDEX ix_concierge_knowledge_gaps_tenant_property_external ON public.concierge_knowledge_gaps USING btree (tenant_id, property_external_id)",
+      "indexname": "ix_concierge_knowledge_gaps_tenant_property_external",
+      "is_unique": false
+    },
+    {
+      "columns": [
+        "tenant_id",
+        "resolved"
+      ],
+      "indexdef": "CREATE INDEX ix_concierge_knowledge_gaps_tenant_resolved ON public.concierge_knowledge_gaps USING btree (tenant_id, resolved)",
+      "indexname": "ix_concierge_knowledge_gaps_tenant_resolved",
+      "is_unique": false
+    }
+  ],
+  "table": "concierge_knowledge_gaps"
+}

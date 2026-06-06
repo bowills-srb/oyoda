@@ -1,0 +1,19 @@
+{
+  "fixture_id": "direct/008_matthew_morrison",
+  "description": "direct inquiry captured from live Beach Habitats inbound traffic",
+  "expected_route_contains": "direct",
+  "expected_pipeline_output": {
+    "platform": "direct",
+    "parser_source_contains": "",
+    "guest_name": "Guest 010",
+    "latest_guest_message_contains": [
+      "We are scheduled to arrive on June 4. Per the instructions, we cannot access the"
+    ],
+    "requested_check_in": "2026-06-04",
+    "requested_check_out": null,
+    "requested_guests": null,
+    "platform_listing_id": "",
+    "platform_unit_id": "",
+    "property_reference_token": "Property_010"
+  }
+}

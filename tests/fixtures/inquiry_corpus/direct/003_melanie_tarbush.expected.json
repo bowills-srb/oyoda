@@ -1,0 +1,19 @@
+{
+  "fixture_id": "direct/003_melanie_tarbush",
+  "description": "direct inquiry captured from live Beach Habitats inbound traffic",
+  "expected_route_contains": "direct",
+  "expected_pipeline_output": {
+    "platform": "direct",
+    "parser_source_contains": "",
+    "guest_name": "Guest 003",
+    "latest_guest_message_contains": [
+      "Hello! Can you please explain the layout of the condo? One of the reviews says i"
+    ],
+    "requested_check_in": "2026-06-09",
+    "requested_check_out": "2026-06-14",
+    "requested_guests": 8,
+    "platform_listing_id": "",
+    "platform_unit_id": "",
+    "property_reference_token": "unit_003"
+  }
+}

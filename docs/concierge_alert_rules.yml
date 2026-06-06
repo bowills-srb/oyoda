@@ -1,0 +1,92 @@
+groups:
+  - name: concierge-slo
+    rules:
+      - alert: ConciergeApiP95LatencyHigh
+        expr: histogram_quantile(0.95, sum(rate(concierge_http_request_latency_seconds_bucket{path_group=~"concierge|voice|knowledge|sms|phone"}[5m])) by (le, path_group)) > 1.2
+        for: 10m
+        labels:
+          severity: page
+        annotations:
+          summary: "Concierge API p95 latency exceeded 1.2s for 10m"
+
+      - alert: ConciergeKnowledgeEmptyRateHigh
+        expr: |
+          (
+            sum(rate(concierge_knowledge_retrieval_total{outcome="empty"}[15m]))
+            /
+            clamp_min(sum(rate(concierge_knowledge_retrieval_total[15m])), 1e-9)
+          ) > 0.05
+        for: 15m
+        labels:
+          severity: warn
+        annotations:
+          summary: "Concierge knowledge empty retrieval rate exceeded 5%"
+
+      - alert: ConciergeErrorRateHigh
+        expr: |
+          (
+            sum(rate(concierge_http_requests_total{status_class=~"5xx"}[5m]))
+            /
+            clamp_min(sum(rate(concierge_http_requests_total[5m])), 1e-9)
+          ) > 0.01
+        for: 10m
+        labels:
+          severity: page
+        annotations:
+          summary: "Concierge 5xx rate exceeded 1% for 10m"
+
+      - alert: ConciergeEscalationBacklogHigh
+        expr: concierge_open_escalations > 25
+        for: 10m
+        labels:
+          severity: warn
+        annotations:
+          summary: "Concierge escalation backlog exceeded 25 open tickets"
+
+      # ── Composer-fallback alarms ──────────────────────────────────────────
+      # These rules catch the May 21-26 silent-outage pattern: key misconfiguration
+      # or an integration crash causes every inbound message to fall back to
+      # deterministic concatenation, and nobody notices for days.
+      #
+      # concierge_composer_outcome_total is emitted at orchestrator step 6 for
+      # every inbound message that reached the compose stage.  Labels:
+      #   composer_source  — raw ComposerMetadata.composer_source value
+      #   fallback_cause   — derived: none | empty | orchestrator_error | no_keys |
+      #                      providers_failed | flag_off
+
+      - alert: ComposerFallbackSustained
+        # PAGE — the May 21-26 signature: keys missing or integration broken.
+        # Any sustained occurrence means guests are silently getting canned
+        # concatenation instead of LLM responses.  10m for: avoids paging on
+        # a single request blip; would have caught the 5-day outage in 10 min.
+        expr: rate(concierge_composer_outcome_total{fallback_cause=~"no_keys|orchestrator_error"}[10m]) > 0
+        for: 10m
+        labels:
+          severity: page
+        annotations:
+          summary: "Composer is falling back due to missing keys or orchestrator error (May 21-26 outage signature)"
+          description: >
+            fallback_cause={{ $labels.fallback_cause }} sustained for 10m —
+            guests are receiving deterministic concatenation instead of LLM
+            responses.  Check ANTHROPIC_API_KEY / GROQ_API_KEY propagation
+            and recent deploy logs.
+
+      - alert: ComposerProviderFailureRateHigh
+        # WARN — transient LLM-provider failure rate elevated.  Self-healing
+        # Anthropic/Groq outages typically resolve within minutes; 20% over
+        # 15m warrants investigation but not a 3am page.
+        expr: |
+          (
+            sum(rate(concierge_composer_outcome_total{fallback_cause="providers_failed"}[15m]))
+            /
+            clamp_min(sum(rate(concierge_composer_outcome_total[15m])), 1e-9)
+          ) > 0.20
+        for: 15m
+        labels:
+          severity: warn
+        annotations:
+          summary: "More than 20% of composer calls are falling back to concatenation via provider failure"
+          description: >
+            Provider-failure fallback rate has exceeded 20% for 15m.
+            This is a degraded-LLM signal, not the key-misconfiguration
+            alarm.  Check Anthropic / Groq status pages and recent error logs.

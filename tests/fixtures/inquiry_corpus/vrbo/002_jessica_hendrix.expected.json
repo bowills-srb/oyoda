@@ -1,0 +1,19 @@
+{
+  "fixture_id": "vrbo/002_jessica_hendrix",
+  "description": "vrbo inquiry captured from live Beach Habitats inbound traffic",
+  "expected_route_contains": "vrbo",
+  "expected_pipeline_output": {
+    "platform": "vrbo",
+    "parser_source_contains": "",
+    "guest_name": "Guest 012",
+    "latest_guest_message_contains": [
+      "Very interested in this house for September for my family. I was going to ask if"
+    ],
+    "requested_check_in": "2026-09-13",
+    "requested_check_out": "2026-09-20",
+    "requested_guests": null,
+    "platform_listing_id": "",
+    "platform_unit_id": "",
+    "property_reference_token": "ExternalID:2403-000012"
+  }
+}

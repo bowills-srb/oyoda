@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#08090f"/>
+      <stop offset="100%" style="stop-color:#0d1520"/>
+    </linearGradient>
+    <linearGradient id="amber" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#c87832"/>
+      <stop offset="100%" style="stop-color:#e09040"/>
+    </linearGradient>
+    <!-- Grid pattern -->
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#ffffff" stroke-width="0.3" opacity="0.04"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <!-- Subtle amber glow bottom right -->
+  <ellipse cx="1050" cy="500" rx="400" ry="300" fill="#c87832" opacity="0.04"/>
+
+  <!-- Logo mark: o + arc -->
+  <text x="600" y="248" font-family="Georgia, serif" font-size="72" font-weight="500"
+        fill="#f0ebe3" text-anchor="middle" letter-spacing="-1">oyvoda</text>
+
+  <!-- Amber arc above the o -->
+  <path d="M 558 178 Q 585 158 612 178" stroke="url(#amber)" stroke-width="4"
+        fill="none" stroke-linecap="round"/>
+
+  <!-- Divider -->
+  <rect x="480" y="272" width="240" height="1" fill="#c87832" opacity="0.4"/>
+
+  <!-- Tagline -->
+  <text x="600" y="330" font-family="Georgia, serif" font-size="28" font-weight="400"
+        fill="#f0ebe3" text-anchor="middle" opacity="0.9">Professional Hospitality</text>
+  <text x="600" y="368" font-family="Georgia, serif" font-size="28" font-style="italic"
+        fill="#c87832" text-anchor="middle">for the Private Stay.</text>
+
+  <!-- Sub copy -->
+  <text x="600" y="422" font-family="'DM Sans', Arial, sans-serif" font-size="16"
+        fill="#8a9ab5" text-anchor="middle">AI-powered · RCS-first · White-labeled · Any PMS</text>
+
+  <!-- Stats row -->
+  <g transform="translate(600, 510)">
+    <!-- Stat 1 -->
+    <g transform="translate(-240, 0)">
+      <text x="0" y="0" font-family="Georgia, serif" font-size="32" font-weight="600"
+            fill="#f0ebe3" text-anchor="middle">89%</text>
+      <text x="0" y="22" font-family="Arial, sans-serif" font-size="12"
+            fill="#5a7090" text-anchor="middle">QUESTIONS RESOLVED</text>
+    </g>
+    <!-- Divider -->
+    <rect x="-100" y="-24" width="1" height="50" fill="#2a3a50"/>
+    <!-- Stat 2 -->
+    <g transform="translate(0, 0)">
+      <text x="0" y="0" font-family="Georgia, serif" font-size="32" font-weight="600"
+            fill="#f0ebe3" text-anchor="middle">8.4 min</text>
+      <text x="0" y="22" font-family="Arial, sans-serif" font-size="12"
+            fill="#5a7090" text-anchor="middle">SAVED PER INTERACTION</text>
+    </g>
+    <!-- Divider -->
+    <rect x="100" y="-24" width="1" height="50" fill="#2a3a50"/>
+    <!-- Stat 3 -->
+    <g transform="translate(240, 0)">
+      <text x="0" y="0" font-family="Georgia, serif" font-size="32" font-weight="600"
+            fill="#f0ebe3" text-anchor="middle">24/7</text>
+      <text x="0" y="22" font-family="Arial, sans-serif" font-size="12"
+            fill="#5a7090" text-anchor="middle">ALWAYS ON</text>
+    </g>
+  </g>
+
+  <!-- Bottom domain -->
+  <text x="600" y="610" font-family="Arial, sans-serif" font-size="13"
+        fill="#2a3a50" text-anchor="middle" letter-spacing="2">OYVODA.COM</text>
+</svg>

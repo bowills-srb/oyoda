@@ -1,0 +1,19 @@
+{
+  "fixture_id": "direct/005_christina_moser",
+  "description": "direct inquiry captured from live Beach Habitats inbound traffic",
+  "expected_route_contains": "direct",
+  "expected_pipeline_output": {
+    "platform": "direct",
+    "parser_source_contains": "",
+    "guest_name": "Guest 006",
+    "latest_guest_message_contains": [
+      "Hello- can you confirm if the unit has the following? High chair Pack and play B"
+    ],
+    "requested_check_in": "2026-05-23",
+    "requested_check_out": "2026-05-30",
+    "requested_guests": null,
+    "platform_listing_id": "",
+    "platform_unit_id": "",
+    "property_reference_token": "unit_006"
+  }
+}

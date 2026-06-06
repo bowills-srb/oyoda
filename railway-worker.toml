@@ -1,0 +1,8 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "docker/Dockerfile.worker"
+
+[deploy]
+startCommand = "sh -c 'python3 scripts/railway_bootstrap.py --role worker --service-name oyvoda-worker -- celery -A app.workers.celery_app:celery_app worker --loglevel=INFO --queues=ingestion,concierge,operations --hostname=multiq@%h --concurrency=${CELERY_INGESTION_CONCURRENCY:-6} --prefetch-multiplier=1'"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3

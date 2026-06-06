@@ -1,0 +1,315 @@
+{
+  "alembic_version": "080_operator_policies_market_id_corrective",
+  "captured_at_utc": "2026-05-18T11:23:23.127945+00:00",
+  "columns": [
+    {
+      "column_default": "gen_random_uuid()",
+      "column_name": "normalization_id",
+      "data_type": "uuid",
+      "is_nullable": false,
+      "udt_name": "uuid"
+    },
+    {
+      "column_default": null,
+      "column_name": "tenant_id",
+      "data_type": "uuid",
+      "is_nullable": false,
+      "udt_name": "uuid"
+    },
+    {
+      "column_default": null,
+      "column_name": "message_id",
+      "data_type": "uuid",
+      "is_nullable": true,
+      "udt_name": "uuid"
+    },
+    {
+      "column_default": null,
+      "column_name": "source_channel",
+      "data_type": "text",
+      "is_nullable": false,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "source_provider",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "source_thread_id",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "source_message_id",
+      "data_type": "text",
+      "is_nullable": false,
+      "udt_name": "text"
+    },
+    {
+      "column_default": "'guest'::text",
+      "column_name": "sender_role",
+      "data_type": "text",
+      "is_nullable": false,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "sender_display_name",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "sender_address",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": "now()",
+      "column_name": "sent_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": false,
+      "udt_name": "timestamptz"
+    },
+    {
+      "column_default": null,
+      "column_name": "raw_subject",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "latest_guest_turn",
+      "data_type": "text",
+      "is_nullable": false,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "prior_thread_context",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "full_message_text",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": "'[]'::jsonb",
+      "column_name": "structured_asks",
+      "data_type": "jsonb",
+      "is_nullable": false,
+      "udt_name": "jsonb"
+    },
+    {
+      "column_default": "'[]'::jsonb",
+      "column_name": "prior_operator_commitments",
+      "data_type": "jsonb",
+      "is_nullable": false,
+      "udt_name": "jsonb"
+    },
+    {
+      "column_default": "'[]'::jsonb",
+      "column_name": "property_binding_candidates",
+      "data_type": "jsonb",
+      "is_nullable": false,
+      "udt_name": "jsonb"
+    },
+    {
+      "column_default": "'{}'::jsonb",
+      "column_name": "channel_constraints",
+      "data_type": "jsonb",
+      "is_nullable": false,
+      "udt_name": "jsonb"
+    },
+    {
+      "column_default": null,
+      "column_name": "selected_property_code",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "selected_property_match_type",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "parser_used",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": "'v1'::text",
+      "column_name": "parser_version",
+      "data_type": "text",
+      "is_nullable": false,
+      "udt_name": "text"
+    },
+    {
+      "column_default": "'[]'::jsonb",
+      "column_name": "parser_notes",
+      "data_type": "jsonb",
+      "is_nullable": false,
+      "udt_name": "jsonb"
+    },
+    {
+      "column_default": null,
+      "column_name": "latest_turn_confidence",
+      "data_type": "numeric",
+      "is_nullable": true,
+      "udt_name": "numeric"
+    },
+    {
+      "column_default": "false",
+      "column_name": "latest_turn_extracted",
+      "data_type": "boolean",
+      "is_nullable": false,
+      "udt_name": "bool"
+    },
+    {
+      "column_default": null,
+      "column_name": "route_outcome",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "draft_source",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "fallback_reason",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": "now()",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": false,
+      "udt_name": "timestamptz"
+    },
+    {
+      "column_default": "now()",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": false,
+      "udt_name": "timestamptz"
+    },
+    {
+      "column_default": null,
+      "column_name": "composer_source",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "composer_response_text",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "composer_latency_ms",
+      "data_type": "integer",
+      "is_nullable": true,
+      "udt_name": "int4"
+    },
+    {
+      "column_default": null,
+      "column_name": "composer_input_tokens",
+      "data_type": "integer",
+      "is_nullable": true,
+      "udt_name": "int4"
+    },
+    {
+      "column_default": null,
+      "column_name": "composer_output_tokens",
+      "data_type": "integer",
+      "is_nullable": true,
+      "udt_name": "int4"
+    },
+    {
+      "column_default": "'[]'::jsonb",
+      "column_name": "composer_notes",
+      "data_type": "jsonb",
+      "is_nullable": false,
+      "udt_name": "jsonb"
+    }
+  ],
+  "indexes": [
+    {
+      "columns": [
+        "tenant_id",
+        "selected_property_code",
+        "selected_property_match_type"
+      ],
+      "indexdef": "CREATE INDEX idx_msg_norm_property_match ON public.message_normalizations USING btree (tenant_id, selected_property_code, selected_property_match_type)",
+      "indexname": "idx_msg_norm_property_match",
+      "is_unique": false
+    },
+    {
+      "columns": [
+        "tenant_id",
+        "route_outcome",
+        "sent_at"
+      ],
+      "indexdef": "CREATE INDEX idx_msg_norm_tenant_route ON public.message_normalizations USING btree (tenant_id, route_outcome, sent_at DESC)",
+      "indexname": "idx_msg_norm_tenant_route",
+      "is_unique": false
+    },
+    {
+      "columns": [
+        "tenant_id",
+        "sent_at"
+      ],
+      "indexdef": "CREATE INDEX idx_msg_norm_tenant_sent ON public.message_normalizations USING btree (tenant_id, sent_at DESC)",
+      "indexname": "idx_msg_norm_tenant_sent",
+      "is_unique": false
+    },
+    {
+      "columns": [
+        "normalization_id"
+      ],
+      "indexdef": "CREATE UNIQUE INDEX message_normalizations_pkey ON public.message_normalizations USING btree (normalization_id)",
+      "indexname": "message_normalizations_pkey",
+      "is_unique": true
+    },
+    {
+      "columns": [
+        "tenant_id",
+        "source_channel",
+        "source_message_id"
+      ],
+      "indexdef": "CREATE UNIQUE INDEX uq_message_norm_source ON public.message_normalizations USING btree (tenant_id, source_channel, source_message_id)",
+      "indexname": "uq_message_norm_source",
+      "is_unique": true
+    }
+  ],
+  "table": "message_normalizations"
+}

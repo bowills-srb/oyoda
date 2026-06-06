@@ -1,0 +1,123 @@
+:root {
+  /* Surfaces */
+  --surface-page:    #fafafa;
+  --surface-raised:  #ffffff;
+  --surface-sunken:  #f5f5f4;
+  --surface-overlay: rgba(10,10,10,0.4);
+
+  /* Borders */
+  --border-default:  #e8e8e7;
+  --border-strong:   #d4d4d3;
+  --border-hairline: #f1f1f0;
+  --border-focus:    #b8651a;
+
+  /* Text */
+  --text-primary:   #0a0a0a;
+  --text-secondary: #525050;
+  --text-tertiary:  #8a8888;
+  --text-disabled:  #c4c2c1;
+  --text-inverse:   #ffffff;
+
+  /* Brand (used surgically) */
+  --brand-50:  #faf0e6;
+  --brand-100: #f0d4b0;
+  --brand-500: #d4791e;
+  --brand-600: #b8651a;
+  --brand-700: #8a4a18;
+
+  /* Status (semantic only — never decorative) */
+  --success-50:  #ecfdf5;
+  --success-600: #0a7d3e;
+  --success-700: #065f2f;
+
+  --warning-50:  #fff8e6;
+  --warning-600: #b8650f;
+  --warning-700: #8a4a0a;
+
+  --danger-50:   #fef2f2;
+  --danger-600:  #b91c1c;
+  --danger-700:  #8a1414;
+
+  --info-50:     #eff6ff;
+  --info-600:    #1e5fb8;
+  --info-700:    #164a8c;
+
+  /* Typography */
+  --font-sans:    'Inter', 'InterVariable', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', 'SF Mono', Menlo, monospace;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+
+  /* Type scale */
+  --text-display:   32px;
+  --text-h1:        22px;
+  --text-h2:        17px;
+  --text-h3:        14px;
+  --text-body:      14px;
+  --text-body-sm:   13px;
+  --text-caption:   12px;
+  --text-tiny:      11px;
+
+  /* Spacing */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* Radii */
+  --radius-sm:   4px;
+  --radius-md:   6px;
+  --radius-lg:   8px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 8px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-xl: 0 16px 48px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.06);
+
+  /* Motion */
+  --duration-fast:   100ms;
+  --duration-medium: 200ms;
+  --duration-slow:   300ms;
+  --ease-default:    cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
+
+  /* Layout */
+  --shell-nav-width:    240px;
+  --shell-nav-collapsed: 56px;
+  --shell-detail-min:   360px;
+  --shell-detail-max:   480px;
+  --shell-topbar:       48px;
+
+  /* Legacy aliases — keep for one ship while sections migrate */
+  --amber:  var(--brand-600);
+  --gold:   var(--brand-500);
+  --glow:   var(--brand-700);
+  --green:  var(--success-600);
+  --red:    var(--danger-600);
+  --yellow: var(--warning-600);
+  --blue:   var(--info-600);
+  --ink:    var(--surface-page);
+  --navy:   var(--surface-raised);
+  --slate:  var(--surface-sunken);
+  --mid:    var(--border-default);
+  --border: var(--border-default);
+  --dim:    var(--text-tertiary);
+  --ghost:  var(--text-secondary);
+  --white:  var(--text-primary);
+  --sidebar: var(--shell-nav-width);
+  --topbar:  var(--shell-topbar);
+
+  /* Compatibility tokens for unmigrated section CSS */
+  --border-amber: var(--brand-100);
+  --imp-bg:       var(--brand-50);
+  --imp-border:   var(--brand-100);
+}

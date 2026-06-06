@@ -1,0 +1,142 @@
+{
+  "alembic_version": "081_healer_proposals",
+  "captured_at_utc": "2026-05-18T14:00:00+00:00",
+  "columns": [
+    {
+      "column_default": "gen_random_uuid()",
+      "column_name": "proposal_id",
+      "data_type": "uuid",
+      "is_nullable": false,
+      "udt_name": "uuid"
+    },
+    {
+      "column_default": null,
+      "column_name": "tenant_id",
+      "data_type": "uuid",
+      "is_nullable": false,
+      "udt_name": "uuid"
+    },
+    {
+      "column_default": null,
+      "column_name": "proposal_kind",
+      "data_type": "text",
+      "is_nullable": false,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "signal_source",
+      "data_type": "text",
+      "is_nullable": false,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "dedup_key",
+      "data_type": "text",
+      "is_nullable": false,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "summary",
+      "data_type": "text",
+      "is_nullable": false,
+      "udt_name": "text"
+    },
+    {
+      "column_default": "'[]'::jsonb",
+      "column_name": "evidence",
+      "data_type": "jsonb",
+      "is_nullable": false,
+      "udt_name": "jsonb"
+    },
+    {
+      "column_default": "'{}'::jsonb",
+      "column_name": "proposed_change",
+      "data_type": "jsonb",
+      "is_nullable": false,
+      "udt_name": "jsonb"
+    },
+    {
+      "column_default": "'pending'::text",
+      "column_name": "status",
+      "data_type": "text",
+      "is_nullable": false,
+      "udt_name": "text"
+    },
+    {
+      "column_default": "0",
+      "column_name": "confidence",
+      "data_type": "double precision",
+      "is_nullable": false,
+      "udt_name": "float8"
+    },
+    {
+      "column_default": "0",
+      "column_name": "cluster_size",
+      "data_type": "integer",
+      "is_nullable": false,
+      "udt_name": "int4"
+    },
+    {
+      "column_default": "now()",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": false,
+      "udt_name": "timestamptz"
+    },
+    {
+      "column_default": null,
+      "column_name": "reviewed_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": true,
+      "udt_name": "timestamptz"
+    },
+    {
+      "column_default": null,
+      "column_name": "reviewed_by",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": null,
+      "column_name": "review_notes",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    }
+  ],
+  "indexes": [
+    {
+      "columns": [
+        "proposal_id"
+      ],
+      "indexdef": "CREATE UNIQUE INDEX healer_proposals_pkey ON public.healer_proposals USING btree (proposal_id)",
+      "indexname": "healer_proposals_pkey",
+      "is_unique": true
+    },
+    {
+      "columns": [
+        "tenant_id",
+        "status",
+        "created_at"
+      ],
+      "indexdef": "CREATE INDEX ix_healer_proposals_tenant_status ON public.healer_proposals USING btree (tenant_id, status, created_at)",
+      "indexname": "ix_healer_proposals_tenant_status",
+      "is_unique": false
+    },
+    {
+      "columns": [
+        "tenant_id",
+        "proposal_kind",
+        "dedup_key"
+      ],
+      "indexdef": "CREATE UNIQUE INDEX ux_healer_proposals_pending_dedup ON public.healer_proposals USING btree (tenant_id, proposal_kind, dedup_key) WHERE (status = 'pending'::text)",
+      "indexname": "ux_healer_proposals_pending_dedup",
+      "is_unique": true
+    }
+  ],
+  "table": "healer_proposals"
+}

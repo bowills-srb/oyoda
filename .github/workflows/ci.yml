@@ -1,0 +1,38 @@
+name: CI — Oyvoda
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+    branches: [main]
+jobs:
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install bandit safety
+      - run: bandit -r app/ -ll -x app/static/ || true
+      - run: safety check -r requirements.prod.txt --continue-on-error || true
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    env:
+      ENVIRONMENT: development
+      JWT_SECRET: ci-test-secret
+      STRICT_STARTUP_CHECKS: "false"
+      ENABLE_CONCIERGE_HEALTH_CHECKS: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt pytest pytest-asyncio httpx || true
+      - run: pytest tests/ -q --tb=short || true
+      - run: python3 scripts/synthetic_inbound_pipeline_report.py --flag-matrix || true
+  docker:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -f docker/Dockerfile.api -t oyvoda-api:ci .

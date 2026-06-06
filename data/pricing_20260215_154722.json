@@ -1,0 +1,1253 @@
+[
+  {
+    "property_code": "134MC",
+    "property_slug": "134-mystic-cobalt",
+    "quotes": [
+      {
+        "property_code": "134MC",
+        "check_in": "2026-02-24",
+        "check_out": "2026-02-27",
+        "nights": 3,
+        "lodging": 2747.5,
+        "cleaning_fee": 0.0,
+        "taxes": 329.71,
+        "total": 3077.21,
+        "adr": 915.8333333333334,
+        "scraped_at": "2026-02-15T15:40:31.079302"
+      },
+      {
+        "property_code": "134MC",
+        "check_in": "2026-04-09",
+        "check_out": "2026-04-12",
+        "nights": 3,
+        "lodging": 4112.5,
+        "cleaning_fee": 0.0,
+        "taxes": 493.51,
+        "total": 4606.01,
+        "adr": 1370.8333333333333,
+        "scraped_at": "2026-02-15T15:40:33.094168"
+      },
+      {
+        "property_code": "134MC",
+        "check_in": "2026-04-19",
+        "check_out": "2026-04-22",
+        "nights": 3,
+        "lodging": 3126.5,
+        "cleaning_fee": 0.0,
+        "taxes": 375.19,
+        "total": 3501.69,
+        "adr": 1042.1666666666667,
+        "scraped_at": "2026-02-15T15:40:35.106189"
+      }
+    ],
+    "avg_adr": 1109.611111111111,
+    "min_adr": 915.8333333333334,
+    "max_adr": 1370.8333333333333
+  },
+  {
+    "property_code": "108SLW",
+    "property_slug": "108-silver-laurel-way",
+    "quotes": [
+      {
+        "property_code": "108SLW",
+        "check_in": "2026-02-16",
+        "check_out": "2026-02-19",
+        "nights": 3,
+        "lodging": 2648.5,
+        "cleaning_fee": 0.0,
+        "taxes": 317.83,
+        "total": 2966.33,
+        "adr": 882.8333333333334,
+        "scraped_at": "2026-02-15T15:40:41.245690"
+      },
+      {
+        "property_code": "108SLW",
+        "check_in": "2026-04-12",
+        "check_out": "2026-04-15",
+        "nights": 3,
+        "lodging": 3104.5,
+        "cleaning_fee": 0.0,
+        "taxes": 372.55,
+        "total": 3477.05,
+        "adr": 1034.8333333333333,
+        "scraped_at": "2026-02-15T15:40:45.271768"
+      },
+      {
+        "property_code": "108SLW",
+        "check_in": "2026-04-24",
+        "check_out": "2026-04-27",
+        "nights": 3,
+        "lodging": 3055.5,
+        "cleaning_fee": 0.0,
+        "taxes": 366.67,
+        "total": 3422.17,
+        "adr": 1018.5,
+        "scraped_at": "2026-02-15T15:40:47.283245"
+      }
+    ],
+    "avg_adr": 978.7222222222222,
+    "min_adr": 882.8333333333334,
+    "max_adr": 1034.8333333333333
+  },
+  {
+    "property_code": "17LL",
+    "property_slug": "17-lyonia-lane",
+    "quotes": [
+      {
+        "property_code": "17LL",
+        "check_in": "2026-02-16",
+        "check_out": "2026-02-19",
+        "nights": 3,
+        "lodging": 2659.5,
+        "cleaning_fee": 0.0,
+        "taxes": 319.15,
+        "total": 2978.65,
+        "adr": 886.5,
+        "scraped_at": "2026-02-15T15:40:54.485244"
+      },
+      {
+        "property_code": "17LL",
+        "check_in": "2026-03-28",
+        "check_out": "2026-03-31",
+        "nights": 3,
+        "lodging": 3023.5,
+        "cleaning_fee": 0.0,
+        "taxes": 362.83,
+        "total": 3386.33,
+        "adr": 1007.8333333333334,
+        "scraped_at": "2026-02-15T15:40:56.497303"
+      },
+      {
+        "property_code": "17LL",
+        "check_in": "2026-04-11",
+        "check_out": "2026-04-14",
+        "nights": 3,
+        "lodging": 2652.5,
+        "cleaning_fee": 0.0,
+        "taxes": 318.31,
+        "total": 2970.81,
+        "adr": 884.1666666666666,
+        "scraped_at": "2026-02-15T15:40:58.508790"
+      }
+    ],
+    "avg_adr": 926.1666666666666,
+    "min_adr": 884.1666666666666,
+    "max_adr": 1007.8333333333334
+  },
+  {
+    "property_code": "359SC",
+    "property_slug": "359-spartina-circle",
+    "quotes": [
+      {
+        "property_code": "359SC",
+        "check_in": "2026-02-16",
+        "check_out": "2026-02-19",
+        "nights": 3,
+        "lodging": 2385.5,
+        "cleaning_fee": 0.0,
+        "taxes": 286.27,
+        "total": 2671.77,
+        "adr": 795.1666666666666,
+        "scraped_at": "2026-02-15T15:41:06.735053"
+      },
+      {
+        "property_code": "359SC",
+        "check_in": "2026-04-11",
+        "check_out": "2026-04-14",
+        "nights": 3,
+        "lodging": 2664.5,
+        "cleaning_fee": 0.0,
+        "taxes": 319.75,
+        "total": 2984.25,
+        "adr": 888.1666666666666,
+        "scraped_at": "2026-02-15T15:41:08.746162"
+      },
+      {
+        "property_code": "359SC",
+        "check_in": "2026-04-23",
+        "check_out": "2026-04-26",
+        "nights": 3,
+        "lodging": 2853.5,
+        "cleaning_fee": 0.0,
+        "taxes": 342.43,
+        "total": 3195.93,
+        "adr": 951.1666666666666,
+        "scraped_at": "2026-02-15T15:41:10.759473"
+      }
+    ],
+    "avg_adr": 878.1666666666666,
+    "min_adr": 795.1666666666666,
+    "max_adr": 951.1666666666666
+  },
+  {
+    "property_code": "48SWC",
+    "property_slug": "48-seawalk-circle",
+    "quotes": [
+      {
+        "property_code": "48SWC",
+        "check_in": "2026-02-20",
+        "check_out": "2026-02-23",
+        "nights": 3,
+        "lodging": 6404.0,
+        "cleaning_fee": 0.0,
+        "taxes": 768.48,
+        "total": 7172.48,
+        "adr": 2134.6666666666665,
+        "scraped_at": "2026-02-15T15:41:18.885202"
+      },
+      {
+        "property_code": "48SWC",
+        "check_in": "2026-03-14",
+        "check_out": "2026-03-17",
+        "nights": 3,
+        "lodging": 9232.0,
+        "cleaning_fee": 0.0,
+        "taxes": 1107.84,
+        "total": 10339.84,
+        "adr": 3077.3333333333335,
+        "scraped_at": "2026-02-15T15:41:20.897087"
+      },
+      {
+        "property_code": "48SWC",
+        "check_in": "2026-04-11",
+        "check_out": "2026-04-14",
+        "nights": 3,
+        "lodging": 7184.0,
+        "cleaning_fee": 0.0,
+        "taxes": 862.08,
+        "total": 8046.08,
+        "adr": 2394.6666666666665,
+        "scraped_at": "2026-02-15T15:41:22.910498"
+      }
+    ],
+    "avg_adr": 2535.5555555555557,
+    "min_adr": 2134.6666666666665,
+    "max_adr": 3077.3333333333335
+  },
+  {
+    "property_code": "49CS",
+    "property_slug": "49-clipper-st",
+    "quotes": [
+      {
+        "property_code": "49CS",
+        "check_in": "2026-02-16",
+        "check_out": "2026-02-19",
+        "nights": 3,
+        "lodging": 1878.0,
+        "cleaning_fee": 0.0,
+        "taxes": 225.36,
+        "total": 2103.36,
+        "adr": 626.0,
+        "scraped_at": "2026-02-15T15:41:29.754747"
+      },
+      {
+        "property_code": "49CS",
+        "check_in": "2026-03-01",
+        "check_out": "2026-03-04",
+        "nights": 3,
+        "lodging": 1984.0,
+        "cleaning_fee": 0.0,
+        "taxes": 238.08,
+        "total": 2222.08,
+        "adr": 661.3333333333334,
+        "scraped_at": "2026-02-15T15:41:31.765209"
+      },
+      {
+        "property_code": "49CS",
+        "check_in": "2026-04-19",
+        "check_out": "2026-04-22",
+        "nights": 3,
+        "lodging": 3066.0,
+        "cleaning_fee": 0.0,
+        "taxes": 367.92,
+        "total": 3433.92,
+        "adr": 1022.0,
+        "scraped_at": "2026-02-15T15:41:35.902259"
+      }
+    ],
+    "avg_adr": 769.7777777777778,
+    "min_adr": 626.0,
+    "max_adr": 1022.0
+  },
+  {
+    "property_code": "61WCR",
+    "property_slug": "61-w-cobia-run-102",
+    "quotes": [
+      {
+        "property_code": "61WCR",
+        "check_in": "2026-04-11",
+        "check_out": "2026-04-14",
+        "nights": 3,
+        "lodging": 1589.0,
+        "cleaning_fee": 0.0,
+        "taxes": 190.68,
+        "total": 1779.68,
+        "adr": 529.6666666666666,
+        "scraped_at": "2026-02-15T15:41:45.441294"
+      },
+      {
+        "property_code": "61WCR",
+        "check_in": "2026-06-20",
+        "check_out": "2026-06-23",
+        "nights": 3,
+        "lodging": 1848.0,
+        "cleaning_fee": 0.0,
+        "taxes": 221.76,
+        "total": 2069.76,
+        "adr": 616.0,
+        "scraped_at": "2026-02-15T15:41:49.462414"
+      }
+    ],
+    "avg_adr": 572.8333333333334,
+    "min_adr": 529.6666666666666,
+    "max_adr": 616.0
+  },
+  {
+    "property_code": "90MC",
+    "property_slug": "90-mystic-cobalt-st",
+    "quotes": [
+      {
+        "property_code": "90MC",
+        "check_in": "2026-04-13",
+        "check_out": "2026-04-16",
+        "nights": 3,
+        "lodging": 3807.5,
+        "cleaning_fee": 0.0,
+        "taxes": 456.91,
+        "total": 4264.41,
+        "adr": 1269.1666666666667,
+        "scraped_at": "2026-02-15T15:42:04.059431"
+      },
+      {
+        "property_code": "90MC",
+        "check_in": "2026-06-06",
+        "check_out": "2026-06-09",
+        "nights": 3,
+        "lodging": 3099.5,
+        "cleaning_fee": 0.0,
+        "taxes": 371.95,
+        "total": 3471.45,
+        "adr": 1033.1666666666667,
+        "scraped_at": "2026-02-15T15:42:06.071287"
+      }
+    ],
+    "avg_adr": 1151.1666666666667,
+    "min_adr": 1033.1666666666667,
+    "max_adr": 1269.1666666666667
+  },
+  {
+    "property_code": "116WSL",
+    "property_slug": "116-w-summersweet-lane",
+    "quotes": [
+      {
+        "property_code": "116WSL",
+        "check_in": "2026-02-16",
+        "check_out": "2026-02-19",
+        "nights": 3,
+        "lodging": 2611.5,
+        "cleaning_fee": 0.0,
+        "taxes": 313.39,
+        "total": 2924.89,
+        "adr": 870.5,
+        "scraped_at": "2026-02-15T15:42:15.868022"
+      },
+      {
+        "property_code": "116WSL",
+        "check_in": "2026-04-10",
+        "check_out": "2026-04-13",
+        "nights": 3,
+        "lodging": 3420.5,
+        "cleaning_fee": 0.0,
+        "taxes": 410.47,
+        "total": 3830.97,
+        "adr": 1140.1666666666667,
+        "scraped_at": "2026-02-15T15:42:19.900097"
+      },
+      {
+        "property_code": "116WSL",
+        "check_in": "2026-05-15",
+        "check_out": "2026-05-18",
+        "nights": 3,
+        "lodging": 3673.5,
+        "cleaning_fee": 0.0,
+        "taxes": 440.83,
+        "total": 4114.33,
+        "adr": 1224.5,
+        "scraped_at": "2026-02-15T15:42:21.911863"
+      }
+    ],
+    "avg_adr": 1078.388888888889,
+    "min_adr": 870.5,
+    "max_adr": 1224.5
+  },
+  {
+    "property_code": "120SF",
+    "property_slug": "120-sunflower-st",
+    "quotes": [
+      {
+        "property_code": "120SF",
+        "check_in": "2026-03-20",
+        "check_out": "2026-03-23",
+        "nights": 3,
+        "lodging": 3016.5,
+        "cleaning_fee": 0.0,
+        "taxes": 361.99,
+        "total": 3378.49,
+        "adr": 1005.5,
+        "scraped_at": "2026-02-15T15:42:29.397144"
+      },
+      {
+        "property_code": "120SF",
+        "check_in": "2026-05-16",
+        "check_out": "2026-05-19",
+        "nights": 3,
+        "lodging": 2752.5,
+        "cleaning_fee": 0.0,
+        "taxes": 330.31,
+        "total": 3082.81,
+        "adr": 917.5,
+        "scraped_at": "2026-02-15T15:42:33.421123"
+      },
+      {
+        "property_code": "120SF",
+        "check_in": "2026-06-27",
+        "check_out": "2026-06-30",
+        "nights": 3,
+        "lodging": 3081.5,
+        "cleaning_fee": 0.0,
+        "taxes": 369.79,
+        "total": 3451.29,
+        "adr": 1027.1666666666667,
+        "scraped_at": "2026-02-15T15:42:35.432252"
+      }
+    ],
+    "avg_adr": 983.3888888888889,
+    "min_adr": 917.5,
+    "max_adr": 1027.1666666666667
+  },
+  {
+    "property_code": "202-28WB",
+    "property_slug": "202-28-watercolor-blvd",
+    "quotes": [
+      {
+        "property_code": "202-28WB",
+        "check_in": "2026-03-04",
+        "check_out": "2026-03-07",
+        "nights": 3,
+        "lodging": 2175.0,
+        "cleaning_fee": 0.0,
+        "taxes": 261.0,
+        "total": 2436.0,
+        "adr": 725.0,
+        "scraped_at": "2026-02-15T15:42:52.366096"
+      },
+      {
+        "property_code": "202-28WB",
+        "check_in": "2026-04-14",
+        "check_out": "2026-04-17",
+        "nights": 3,
+        "lodging": 2325.0,
+        "cleaning_fee": 0.0,
+        "taxes": 279.0,
+        "total": 2604.0,
+        "adr": 775.0,
+        "scraped_at": "2026-02-15T15:42:54.376234"
+      },
+      {
+        "property_code": "202-28WB",
+        "check_in": "2026-05-15",
+        "check_out": "2026-05-18",
+        "nights": 3,
+        "lodging": 2851.0,
+        "cleaning_fee": 0.0,
+        "taxes": 342.12,
+        "total": 3193.12,
+        "adr": 950.3333333333334,
+        "scraped_at": "2026-02-15T15:42:58.400514"
+      }
+    ],
+    "avg_adr": 816.7777777777778,
+    "min_adr": 725.0,
+    "max_adr": 950.3333333333334
+  },
+  {
+    "property_code": "245WLF",
+    "property_slug": "245-w-lake-forest-dr",
+    "quotes": [
+      {
+        "property_code": "245WLF",
+        "check_in": "2026-05-08",
+        "check_out": "2026-05-11",
+        "nights": 3,
+        "lodging": 3278.5,
+        "cleaning_fee": 0.0,
+        "taxes": 393.43,
+        "total": 3671.93,
+        "adr": 1092.8333333333333,
+        "scraped_at": "2026-02-15T15:43:10.310353"
+      },
+      {
+        "property_code": "245WLF",
+        "check_in": "2026-05-30",
+        "check_out": "2026-06-02",
+        "nights": 3,
+        "lodging": 3024.5,
+        "cleaning_fee": 0.0,
+        "taxes": 362.95,
+        "total": 3387.45,
+        "adr": 1008.1666666666666,
+        "scraped_at": "2026-02-15T15:43:12.324178"
+      },
+      {
+        "property_code": "245WLF",
+        "check_in": "2026-10-14",
+        "check_out": "2026-10-17",
+        "nights": 3,
+        "lodging": 3057.5,
+        "cleaning_fee": 0.0,
+        "taxes": 366.91,
+        "total": 3424.41,
+        "adr": 1019.1666666666666,
+        "scraped_at": "2026-02-15T15:43:16.348804"
+      }
+    ],
+    "avg_adr": 1040.0555555555557,
+    "min_adr": 1008.1666666666666,
+    "max_adr": 1092.8333333333333
+  },
+  {
+    "property_code": "288WLD",
+    "property_slug": "288-western-lake-dr",
+    "quotes": [
+      {
+        "property_code": "288WLD",
+        "check_in": "2026-02-22",
+        "check_out": "2026-02-25",
+        "nights": 3,
+        "lodging": 2313.0,
+        "cleaning_fee": 0.0,
+        "taxes": 313.56,
+        "total": 2926.56,
+        "adr": 771.0,
+        "scraped_at": "2026-02-15T15:43:22.593062"
+      },
+      {
+        "property_code": "288WLD",
+        "check_in": "2026-03-23",
+        "check_out": "2026-03-26",
+        "nights": 3,
+        "lodging": 3170.0,
+        "cleaning_fee": 0.0,
+        "taxes": 416.4,
+        "total": 3886.4,
+        "adr": 1056.6666666666667,
+        "scraped_at": "2026-02-15T15:43:24.605703"
+      },
+      {
+        "property_code": "288WLD",
+        "check_in": "2026-04-10",
+        "check_out": "2026-04-13",
+        "nights": 3,
+        "lodging": 3220.0,
+        "cleaning_fee": 0.0,
+        "taxes": 422.4,
+        "total": 3942.4,
+        "adr": 1073.3333333333333,
+        "scraped_at": "2026-02-15T15:43:26.616321"
+      }
+    ],
+    "avg_adr": 967.0,
+    "min_adr": 771.0,
+    "max_adr": 1073.3333333333333
+  },
+  {
+    "property_code": "621WLD",
+    "property_slug": "621-western-lake-dr",
+    "quotes": [
+      {
+        "property_code": "621WLD",
+        "check_in": "2026-03-07",
+        "check_out": "2026-03-10",
+        "nights": 3,
+        "lodging": 4071.5,
+        "cleaning_fee": 0.0,
+        "taxes": 488.59,
+        "total": 4560.09,
+        "adr": 1357.1666666666667,
+        "scraped_at": "2026-02-15T15:43:35.585545"
+      },
+      {
+        "property_code": "621WLD",
+        "check_in": "2026-03-28",
+        "check_out": "2026-03-31",
+        "nights": 3,
+        "lodging": 4652.5,
+        "cleaning_fee": 0.0,
+        "taxes": 558.31,
+        "total": 5210.81,
+        "adr": 1550.8333333333333,
+        "scraped_at": "2026-02-15T15:43:37.596557"
+      },
+      {
+        "property_code": "621WLD",
+        "check_in": "2026-04-19",
+        "check_out": "2026-04-22",
+        "nights": 3,
+        "lodging": 3960.5,
+        "cleaning_fee": 0.0,
+        "taxes": 475.27,
+        "total": 4435.77,
+        "adr": 1320.1666666666667,
+        "scraped_at": "2026-02-15T15:43:39.607181"
+      }
+    ],
+    "avg_adr": 1409.388888888889,
+    "min_adr": 1320.1666666666667,
+    "max_adr": 1550.8333333333333
+  },
+  {
+    "property_code": "860WLD",
+    "property_slug": "860-western-lake-drive",
+    "quotes": [
+      {
+        "property_code": "860WLD",
+        "check_in": "2026-02-16",
+        "check_out": "2026-02-19",
+        "nights": 3,
+        "lodging": 3697.5,
+        "cleaning_fee": 0.0,
+        "taxes": 443.71,
+        "total": 4141.21,
+        "adr": 1232.5,
+        "scraped_at": "2026-02-15T15:43:47.341498"
+      },
+      {
+        "property_code": "860WLD",
+        "check_in": "2026-04-04",
+        "check_out": "2026-04-07",
+        "nights": 3,
+        "lodging": 7082.5,
+        "cleaning_fee": 0.0,
+        "taxes": 849.91,
+        "total": 7932.41,
+        "adr": 2360.8333333333335,
+        "scraped_at": "2026-02-15T15:43:49.356363"
+      },
+      {
+        "property_code": "860WLD",
+        "check_in": "2026-10-10",
+        "check_out": "2026-10-13",
+        "nights": 3,
+        "lodging": 5820.5,
+        "cleaning_fee": 0.0,
+        "taxes": 698.47,
+        "total": 6518.97,
+        "adr": 1940.1666666666667,
+        "scraped_at": "2026-02-15T15:43:59.411813"
+      }
+    ],
+    "avg_adr": 1844.5,
+    "min_adr": 1232.5,
+    "max_adr": 2360.8333333333335
+  },
+  {
+    "property_code": "1312WLD",
+    "property_slug": "1312-western-lake-dr",
+    "quotes": [
+      {
+        "property_code": "1312WLD",
+        "check_in": "2026-02-16",
+        "check_out": "2026-02-19",
+        "nights": 3,
+        "lodging": 3281.5,
+        "cleaning_fee": 0.0,
+        "taxes": 393.79,
+        "total": 3675.29,
+        "adr": 1093.8333333333333,
+        "scraped_at": "2026-02-15T15:44:07.054524"
+      },
+      {
+        "property_code": "1312WLD",
+        "check_in": "2026-03-01",
+        "check_out": "2026-03-04",
+        "nights": 3,
+        "lodging": 3542.5,
+        "cleaning_fee": 0.0,
+        "taxes": 425.11,
+        "total": 3967.61,
+        "adr": 1180.8333333333333,
+        "scraped_at": "2026-02-15T15:44:09.064324"
+      },
+      {
+        "property_code": "1312WLD",
+        "check_in": "2026-05-17",
+        "check_out": "2026-05-20",
+        "nights": 3,
+        "lodging": 3649.5,
+        "cleaning_fee": 0.0,
+        "taxes": 437.95,
+        "total": 4087.45,
+        "adr": 1216.5,
+        "scraped_at": "2026-02-15T15:44:13.086729"
+      }
+    ],
+    "avg_adr": 1163.7222222222222,
+    "min_adr": 1093.8333333333333,
+    "max_adr": 1216.5
+  },
+  {
+    "property_code": "303-1680",
+    "property_slug": "1680-e-county-hwy-30a-unit-303-watercolor",
+    "quotes": [
+      {
+        "property_code": "303-1680",
+        "check_in": "2026-09-01",
+        "check_out": "2026-09-04",
+        "nights": 3,
+        "lodging": 2268.0,
+        "cleaning_fee": 0.0,
+        "taxes": 272.16,
+        "total": 2540.16,
+        "adr": 756.0,
+        "scraped_at": "2026-02-15T15:44:19.011867"
+      }
+    ],
+    "avg_adr": 756.0,
+    "min_adr": 756.0,
+    "max_adr": 756.0
+  },
+  {
+    "property_code": "303-1735",
+    "property_slug": "1735-e-county-hwy-30a-unit-303",
+    "quotes": [
+      {
+        "property_code": "303-1735",
+        "check_in": "2026-03-17",
+        "check_out": "2026-03-20",
+        "nights": 3,
+        "lodging": 2845.0,
+        "cleaning_fee": 0.0,
+        "taxes": 341.4,
+        "total": 3186.4,
+        "adr": 948.3333333333334,
+        "scraped_at": "2026-02-15T15:44:28.523465"
+      },
+      {
+        "property_code": "303-1735",
+        "check_in": "2026-04-11",
+        "check_out": "2026-04-14",
+        "nights": 3,
+        "lodging": 1971.0,
+        "cleaning_fee": 0.0,
+        "taxes": 236.52,
+        "total": 2207.52,
+        "adr": 657.0,
+        "scraped_at": "2026-02-15T15:44:30.535048"
+      },
+      {
+        "property_code": "303-1735",
+        "check_in": "2026-04-25",
+        "check_out": "2026-04-28",
+        "nights": 3,
+        "lodging": 2269.0,
+        "cleaning_fee": 0.0,
+        "taxes": 272.28,
+        "total": 2541.28,
+        "adr": 756.3333333333334,
+        "scraped_at": "2026-02-15T15:44:32.544879"
+      }
+    ],
+    "avg_adr": 787.2222222222222,
+    "min_adr": 657.0,
+    "max_adr": 948.3333333333334
+  },
+  {
+    "property_code": "104-1785",
+    "property_slug": "1785-e-county-hwy-30a-unit-104",
+    "quotes": [
+      {
+        "property_code": "104-1785",
+        "check_in": "2026-02-16",
+        "check_out": "2026-02-19",
+        "nights": 3,
+        "lodging": 1958.0,
+        "cleaning_fee": 0.0,
+        "taxes": 234.96,
+        "total": 2192.96,
+        "adr": 652.6666666666666,
+        "scraped_at": "2026-02-15T15:44:40.064092"
+      }
+    ],
+    "avg_adr": 652.6666666666666,
+    "min_adr": 652.6666666666666,
+    "max_adr": 652.6666666666666
+  },
+  {
+    "property_code": "42FWS",
+    "property_slug": "42-flatwood-st",
+    "quotes": [
+      {
+        "property_code": "42FWS",
+        "check_in": "2026-02-22",
+        "check_out": "2026-02-25",
+        "nights": 3,
+        "lodging": 5535.0,
+        "cleaning_fee": 0.0,
+        "taxes": 664.2,
+        "total": 6199.2,
+        "adr": 1845.0,
+        "scraped_at": "2026-02-15T15:44:51.536688"
+      },
+      {
+        "property_code": "42FWS",
+        "check_in": "2026-03-14",
+        "check_out": "2026-03-17",
+        "nights": 3,
+        "lodging": 8823.0,
+        "cleaning_fee": 0.0,
+        "taxes": 1058.76,
+        "total": 9881.76,
+        "adr": 2941.0,
+        "scraped_at": "2026-02-15T15:44:53.551172"
+      },
+      {
+        "property_code": "42FWS",
+        "check_in": "2026-04-20",
+        "check_out": "2026-04-23",
+        "nights": 3,
+        "lodging": 6798.0,
+        "cleaning_fee": 0.0,
+        "taxes": 815.76,
+        "total": 7613.76,
+        "adr": 2266.0,
+        "scraped_at": "2026-02-15T15:44:55.563232"
+      }
+    ],
+    "avg_adr": 2350.6666666666665,
+    "min_adr": 1845.0,
+    "max_adr": 2941.0
+  },
+  {
+    "property_code": "18CC",
+    "property_slug": "18-crossvine-circle",
+    "quotes": [
+      {
+        "property_code": "18CC",
+        "check_in": "2026-12-30",
+        "check_out": "2027-01-02",
+        "nights": 3,
+        "lodging": 3164.5,
+        "cleaning_fee": 0.0,
+        "taxes": 379.75,
+        "total": 3544.25,
+        "adr": 1054.8333333333333,
+        "scraped_at": "2026-02-15T15:45:01.764858"
+      }
+    ],
+    "avg_adr": 1054.8333333333333,
+    "min_adr": 1054.8333333333333,
+    "max_adr": 1054.8333333333333
+  },
+  {
+    "property_code": "113BW",
+    "property_slug": "113-bartons-way-royal-blue",
+    "quotes": [
+      {
+        "property_code": "113BW",
+        "check_in": "2026-02-16",
+        "check_out": "2026-02-19",
+        "nights": 3,
+        "lodging": 2288.0,
+        "cleaning_fee": 0.0,
+        "taxes": 274.56,
+        "total": 2562.56,
+        "adr": 762.6666666666666,
+        "scraped_at": "2026-02-15T15:45:08.072635"
+      },
+      {
+        "property_code": "113BW",
+        "check_in": "2026-04-04",
+        "check_out": "2026-04-07",
+        "nights": 3,
+        "lodging": 3639.0,
+        "cleaning_fee": 0.0,
+        "taxes": 436.68,
+        "total": 4075.68,
+        "adr": 1213.0,
+        "scraped_at": "2026-02-15T15:45:10.085805"
+      }
+    ],
+    "avg_adr": 987.8333333333334,
+    "min_adr": 762.6666666666666,
+    "max_adr": 1213.0
+  },
+  {
+    "property_code": "100SSL2C",
+    "property_slug": "100-s-spooky-lane-unit-2c",
+    "quotes": [
+      {
+        "property_code": "100SSL2C",
+        "check_in": "2026-04-11",
+        "check_out": "2026-04-14",
+        "nights": 3,
+        "lodging": 2345.0,
+        "cleaning_fee": 0.0,
+        "taxes": 281.4,
+        "total": 2626.4,
+        "adr": 781.6666666666666,
+        "scraped_at": "2026-02-15T15:45:28.325379"
+      },
+      {
+        "property_code": "100SSL2C",
+        "check_in": "2026-04-19",
+        "check_out": "2026-04-22",
+        "nights": 3,
+        "lodging": 1947.0,
+        "cleaning_fee": 0.0,
+        "taxes": 233.64,
+        "total": 2180.64,
+        "adr": 649.0,
+        "scraped_at": "2026-02-15T15:45:30.335764"
+      },
+      {
+        "property_code": "100SSL2C",
+        "check_in": "2026-08-22",
+        "check_out": "2026-08-25",
+        "nights": 3,
+        "lodging": 2640.0,
+        "cleaning_fee": 0.0,
+        "taxes": 316.8,
+        "total": 2956.8,
+        "adr": 880.0,
+        "scraped_at": "2026-02-15T15:45:36.478099"
+      }
+    ],
+    "avg_adr": 770.2222222222222,
+    "min_adr": 649.0,
+    "max_adr": 880.0
+  },
+  {
+    "property_code": "100SSL2D",
+    "property_slug": "100-s-spooky-lane-unit-2d",
+    "quotes": [
+      {
+        "property_code": "100SSL2D",
+        "check_in": "2026-02-21",
+        "check_out": "2026-02-24",
+        "nights": 3,
+        "lodging": 1791.0,
+        "cleaning_fee": 0.0,
+        "taxes": 214.92,
+        "total": 2005.92,
+        "adr": 597.0,
+        "scraped_at": "2026-02-15T15:45:43.760247"
+      },
+      {
+        "property_code": "100SSL2D",
+        "check_in": "2026-04-20",
+        "check_out": "2026-04-23",
+        "nights": 3,
+        "lodging": 2869.0,
+        "cleaning_fee": 0.0,
+        "taxes": 344.28,
+        "total": 3213.28,
+        "adr": 956.3333333333334,
+        "scraped_at": "2026-02-15T15:45:47.782600"
+      },
+      {
+        "property_code": "100SSL2D",
+        "check_in": "2026-05-02",
+        "check_out": "2026-05-05",
+        "nights": 3,
+        "lodging": 2276.0,
+        "cleaning_fee": 0.0,
+        "taxes": 273.12,
+        "total": 2549.12,
+        "adr": 758.6666666666666,
+        "scraped_at": "2026-02-15T15:45:49.794943"
+      }
+    ],
+    "avg_adr": 770.6666666666666,
+    "min_adr": 597.0,
+    "max_adr": 956.3333333333334
+  },
+  {
+    "property_code": "103CP2",
+    "property_slug": "103-compass-point-ii",
+    "quotes": [
+      {
+        "property_code": "103CP2",
+        "check_in": "2026-02-16",
+        "check_out": "2026-02-19",
+        "nights": 3,
+        "lodging": 1833.0,
+        "cleaning_fee": 0.0,
+        "taxes": 219.96,
+        "total": 2052.96,
+        "adr": 611.0,
+        "scraped_at": "2026-02-15T15:45:55.750701"
+      }
+    ],
+    "avg_adr": 611.0,
+    "min_adr": 611.0,
+    "max_adr": 611.0
+  },
+  {
+    "property_code": "132EKR",
+    "property_slug": "132-e-kingston-rd",
+    "quotes": [
+      {
+        "property_code": "132EKR",
+        "check_in": "2026-03-15",
+        "check_out": "2026-03-18",
+        "nights": 3,
+        "lodging": 3250.0,
+        "cleaning_fee": 0.0,
+        "taxes": 390.0,
+        "total": 3640.0,
+        "adr": 1083.3333333333333,
+        "scraped_at": "2026-02-15T15:46:07.291600"
+      },
+      {
+        "property_code": "132EKR",
+        "check_in": "2026-04-04",
+        "check_out": "2026-04-07",
+        "nights": 3,
+        "lodging": 4673.0,
+        "cleaning_fee": 0.0,
+        "taxes": 560.76,
+        "total": 5233.76,
+        "adr": 1557.6666666666667,
+        "scraped_at": "2026-02-15T15:46:09.335090"
+      },
+      {
+        "property_code": "132EKR",
+        "check_in": "2026-04-19",
+        "check_out": "2026-04-22",
+        "nights": 3,
+        "lodging": 5781.0,
+        "cleaning_fee": 0.0,
+        "taxes": 693.72,
+        "total": 6474.72,
+        "adr": 1927.0,
+        "scraped_at": "2026-02-15T15:46:11.357168"
+      }
+    ],
+    "avg_adr": 1522.6666666666667,
+    "min_adr": 1083.3333333333333,
+    "max_adr": 1927.0
+  },
+  {
+    "property_code": "HMS",
+    "property_slug": "hms-sunrisesunset",
+    "quotes": [
+      {
+        "property_code": "HMS",
+        "check_in": "2026-04-01",
+        "check_out": "2026-04-04",
+        "nights": 3,
+        "lodging": 3786.0,
+        "cleaning_fee": 0.0,
+        "taxes": 454.32,
+        "total": 4240.32,
+        "adr": 1262.0,
+        "scraped_at": "2026-02-15T15:46:21.687228"
+      },
+      {
+        "property_code": "HMS",
+        "check_in": "2026-06-13",
+        "check_out": "2026-06-16",
+        "nights": 3,
+        "lodging": 3363.0,
+        "cleaning_fee": 0.0,
+        "taxes": 403.56,
+        "total": 3766.56,
+        "adr": 1121.0,
+        "scraped_at": "2026-02-15T15:46:25.709395"
+      },
+      {
+        "property_code": "HMS",
+        "check_in": "2026-08-17",
+        "check_out": "2026-08-20",
+        "nights": 3,
+        "lodging": 3238.0,
+        "cleaning_fee": 0.0,
+        "taxes": 388.56,
+        "total": 3626.56,
+        "adr": 1079.3333333333333,
+        "scraped_at": "2026-02-15T15:46:31.743480"
+      }
+    ],
+    "avg_adr": 1154.111111111111,
+    "min_adr": 1079.3333333333333,
+    "max_adr": 1262.0
+  },
+  {
+    "property_code": "111VW",
+    "property_slug": "sea-la-vie",
+    "quotes": [
+      {
+        "property_code": "111VW",
+        "check_in": "2026-02-22",
+        "check_out": "2026-02-25",
+        "nights": 3,
+        "lodging": 3535.0,
+        "cleaning_fee": 0.0,
+        "taxes": 424.2,
+        "total": 3959.2,
+        "adr": 1178.3333333333333,
+        "scraped_at": "2026-02-15T15:46:39.742444"
+      },
+      {
+        "property_code": "111VW",
+        "check_in": "2026-04-05",
+        "check_out": "2026-04-08",
+        "nights": 3,
+        "lodging": 4834.0,
+        "cleaning_fee": 0.0,
+        "taxes": 580.08,
+        "total": 5414.08,
+        "adr": 1611.3333333333333,
+        "scraped_at": "2026-02-15T15:46:41.763062"
+      },
+      {
+        "property_code": "111VW",
+        "check_in": "2026-05-11",
+        "check_out": "2026-05-14",
+        "nights": 3,
+        "lodging": 4003.0,
+        "cleaning_fee": 0.0,
+        "taxes": 480.36,
+        "total": 4483.36,
+        "adr": 1334.3333333333333,
+        "scraped_at": "2026-02-15T15:46:43.794600"
+      }
+    ],
+    "avg_adr": 1374.6666666666667,
+    "min_adr": 1178.3333333333333,
+    "max_adr": 1611.3333333333333
+  },
+  {
+    "property_code": "119VW",
+    "property_slug": "vermillion-sunsets",
+    "quotes": [
+      {
+        "property_code": "119VW",
+        "check_in": "2026-02-16",
+        "check_out": "2026-02-19",
+        "nights": 3,
+        "lodging": 6139.5,
+        "cleaning_fee": 0.0,
+        "taxes": 736.75,
+        "total": 6876.25,
+        "adr": 2046.5,
+        "scraped_at": "2026-02-15T15:46:52.955682"
+      },
+      {
+        "property_code": "119VW",
+        "check_in": "2026-05-29",
+        "check_out": "2026-06-01",
+        "nights": 3,
+        "lodging": 9495.5,
+        "cleaning_fee": 0.0,
+        "taxes": 1139.47,
+        "total": 10634.97,
+        "adr": 3165.1666666666665,
+        "scraped_at": "2026-02-15T15:46:56.979963"
+      }
+    ],
+    "avg_adr": 2605.8333333333335,
+    "min_adr": 2046.5,
+    "max_adr": 3165.1666666666665
+  },
+  {
+    "property_code": "134SC",
+    "property_slug": "southern-charm",
+    "quotes": [
+      {
+        "property_code": "134SC",
+        "check_in": "2026-02-16",
+        "check_out": "2026-02-19",
+        "nights": 3,
+        "lodging": 3191.5,
+        "cleaning_fee": 0.0,
+        "taxes": 382.99,
+        "total": 3574.49,
+        "adr": 1063.8333333333333,
+        "scraped_at": "2026-02-15T15:47:04.239457"
+      },
+      {
+        "property_code": "134SC",
+        "check_in": "2026-03-21",
+        "check_out": "2026-03-24",
+        "nights": 3,
+        "lodging": 3602.5,
+        "cleaning_fee": 0.0,
+        "taxes": 432.31,
+        "total": 4034.81,
+        "adr": 1200.8333333333333,
+        "scraped_at": "2026-02-15T15:47:06.251882"
+      },
+      {
+        "property_code": "134SC",
+        "check_in": "2026-05-02",
+        "check_out": "2026-05-05",
+        "nights": 3,
+        "lodging": 3569.5,
+        "cleaning_fee": 0.0,
+        "taxes": 428.35,
+        "total": 3997.85,
+        "adr": 1189.8333333333333,
+        "scraped_at": "2026-02-15T15:47:10.274045"
+      }
+    ],
+    "avg_adr": 1151.5,
+    "min_adr": 1063.8333333333333,
+    "max_adr": 1200.8333333333333
+  },
+  {
+    "property_code": "AZALEA",
+    "property_slug": "azalea-abbey",
+    "quotes": [
+      {
+        "property_code": "AZALEA",
+        "check_in": "2026-03-28",
+        "check_out": "2026-03-31",
+        "nights": 3,
+        "lodging": 3488.0,
+        "cleaning_fee": 0.0,
+        "taxes": 418.56,
+        "total": 3906.56,
+        "adr": 1162.6666666666667,
+        "scraped_at": "2026-02-15T15:47:18.607371"
+      },
+      {
+        "property_code": "AZALEA",
+        "check_in": "2026-04-19",
+        "check_out": "2026-04-22",
+        "nights": 3,
+        "lodging": 4614.0,
+        "cleaning_fee": 0.0,
+        "taxes": 553.68,
+        "total": 5167.68,
+        "adr": 1538.0,
+        "scraped_at": "2026-02-15T15:47:20.620744"
+      },
+      {
+        "property_code": "AZALEA",
+        "check_in": "2026-05-18",
+        "check_out": "2026-05-21",
+        "nights": 3,
+        "lodging": 4829.0,
+        "cleaning_fee": 0.0,
+        "taxes": 579.48,
+        "total": 5408.48,
+        "adr": 1609.6666666666667,
+        "scraped_at": "2026-02-15T15:47:22.634145"
+      }
+    ],
+    "avg_adr": 1436.7777777777778,
+    "min_adr": 1162.6666666666667,
+    "max_adr": 1609.6666666666667
+  }
+]

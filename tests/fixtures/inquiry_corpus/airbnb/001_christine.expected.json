@@ -1,0 +1,19 @@
+{
+  "fixture_id": "airbnb/001_christine",
+  "description": "airbnb inquiry captured from live Beach Habitats inbound traffic",
+  "expected_route_contains": "airbnb",
+  "expected_pipeline_output": {
+    "platform": "airbnb",
+    "parser_source_contains": "",
+    "guest_name": "Guest 005",
+    "latest_guest_message_contains": [
+      "I need to update guest number and also I got a message it didn’t book and I want"
+    ],
+    "requested_check_in": "2026-06-20",
+    "requested_check_out": "2026-06-25",
+    "requested_guests": 1,
+    "platform_listing_id": "",
+    "platform_unit_id": "",
+    "property_reference_token": "unit_005"
+  }
+}

@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Beach Habitats — AI Concierge Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; }
+    #root { min-height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React + ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+  <!-- Recharts -->
+  <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+
+  <!-- Babel for in-browser JSX transpilation -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+    const {
+      LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+      ResponsiveContainer, PieChart, Pie, Cell, Area, AreaChart,
+      RadarChart, Radar, PolarGrid, PolarAngleAxis
+    } = Recharts;
+
+    // ─── PALM TREE SVG ────────────────────────────────────────────────────────
+    const PalmTree = ({ size = 28, color = "#10b981" }) => (
+      <svg width={size} height={size} viewBox="0 0 64 64" fill="none">
+        <path d="M32 56 C32 56 30 40 30 28" stroke={color} strokeWidth="3" strokeLinecap="round"/>
+        <path d="M30 28 C28 20 20 16 12 18 C16 22 22 24 28 26" fill={color} opacity="0.9"/>
+        <path d="M30 30 C24 24 14 26 8 32 C14 32 22 30 28 30" fill={color} opacity="0.8"/>
+        <path d="M30 28 C32 20 40 16 48 18 C44 22 38 24 32 26" fill={color} opacity="0.9"/>
+        <path d="M30 30 C36 24 46 26 52 32 C46 32 38 30 32 30" fill={color} opacity="0.8"/>
+        <path d="M30 26 C30 18 26 10 20 8 C22 14 26 20 28 24" fill={color} opacity="0.7"/>
+        <ellipse cx="32" cy="57" rx="6" ry="2" fill={color} opacity="0.3"/>
+      </svg>
+    );
+
+    // ─── MOCK DATA ────────────────────────────────────────────────────────────
+    const MOCK = {
+      stats: { total:47, arriving:6, inStay:31, departing:4, escalations:2, conversations:1284 },
+      weekly: [
+        { day:"Mon", inquiries:142, resolved:128, escalated:4, voice:18 },
+        { day:"Tue", inquiries:158, resolved:143, escalated:5, voice:22 },
+        { day:"Wed", inquiries:134, resolved:121, escalated:3, voice:15 },
+        { day:"Thu", inquiries:167, resolved:154, escalated:6, voice:28 },
+        { day:"Fri", inquiries:201, resolved:186, escalated:8, voice:34 },
+        { day:"Sat", inquiries:289, resolved:268, escalated:10, voice:52 },
+        { day:"Sun", inquiries:193, resolved:178, escalated:7, voice:38 },
+      ],
+      monthly: Array.from({length:30},(_,i)=>({
+        date: `Mar ${i+1}`,
+        inquiries: Math.floor(120+Math.random()*100),
+        resolved: Math.floor(100+Math.random()*90),
+        csat: +(4.4+Math.random()*0.6).toFixed(2),
+        responseMs: Math.floor(1800+Math.random()*800),
+      })),
+      topQuestions: [
+        { q:"WiFi Password", count:342, pct:89, category:"access" },
+        { q:"Checkout Time / Late Checkout", count:218, pct:72, category:"timing" },
+        { q:"Restaurant Recommendations", count:196, pct:65, category:"local" },
+        { q:"Parking Instructions", count:142, pct:58, category:"access" },
+        { q:"Beach Access & Directions", count:128, pct:52, category:"local" },
+        { q:"Check-in Code / Door Lock", count:114, pct:47, category:"access" },
+        { q:"Pool / Hot Tub Details", count:98, pct:41, category:"amenity" },
+        { q:"Trash & Recycling Schedule", count:76, pct:34, category:"housekeeping" },
+        { q:"AC / Thermostat Help", count:64, pct:29, category:"maintenance" },
+        { q:"Extra Towels / Linens", count:58, pct:26, category:"housekeeping" },
+      ],
+      sentiment: [
+        { label:"Delighted", pct:54, color:"#10b981" },
+        { label:"Satisfied", pct:28, color:"#34d399" },
+        { label:"Neutral", pct:12, color:"#f59e0b" },
+        { label:"Frustrated", pct:5, color:"#f97316" },
+        { label:"Angry", pct:1, color:"#ef4444" },
+      ],
+      heatmap: Array.from({length:7},(_,day)=>Array.from({length:24},(_,hr)=>({
+        day, hr,
+        value: (hr>=8&&hr<=11||hr>=15&&hr<=17) ? Math.floor(15+Math.random()*25)
+             : (hr>=22||hr<6) ? Math.floor(1+Math.random()*5)
+             : Math.floor(5+Math.random()*15),
+      }))).flat(),
+      propertyRank: [
+        { name:"Gulf View #204", inquiries:87, csat:4.9, resolved:94, issues:1 },
+        { name:"Seabreeze #118", inquiries:72, csat:4.8, resolved:91, issues:0 },
+        { name:"Ocean Palms #305", inquiries:118, csat:4.3, resolved:78, issues:4 },
+        { name:"Sandy Shores #209", inquiries:64, csat:4.9, resolved:96, issues:0 },
+        { name:"Coastal Loft #401", inquiries:95, csat:4.6, resolved:87, issues:2 },
+        { name:"Beachfront #102", inquiries:52, csat:4.8, resolved:93, issues:1 },
+      ],
+      revenue: [
+        { month:"Oct", saved:1240, upsell:380, total:1620 },
+        { month:"Nov", saved:1480, upsell:420, total:1900 },
+        { month:"Dec", saved:2100, upsell:680, total:2780 },
+        { month:"Jan", saved:1800, upsell:540, total:2340 },
+        { month:"Feb", saved:2200, upsell:720, total:2920 },
+        { month:"Mar", saved:2480, upsell:860, total:3340 },
+      ],
+      escalations: [
+        { id:1, guest:"John S.", property:"Ocean Palms #305", issue:"AC not cooling", priority:"high", time:"14m ago", status:"pending" },
+        { id:2, guest:"Maria L.", property:"Coastal Loft #401", issue:"Lock code not working", priority:"urgent", time:"2m ago", status:"pending" },
+      ],
+      responseTime: [
+        { range:"< 1s", count:423, pct:33 },
+        { range:"1–3s", count:612, pct:48 },
+        { range:"3–10s", count:178, pct:14 },
+        { range:"> 10s", count:64, pct:5 },
+      ],
+      operatorHealth: { resolutionRate:89, avgCsat:4.87, responseSpeed:94, escalationRate:96, knowledgeCoverage:82, guestEngagement:88 },
+      kbGaps: [
+        { q:"Can I extend my stay by one more night?", count:8, suggested:"Check availability via email or call (850) 555-0100." },
+        { q:"Is there a kayak or paddleboard rental nearby?", count:6, suggested:"Yes — Coastal Watersports is 0.4mi away, open 8am–6pm." },
+        { q:"Where is the nearest urgent care?", count:5, suggested:"Sacred Heart Urgent Care on Hwy 98, 3.2mi." },
+        { q:"Can I get a mid-stay clean?", count:4, suggested:"Mid-stay cleans available for $75, book 24h in advance." },
+      ],
+    };
+
+    const COLORS = { primary:"#10b981", dark:"#065f46", mid:"#047857", light:"#34d399", amber:"#f59e0b", red:"#ef4444", blue:"#3b82f6", teal:"#14b8a6" };
+    const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+    // ─── NAV ──────────────────────────────────────────────────────────────────
+    const Nav = ({ page, setPage }) => {
+      const [scrolled, setScrolled] = useState(false);
+      useEffect(() => {
+        const h = () => setScrolled(window.scrollY > 20);
+        window.addEventListener("scroll", h);
+        return () => window.removeEventListener("scroll", h);
+      }, []);
+      return (
+        <nav style={{ position:"fixed",top:0,left:0,right:0,zIndex:1000,background:scrolled?"rgba(255,255,255,0.97)":"transparent",backdropFilter:scrolled?"blur(12px)":"none",boxShadow:scrolled?"0 2px 20px rgba(0,0,0,0.08)":"none",transition:"all 0.3s",padding:"0 40px",display:"flex",alignItems:"center",justifyContent:"space-between",height:64 }}>
+          <div style={{ display:"flex",alignItems:"center",gap:10,cursor:"pointer" }} onClick={() => setPage("home")}>
+            <PalmTree size={32} color="#10b981" />
+            <div>
+              <div style={{ fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:700,color:"#065f46",lineHeight:1 }}>Beach Habitats</div>
+              <div style={{ fontSize:9,letterSpacing:"0.15em",color:"#6b7280",textTransform:"uppercase",lineHeight:1 }}>AI Concierge Platform</div>
+            </div>
+          </div>
+          <div style={{ display:"flex",gap:8,alignItems:"center" }}>
+            {[["home","Platform"],["demo","Live Demo"],["operators","For Operators"],["pricing","Pricing"]].map(([p,l]) => (
+              <button key={p} onClick={() => setPage(p)} style={{ background:page===p?"#10b981":"transparent",color:page===p?"white":"#374151",border:"none",borderRadius:8,padding:"8px 16px",fontSize:14,fontWeight:600,cursor:"pointer",transition:"all 0.2s" }}>{l}</button>
+            ))}
+            <button onClick={() => setPage("signup")} style={{ background:"linear-gradient(135deg,#065f46,#10b981)",color:"white",border:"none",borderRadius:8,padding:"9px 20px",fontSize:14,fontWeight:700,cursor:"pointer",marginLeft:8,boxShadow:"0 4px 12px rgba(16,185,129,0.3)" }}>Get Started →</button>
+          </div>
+        </nav>
+      );
+    };
+
+    // ─── HOME ─────────────────────────────────────────────────────────────────
+    const HomePage = ({ setPage }) => {
+      const features = [
+        { icon:"🏖️", title:"Instant Guest Answers", desc:"WiFi, codes, local recs, checkout rules — answered in under 3 seconds, 24/7, in any language." },
+        { icon:"📊", title:"Deep Operator Analytics", desc:"Resolution rates, revenue impact, sentiment trends, inquiry heatmaps, per-property scoring." },
+        { icon:"🎨", title:"White-Label Ready", desc:"Upload your logo, set your colors. Guests see YOUR brand, powered by AI." },
+        { icon:"🔗", title:"PMS Integrations", desc:"Native connectors for Escapia, Guesty, Hostfully, VRBO, and Airbnb." },
+        { icon:"🎙️", title:"Voice-First Design", desc:"Tap the palm. Talk naturally. Multi-step voice conversations without friction." },
+        { icon:"🧠", title:"Operator Health Score", desc:"A composite AI score combining resolution rate, CSAT, response speed, and KB coverage." },
+      ];
+      return (
+        <div style={{ fontFamily:"'Inter',sans-serif" }}>
+          <div style={{ minHeight:"100vh",background:"linear-gradient(160deg,#022c22 0%,#064e3b 40%,#065f46 70%,#047857 100%)",display:"flex",flexDirection:"column",justifyContent:"center",alignItems:"center",textAlign:"center",padding:"100px 24px 60px",position:"relative",overflow:"hidden" }}>
+            <div style={{ position:"absolute",inset:0,backgroundImage:"radial-gradient(circle,rgba(255,255,255,0.05) 1px,transparent 1px)",backgroundSize:"40px 40px" }} />
+            <div style={{ position:"relative",maxWidth:800 }}>
+              <div style={{ display:"inline-flex",alignItems:"center",gap:8,background:"rgba(16,185,129,0.2)",border:"1px solid rgba(16,185,129,0.4)",borderRadius:100,padding:"6px 16px",marginBottom:24,color:"#6ee7b7",fontSize:13,fontWeight:600 }}>
+                <span style={{ width:6,height:6,borderRadius:"50%",background:"#34d399",display:"inline-block" }} />
+                Now serving 200+ properties along the Gulf Coast
+              </div>
+              <h1 style={{ fontFamily:"'Playfair Display',serif",fontSize:"clamp(40px,6vw,72px)",fontWeight:800,color:"white",lineHeight:1.1,marginBottom:24 }}>
+                Your Guests Deserve<br /><span style={{ color:"#34d399" }}>Concierge-Level</span> Service.<br />Every Hour. Every Stay.
+              </h1>
+              <p style={{ fontSize:19,color:"#a7f3d0",lineHeight:1.6,maxWidth:600,margin:"0 auto 40px" }}>Beach Habitats turns your vacation rental operation into a 24/7 AI-powered concierge — white-labeled, PMS-integrated, and beloved by guests.</p>
+              <div style={{ display:"flex",gap:16,justifyContent:"center",flexWrap:"wrap" }}>
+                <button onClick={() => setPage("demo")} style={{ background:"linear-gradient(135deg,#10b981,#059669)",color:"white",border:"none",borderRadius:12,padding:"16px 36px",fontSize:17,fontWeight:700,cursor:"pointer",boxShadow:"0 8px 32px rgba(16,185,129,0.4)" }}>See Live Demo →</button>
+                <button onClick={() => setPage("operators")} style={{ background:"rgba(255,255,255,0.1)",color:"white",border:"1px solid rgba(255,255,255,0.3)",borderRadius:12,padding:"16px 36px",fontSize:17,fontWeight:700,cursor:"pointer" }}>For Operators</button>
+              </div>
+            </div>
+          </div>
+          <div style={{ background:"#f0fdf4",padding:"60px 40px" }}>
+            <div style={{ maxWidth:1100,margin:"0 auto",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:24 }}>
+              {[["87%","AI Resolution Rate","Without human intervention"],["< 3s","Avg Response Time","Chat and voice"],["4.9★","Guest Satisfaction","Across all properties"],["$3.3K","Monthly Value Saved","Per 50-unit operator"]].map(([v,l,s],i) => (
+                <div key={i} style={{ background:"white",borderRadius:16,padding:"28px 24px",boxShadow:"0 4px 24px rgba(0,0,0,0.07)",textAlign:"center",border:"1px solid #e6f7f0" }}>
+                  <div style={{ fontSize:42,fontWeight:800,color:["#10b981","#059669","#047857","#065f46"][i],fontFamily:"'Playfair Display',serif",lineHeight:1 }}>{v}</div>
+                  <div style={{ fontSize:13,fontWeight:700,color:"#374151",marginTop:6,textTransform:"uppercase",letterSpacing:"0.08em" }}>{l}</div>
+                  <div style={{ fontSize:12,color:"#6b7280",marginTop:4 }}>{s}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{ background:"white",padding:"80px 40px" }}>
+            <div style={{ maxWidth:1100,margin:"0 auto" }}>
+              <div style={{ textAlign:"center",marginBottom:60 }}>
+                <h2 style={{ fontFamily:"'Playfair Display',serif",fontSize:42,fontWeight:800,color:"#064e3b",marginBottom:12 }}>Everything Your Operation Needs</h2>
+              </div>
+              <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))",gap:28 }}>
+                {features.map((f,i) => (
+                  <div key={i} style={{ background:"#f9fafb",borderRadius:16,padding:28,border:"1px solid #e5e7eb",transition:"all 0.2s",cursor:"default" }}
+                    onMouseEnter={e => { e.currentTarget.style.background="#f0fdf4"; e.currentTarget.style.borderColor="#10b981"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background="#f9fafb"; e.currentTarget.style.borderColor="#e5e7eb"; }}
+                  >
+                    <div style={{ fontSize:32,marginBottom:12 }}>{f.icon}</div>
+                    <h3 style={{ fontSize:18,fontWeight:700,color:"#064e3b",marginBottom:8 }}>{f.title}</h3>
+                    <p style={{ fontSize:14,color:"#6b7280",lineHeight:1.6 }}>{f.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div style={{ background:"#f0fdf4",padding:"80px 40px",textAlign:"center" }}>
+            <h2 style={{ fontFamily:"'Playfair Display',serif",fontSize:42,color:"#064e3b",fontWeight:800,marginBottom:16 }}>Ready to Transform Your Guest Experience?</h2>
+            <p style={{ color:"#6b7280",fontSize:18,marginBottom:36 }}>Start free. No credit card required. Live in under 24 hours.</p>
+            <button onClick={() => setPage("signup")} style={{ background:"linear-gradient(135deg,#065f46,#10b981)",color:"white",border:"none",borderRadius:12,padding:"18px 48px",fontSize:18,fontWeight:700,cursor:"pointer",boxShadow:"0 8px 32px rgba(16,185,129,0.35)" }}>Start Your Free Trial →</button>
+          </div>
+        </div>
+      );
+    };
+
+    // ─── OPERATOR HEALTH SCORE ────────────────────────────────────────────────
+    const HealthScore = ({ data }) => {
+      const overall = Math.round(Object.values(data).reduce((a,b)=>a+b,0)/Object.keys(data).length);
+      const radarData = Object.entries(data).map(([k,v]) => ({ metric: k.replace(/([A-Z])/g," $1").trim(), value: v }));
+      const grade = overall >= 90 ? "A" : overall >= 80 ? "B" : overall >= 70 ? "C" : "D";
+      const gradeColor = overall >= 90 ? COLORS.primary : overall >= 80 ? COLORS.teal : COLORS.amber;
+      return (
+        <div style={{ background:"white",borderRadius:16,padding:24,border:"1px solid #e5e7eb" }}>
+          <div style={{ display:"flex",justifyContent:"space-between",alignItems:"start",marginBottom:16 }}>
+            <div>
+              <h3 style={{ fontSize:15,fontWeight:700,color:"#064e3b",marginBottom:4 }}>🏆 Operator Health Score</h3>
+              <p style={{ fontSize:12,color:"#6b7280" }}>Composite AI-generated score across 6 dimensions</p>
+            </div>
+            <div style={{ textAlign:"center" }}>
+              <div style={{ fontSize:52,fontWeight:900,color:gradeColor,fontFamily:"'Playfair Display',serif",lineHeight:1 }}>{grade}</div>
+              <div style={{ fontSize:12,color:"#9ca3af" }}>{overall}/100</div>
+            </div>
+          </div>
+          <ResponsiveContainer width="100%" height={200}>
+            <RadarChart data={radarData}>
+              <PolarGrid stroke="#e5e7eb" />
+              <PolarAngleAxis dataKey="metric" tick={{ fontSize:10, fill:"#6b7280" }} />
+              <Radar dataKey="value" stroke={COLORS.primary} fill={COLORS.primary} fillOpacity={0.15} strokeWidth={2} />
+            </RadarChart>
+          </ResponsiveContainer>
+          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginTop:8 }}>
+            {Object.entries(data).map(([k,v]) => (
+              <div key={k} style={{ display:"flex",justifyContent:"space-between",alignItems:"center" }}>
+                <span style={{ fontSize:11,color:"#6b7280",textTransform:"capitalize" }}>{k.replace(/([A-Z])/g," $1").trim()}</span>
+                <div style={{ display:"flex",alignItems:"center",gap:6 }}>
+                  <div style={{ width:48,height:4,background:"#f3f4f6",borderRadius:2,overflow:"hidden" }}>
+                    <div style={{ width:`${v}%`,height:"100%",background:v>=90?COLORS.primary:v>=75?COLORS.teal:COLORS.amber,borderRadius:2 }} />
+                  </div>
+                  <span style={{ fontSize:11,fontWeight:700,color:"#374151",width:24,textAlign:"right" }}>{v}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    };
+
+    // ─── INQUIRY HEATMAP ──────────────────────────────────────────────────────
+    const InquiryHeatmap = ({ data }) => {
+      const maxVal = Math.max(...data.map(d => d.value));
+      const byDayHr = {};
+      data.forEach(d => { byDayHr[`${d.day}-${d.hr}`] = d.value; });
+      const getColor = (v) => {
+        if (v === 0) return "#f9fafb";
+        const intensity = v / maxVal;
+        if (intensity > 0.75) return "#065f46";
+        if (intensity > 0.5) return "#10b981";
+        if (intensity > 0.25) return "#6ee7b7";
+        return "#d1fae5";
+      };
+      return (
+        <div style={{ background:"white",borderRadius:16,padding:24,border:"1px solid #e5e7eb" }}>
+          <h3 style={{ fontSize:15,fontWeight:700,color:"#064e3b",marginBottom:4 }}>🌡️ Inquiry Volume Heatmap</h3>
+          <p style={{ fontSize:12,color:"#6b7280",marginBottom:16 }}>When guests are most active — plan staffing around peaks</p>
+          <div style={{ overflowX:"auto" }}>
+            <div style={{ minWidth:520 }}>
+              <div style={{ display:"flex",gap:1,marginBottom:4,paddingLeft:32 }}>
+                {Array.from({length:24},(_,hr) => (
+                  <div key={hr} style={{ width:16,fontSize:8,color:"#9ca3af",textAlign:"center",flexShrink:0 }}>
+                    {hr===0?"12a":hr===6?"6a":hr===12?"12p":hr===18?"6p":hr%6===0?`${hr}`:""}</div>
+                ))}
+              </div>
+              {DAYS.map((day,di) => (
+                <div key={day} style={{ display:"flex",alignItems:"center",gap:1,marginBottom:1 }}>
+                  <div style={{ width:28,fontSize:9,color:"#6b7280",textAlign:"right",paddingRight:4,flexShrink:0 }}>{day}</div>
+                  {Array.from({length:24},(_,hr) => {
+                    const v = byDayHr[`${di}-${hr}`] || 0;
+                    return <div key={hr} title={`${day} ${hr}:00 — ${v} inquiries`} style={{ width:16,height:14,background:getColor(v),borderRadius:2,flexShrink:0,cursor:"default" }} />;
+                  })}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{ display:"flex",alignItems:"center",gap:8,marginTop:12,fontSize:11,color:"#6b7280" }}>
+            <span>Low</span>
+            {["#d1fae5","#6ee7b7","#10b981","#065f46"].map((c,i) => <div key={i} style={{ width:14,height:14,background:c,borderRadius:2 }} />)}
+            <span>High</span>
+          </div>
+        </div>
+      );
+    };
+
+    // ─── PROPERTY LEADERBOARD ─────────────────────────────────────────────────
+    const PropertyLeaderboard = ({ data }) => (
+      <div style={{ background:"white",borderRadius:16,padding:24,border:"1px solid #e5e7eb" }}>
+        <h3 style={{ fontSize:15,fontWeight:700,color:"#064e3b",marginBottom:4 }}>🏠 Property Performance</h3>
+        <p style={{ fontSize:12,color:"#6b7280",marginBottom:16 }}>Properties generating most inquiries may have unclear listing info</p>
+        <div>
+          {data.sort((a,b)=>b.inquiries-a.inquiries).map((p,i) => (
+            <div key={i} style={{ display:"grid",gridTemplateColumns:"20px 1fr 60px 60px 60px 32px",alignItems:"center",gap:12,padding:"10px 0",borderBottom:i<data.length-1?"1px solid #f3f4f6":"none" }}>
+              <div style={{ fontSize:12,color:"#9ca3af",fontWeight:700,textAlign:"center" }}>#{i+1}</div>
+              <div style={{ fontSize:13,fontWeight:600,color:"#1f2937" }}>{p.name}</div>
+              <div style={{ textAlign:"center" }}>
+                <div style={{ fontSize:13,fontWeight:700,color:"#374151" }}>{p.inquiries}</div>
+                <div style={{ fontSize:10,color:"#9ca3af" }}>inquiries</div>
+              </div>
+              <div style={{ textAlign:"center" }}>
+                <div style={{ fontSize:13,fontWeight:700,color:p.csat>=4.8?COLORS.primary:p.csat>=4.5?COLORS.teal:COLORS.amber }}>{p.csat}★</div>
+                <div style={{ fontSize:10,color:"#9ca3af" }}>CSAT</div>
+              </div>
+              <div style={{ textAlign:"center" }}>
+                <div style={{ fontSize:13,fontWeight:700,color:p.resolved>=90?COLORS.primary:p.resolved>=80?COLORS.teal:COLORS.amber }}>{p.resolved}%</div>
+                <div style={{ fontSize:10,color:"#9ca3af" }}>resolved</div>
+              </div>
+              <div style={{ fontSize:16,textAlign:"center" }}>{p.issues>0?"⚠️":"✅"}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+
+    // ─── REVENUE IMPACT ───────────────────────────────────────────────────────
+    const RevenueImpact = ({ data }) => (
+      <div style={{ background:"white",borderRadius:16,padding:24,border:"1px solid #e5e7eb" }}>
+        <h3 style={{ fontSize:15,fontWeight:700,color:"#064e3b",marginBottom:4 }}>💰 Revenue Impact</h3>
+        <p style={{ fontSize:12,color:"#6b7280",marginBottom:8 }}>Staff hours saved + upsell conversions driven by AI</p>
+        <div style={{ display:"flex",gap:16,marginBottom:16 }}>
+          <div style={{ flex:1,background:"#f0fdf4",borderRadius:10,padding:"12px 16px" }}>
+            <div style={{ fontSize:22,fontWeight:800,color:COLORS.primary,fontFamily:"'Playfair Display',serif" }}>$3,340</div>
+            <div style={{ fontSize:11,color:"#6b7280" }}>This month</div>
+          </div>
+          <div style={{ flex:1,background:"#f0fdf4",borderRadius:10,padding:"12px 16px" }}>
+            <div style={{ fontSize:22,fontWeight:800,color:COLORS.dark,fontFamily:"'Playfair Display',serif" }}>$860</div>
+            <div style={{ fontSize:11,color:"#6b7280" }}>Upsells this month</div>
+          </div>
+        </div>
+        <ResponsiveContainer width="100%" height={120}>
+          <AreaChart data={data}>
+            <defs>
+              <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={COLORS.primary} stopOpacity={0.3}/>
+                <stop offset="95%" stopColor={COLORS.primary} stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+            <Area type="monotone" dataKey="total" stroke={COLORS.primary} fill="url(#revGrad)" strokeWidth={2} />
+            <Area type="monotone" dataKey="upsell" stroke={COLORS.dark} fill="none" strokeWidth={1.5} strokeDasharray="4 2" />
+            <Tooltip formatter={(v,n) => [`$${v}`, n==="total"?"Total Value":"Upsell"]} contentStyle={{ background:"#fff",border:"1px solid #e5e7eb",borderRadius:8,fontSize:12 }} />
+            <XAxis dataKey="month" tick={{ fontSize:10, fill:"#9ca3af" }} axisLine={false} tickLine={false} />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+    );
+
+    // ─── SENTIMENT BREAKDOWN ──────────────────────────────────────────────────
+    const SentimentBreakdown = ({ data }) => (
+      <div style={{ background:"white",borderRadius:16,padding:24,border:"1px solid #e5e7eb" }}>
+        <h3 style={{ fontSize:15,fontWeight:700,color:"#064e3b",marginBottom:4 }}>😊 Guest Sentiment</h3>
+        <p style={{ fontSize:12,color:"#6b7280",marginBottom:16 }}>AI-classified across all conversations this month</p>
+        <ResponsiveContainer width="100%" height={160}>
+          <PieChart>
+            <Pie data={data} dataKey="pct" nameKey="label" cx="50%" cy="50%" innerRadius={45} outerRadius={70} paddingAngle={2}>
+              {data.map((d,i) => <Cell key={i} fill={d.color} />)}
+            </Pie>
+            <Tooltip formatter={(v,n) => [`${v}%`, n]} contentStyle={{ background:"#fff",border:"1px solid #e5e7eb",borderRadius:8,fontSize:12 }} />
+          </PieChart>
+        </ResponsiveContainer>
+        <div style={{ display:"flex",flexDirection:"column",gap:6 }}>
+          {data.map((d,i) => (
+            <div key={i} style={{ display:"flex",alignItems:"center",gap:8 }}>
+              <div style={{ width:10,height:10,borderRadius:2,background:d.color,flexShrink:0 }} />
+              <div style={{ flex:1 }}>
+                <div style={{ height:6,background:"#f3f4f6",borderRadius:3,overflow:"hidden" }}>
+                  <div style={{ width:`${d.pct}%`,height:"100%",background:d.color,borderRadius:3 }} />
+                </div>
+              </div>
+              <div style={{ fontSize:12,color:"#374151",width:64,display:"flex",justifyContent:"space-between" }}>
+                <span style={{ color:"#6b7280",fontSize:11 }}>{d.label}</span>
+                <span style={{ fontWeight:700 }}>{d.pct}%</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+
+    // ─── RESPONSE TIME ────────────────────────────────────────────────────────
+    const ResponseTimeChart = ({ data }) => (
+      <div style={{ background:"white",borderRadius:16,padding:24,border:"1px solid #e5e7eb" }}>
+        <h3 style={{ fontSize:15,fontWeight:700,color:"#064e3b",marginBottom:4 }}>⚡ Response Time Distribution</h3>
+        <p style={{ fontSize:12,color:"#6b7280",marginBottom:16 }}>81% of responses in under 3 seconds</p>
+        {data.map((d,i) => (
+          <div key={i} style={{ marginBottom:12 }}>
+            <div style={{ display:"flex",justifyContent:"space-between",marginBottom:4 }}>
+              <span style={{ fontSize:13,color:"#374151",fontWeight:600 }}>{d.range}</span>
+              <span style={{ fontSize:12,color:"#9ca3af" }}>{d.count.toLocaleString()} responses</span>
+            </div>
+            <div style={{ background:"#f3f4f6",borderRadius:100,height:8,overflow:"hidden" }}>
+              <div style={{ width:`${d.pct}%`,height:"100%",background:i===0?COLORS.primary:i===1?COLORS.teal:i===2?COLORS.amber:COLORS.red,borderRadius:100 }} />
+            </div>
+            <div style={{ fontSize:11,color:"#9ca3af",marginTop:2 }}>{d.pct}% of total</div>
+          </div>
+        ))}
+      </div>
+    );
+
+    // ─── KB GAPS ──────────────────────────────────────────────────────────────
+    const KBGapPanel = ({ data }) => (
+      <div style={{ background:"white",borderRadius:16,padding:24,border:"1px solid #e5e7eb" }}>
+        <div style={{ display:"flex",justifyContent:"space-between",alignItems:"start",marginBottom:16 }}>
+          <div>
+            <h3 style={{ fontSize:15,fontWeight:700,color:"#064e3b",marginBottom:4 }}>🧩 Knowledge Base Gaps</h3>
+            <p style={{ fontSize:12,color:"#6b7280" }}>Questions the AI couldn't fully answer</p>
+          </div>
+          <div style={{ background:"#fef3c7",border:"1px solid #fcd34d",borderRadius:8,padding:"4px 10px",fontSize:12,fontWeight:700,color:"#92400e" }}>{data.length} open</div>
+        </div>
+        {data.map((g,i) => (
+          <div key={i} style={{ borderBottom:i<data.length-1?"1px solid #f3f4f6":"none",paddingBottom:14,marginBottom:14 }}>
+            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"start",gap:12 }}>
+              <div style={{ flex:1 }}>
+                <div style={{ fontSize:13,fontWeight:600,color:"#1f2937",marginBottom:6 }}>"{g.q}"</div>
+                <div style={{ fontSize:12,color:"#10b981",background:"#f0fdf4",borderRadius:6,padding:"6px 10px",borderLeft:"3px solid #10b981" }}>
+                  💡 {g.suggested}
+                </div>
+              </div>
+              <div style={{ display:"flex",flexDirection:"column",alignItems:"center",gap:2,flexShrink:0 }}>
+                <div style={{ fontSize:18,fontWeight:800,color:COLORS.amber,fontFamily:"'Playfair Display',serif" }}>{g.count}x</div>
+                <div style={{ fontSize:10,color:"#9ca3af" }}>asked</div>
+              </div>
+            </div>
+            <div style={{ display:"flex",gap:8,marginTop:8 }}>
+              <button style={{ background:"#f0fdf4",border:"1px solid #10b981",borderRadius:6,padding:"5px 12px",fontSize:12,color:"#065f46",fontWeight:600,cursor:"pointer" }}>✓ Add to KB</button>
+              <button style={{ background:"transparent",border:"1px solid #e5e7eb",borderRadius:6,padding:"5px 12px",fontSize:12,color:"#6b7280",cursor:"pointer" }}>Dismiss</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+
+    // ─── TOP QUESTIONS ────────────────────────────────────────────────────────
+    const TopQuestions = ({ data }) => {
+      const catColors = { access:"#3b82f6",timing:"#f59e0b",local:"#10b981",amenity:"#a855f7",maintenance:"#ef4444",housekeeping:"#06b6d4" };
+      return (
+        <div style={{ background:"white",borderRadius:16,padding:24,border:"1px solid #e5e7eb" }}>
+          <h3 style={{ fontSize:15,fontWeight:700,color:"#064e3b",marginBottom:4 }}>💬 Top Guest Questions</h3>
+          <p style={{ fontSize:12,color:"#6b7280",marginBottom:16 }}>Most common inquiries this month</p>
+          {data.map((q,i) => (
+            <div key={i} style={{ marginBottom:12 }}>
+              <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4 }}>
+                <div style={{ display:"flex",alignItems:"center",gap:8 }}>
+                  <span style={{ fontSize:13,color:"#374151",fontWeight:500 }}>{q.q}</span>
+                  <span style={{ fontSize:10,fontWeight:600,padding:"2px 7px",borderRadius:100,background:`${catColors[q.category]}20`,color:catColors[q.category] }}>{q.category}</span>
+                </div>
+                <span style={{ fontSize:12,color:"#9ca3af",flexShrink:0 }}>{q.count}</span>
+              </div>
+              <div style={{ background:"#f3f4f6",borderRadius:100,height:5,overflow:"hidden" }}>
+                <div style={{ width:`${q.pct}%`,height:"100%",background:catColors[q.category]||COLORS.primary,borderRadius:100 }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    };
+
+    // ─── ESCALATION FEED ──────────────────────────────────────────────────────
+    const EscalationFeed = ({ data }) => (
+      <div style={{ background:"white",borderRadius:16,padding:24,border:"1px solid #e5e7eb" }}>
+        <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16 }}>
+          <h3 style={{ fontSize:15,fontWeight:700,color:"#064e3b" }}>🚨 Live Escalations</h3>
+          {data.length > 0 && <div style={{ background:"#fef2f2",border:"1px solid #fca5a5",borderRadius:8,padding:"3px 10px",fontSize:12,fontWeight:700,color:"#dc2626" }}>{data.length} open</div>}
+        </div>
+        {data.length === 0 ? (
+          <div style={{ textAlign:"center",padding:"24px",color:"#10b981" }}>
+            <div style={{ fontSize:32 }}>✅</div>
+            <div style={{ fontSize:13,fontWeight:600,marginTop:8 }}>No open escalations</div>
+          </div>
+        ) : data.map((e,i) => (
+          <div key={i} style={{ display:"flex",gap:12,padding:"12px 0",borderBottom:i<data.length-1?"1px solid #f3f4f6":"none" }}>
+            <div style={{ width:8,height:8,borderRadius:"50%",background:e.priority==="urgent"?COLORS.red:COLORS.amber,marginTop:4,flexShrink:0,boxShadow:`0 0 6px ${e.priority==="urgent"?COLORS.red:COLORS.amber}` }} />
+            <div style={{ flex:1 }}>
+              <div style={{ fontSize:13,fontWeight:700,color:"#1f2937" }}>{e.guest}</div>
+              <div style={{ fontSize:12,color:"#6b7280",marginBottom:4 }}>{e.property} · {e.time}</div>
+              <div style={{ fontSize:13,color:"#374151" }}>{e.issue}</div>
+              <div style={{ display:"flex",gap:8,marginTop:8 }}>
+                <button style={{ background:"#f0fdf4",border:"1px solid #10b981",borderRadius:6,padding:"4px 10px",fontSize:11,color:"#065f46",fontWeight:600,cursor:"pointer" }}>✓ Resolve</button>
+                <button style={{ background:"transparent",border:"1px solid #e5e7eb",borderRadius:6,padding:"4px 10px",fontSize:11,color:"#6b7280",cursor:"pointer" }}>Assign</button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+
+    // ─── OPERATOR DASHBOARD ───────────────────────────────────────────────────
+    const OperatorDashboard = () => {
+      const [section, setSection] = useState("overview");
+      const [period, setPeriod] = useState(7);
+      const navItems = [
+        { id:"overview", icon:"📊", label:"Overview" },
+        { id:"analytics", icon:"📈", label:"Analytics" },
+        { id:"properties", icon:"🏠", label:"Properties" },
+        { id:"sentiment", icon:"😊", label:"Sentiment" },
+        { id:"revenue", icon:"💰", label:"Revenue" },
+        { id:"gaps", icon:"🧩", label:"KB Gaps" },
+        { id:"escalations", icon:"🚨", label:"Escalations" },
+        { id:"settings", icon:"⚙️", label:"Settings" },
+      ];
+      const statCards = [
+        { label:"Active Sessions", value:MOCK.stats.total, sub:"right now", color:COLORS.primary },
+        { label:"Arriving Today", value:MOCK.stats.arriving, sub:"check-in day", color:COLORS.amber },
+        { label:"In Stay", value:MOCK.stats.inStay, sub:"currently hosted", color:COLORS.dark },
+        { label:"Open Escalations", value:MOCK.stats.escalations, sub:"need attention", color:COLORS.red },
+        { label:"AI Conversations", value:MOCK.stats.conversations.toLocaleString(), sub:"this month", color:COLORS.teal },
+        { label:"Resolution Rate", value:"89%", sub:"AI resolved", color:COLORS.primary },
+      ];
+      const chartData = period === 7 ? MOCK.weekly : MOCK.monthly.slice(-period);
+      return (
+        <div style={{ display:"grid",gridTemplateColumns:"220px 1fr",height:"680px",background:"white",borderRadius:16,overflow:"hidden",border:"1px solid #e5e7eb" }}>
+          <div style={{ background:"#022c22",display:"flex",flexDirection:"column",padding:"20px 0" }}>
+            <div style={{ padding:"0 16px 20px",borderBottom:"1px solid rgba(255,255,255,0.08)" }}>
+              <div style={{ display:"flex",alignItems:"center",gap:8 }}>
+                <PalmTree size={24} color="#34d399" />
+                <div>
+                  <div style={{ color:"white",fontWeight:700,fontSize:13 }}>Beach Habitats</div>
+                  <div style={{ color:"#6ee7b7",fontSize:11 }}>Operator Dashboard</div>
+                </div>
+              </div>
+              <div style={{ marginTop:12,display:"flex",alignItems:"center",gap:6,fontSize:11,color:"#6ee7b7" }}>
+                <div style={{ width:6,height:6,borderRadius:"50%",background:"#34d399" }} />
+                AI Active · 47 sessions live
+              </div>
+            </div>
+            <div style={{ padding:"12px 8px",flex:1 }}>
+              {navItems.map(n => (
+                <button key={n.id} onClick={() => setSection(n.id)} style={{
+                  width:"100%",display:"flex",alignItems:"center",gap:10,
+                  background:section===n.id?"rgba(16,185,129,0.2)":"transparent",
+                  border:section===n.id?"1px solid rgba(16,185,129,0.3)":"1px solid transparent",
+                  borderRadius:10,padding:"9px 14px",color:section===n.id?"#34d399":"#9ca3af",
+                  fontSize:13,fontWeight:600,cursor:"pointer",marginBottom:2,textAlign:"left",transition:"all 0.15s",
+                }}>
+                  <span style={{ fontSize:15 }}>{n.icon}</span>{n.label}
+                  {n.id==="escalations"&&MOCK.stats.escalations>0&&<span style={{ marginLeft:"auto",background:COLORS.red,color:"white",fontSize:10,fontWeight:700,padding:"1px 6px",borderRadius:100 }}>{MOCK.stats.escalations}</span>}
+                  {n.id==="gaps"&&<span style={{ marginLeft:"auto",background:COLORS.amber,color:"#000",fontSize:10,fontWeight:700,padding:"1px 6px",borderRadius:100 }}>{MOCK.kbGaps.length}</span>}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div style={{ overflowY:"auto",background:"#f8fafc",padding:24 }}>
+            {section === "overview" && (
+              <>
+                <div style={{ marginBottom:20 }}>
+                  <h2 style={{ fontFamily:"'Playfair Display',serif",fontSize:22,color:"#064e3b",fontWeight:800 }}>Good morning, Sarah 👋</h2>
+                  <p style={{ color:"#6b7280",fontSize:13 }}>Here's your operation at a glance.</p>
+                </div>
+                <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,marginBottom:20 }}>
+                  {statCards.map((s,i) => (
+                    <div key={i} style={{ background:"white",borderRadius:12,padding:"16px 18px",border:"1px solid #e5e7eb" }}>
+                      <div style={{ fontSize:10,color:"#9ca3af",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em" }}>{s.label}</div>
+                      <div style={{ fontSize:28,fontWeight:800,color:s.color,marginTop:4,fontFamily:"'Playfair Display',serif",lineHeight:1 }}>{s.value}</div>
+                      <div style={{ fontSize:11,color:"#9ca3af",marginTop:3 }}>{s.sub}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:16 }}>
+                  <div style={{ background:"white",borderRadius:16,padding:20,border:"1px solid #e5e7eb" }}>
+                    <h3 style={{ fontSize:14,fontWeight:700,color:"#064e3b",marginBottom:4 }}>📊 Weekly Volume</h3>
+                    <p style={{ fontSize:11,color:"#6b7280",marginBottom:12 }}>Inquiries vs. resolved</p>
+                    <ResponsiveContainer width="100%" height={160}>
+                      <BarChart data={MOCK.weekly}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                        <XAxis dataKey="day" tick={{ fontSize:10,fill:"#9ca3af" }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fontSize:10,fill:"#9ca3af" }} axisLine={false} tickLine={false} />
+                        <Tooltip contentStyle={{ background:"#fff",border:"1px solid #e5e7eb",borderRadius:8,fontSize:11 }} />
+                        <Bar dataKey="inquiries" fill={COLORS.primary} radius={[3,3,0,0]} />
+                        <Bar dataKey="resolved" fill={COLORS.dark} radius={[3,3,0,0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <EscalationFeed data={MOCK.escalations} />
+                </div>
+                <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:16 }}>
+                  <SentimentBreakdown data={MOCK.sentiment} />
+                  <ResponseTimeChart data={MOCK.responseTime} />
+                </div>
+              </>
+            )}
+            {section === "analytics" && (
+              <>
+                <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20 }}>
+                  <div>
+                    <h2 style={{ fontFamily:"'Playfair Display',serif",fontSize:22,color:"#064e3b",fontWeight:800 }}>Analytics</h2>
+                    <p style={{ color:"#6b7280",fontSize:13 }}>Full picture of your AI concierge performance</p>
+                  </div>
+                  <div style={{ display:"flex",gap:6 }}>
+                    {[7,30,90].map(d => (
+                      <button key={d} onClick={() => setPeriod(d)} style={{ background:period===d?"linear-gradient(135deg,#065f46,#10b981)":"white",color:period===d?"white":"#374151",border:"1px solid "+(period===d?"transparent":"#e5e7eb"),borderRadius:8,padding:"6px 14px",fontSize:12,fontWeight:600,cursor:"pointer" }}>{d}d</button>
+                    ))}
+                  </div>
+                </div>
+                <div style={{ background:"white",borderRadius:16,padding:20,border:"1px solid #e5e7eb",marginBottom:16 }}>
+                  <h3 style={{ fontSize:14,fontWeight:700,color:"#064e3b",marginBottom:12 }}>Daily Inquiry Volume & Resolution</h3>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <AreaChart data={chartData}>
+                      <defs>
+                        <linearGradient id="inqGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor={COLORS.primary} stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor={COLORS.primary} stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                      <XAxis dataKey={period===7?"day":"date"} tick={{ fontSize:10,fill:"#9ca3af" }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fontSize:10,fill:"#9ca3af" }} axisLine={false} tickLine={false} />
+                      <Tooltip contentStyle={{ background:"#fff",border:"1px solid #e5e7eb",borderRadius:8,fontSize:11 }} />
+                      <Area type="monotone" dataKey="inquiries" stroke={COLORS.primary} fill="url(#inqGrad)" strokeWidth={2} name="Inquiries" />
+                      <Area type="monotone" dataKey="resolved" stroke={COLORS.dark} fill="none" strokeWidth={2} name="Resolved" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+                <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:16 }}>
+                  <InquiryHeatmap data={MOCK.heatmap} />
+                  <TopQuestions data={MOCK.topQuestions} />
+                </div>
+                <HealthScore data={MOCK.operatorHealth} />
+              </>
+            )}
+            {section === "properties" && (
+              <>
+                <h2 style={{ fontFamily:"'Playfair Display',serif",fontSize:22,color:"#064e3b",fontWeight:800,marginBottom:4 }}>Property Performance</h2>
+                <p style={{ color:"#6b7280",fontSize:13,marginBottom:20 }}>Per-unit breakdown</p>
+                <PropertyLeaderboard data={MOCK.propertyRank} />
+              </>
+            )}
+            {section === "sentiment" && (
+              <>
+                <h2 style={{ fontFamily:"'Playfair Display',serif",fontSize:22,color:"#064e3b",fontWeight:800,marginBottom:4 }}>Guest Sentiment</h2>
+                <p style={{ color:"#6b7280",fontSize:13,marginBottom:20 }}>AI-classified across all conversations</p>
+                <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:16 }}>
+                  <SentimentBreakdown data={MOCK.sentiment} />
+                  <div style={{ background:"white",borderRadius:16,padding:24,border:"1px solid #e5e7eb" }}>
+                    <h3 style={{ fontSize:15,fontWeight:700,color:"#064e3b",marginBottom:16 }}>📉 CSAT Over Time</h3>
+                    <ResponsiveContainer width="100%" height={200}>
+                      <LineChart data={MOCK.monthly.slice(-14)}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                        <XAxis dataKey="date" tick={{ fontSize:9,fill:"#9ca3af" }} axisLine={false} tickLine={false} />
+                        <YAxis domain={[4,5]} tick={{ fontSize:10,fill:"#9ca3af" }} axisLine={false} tickLine={false} />
+                        <Tooltip contentStyle={{ background:"#fff",border:"1px solid #e5e7eb",borderRadius:8,fontSize:11 }} />
+                        <Line type="monotone" dataKey="csat" stroke={COLORS.primary} strokeWidth={2} dot={false} name="CSAT Score" />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </>
+            )}
+            {section === "revenue" && (
+              <>
+                <h2 style={{ fontFamily:"'Playfair Display',serif",fontSize:22,color:"#064e3b",fontWeight:800,marginBottom:4 }}>Revenue Impact</h2>
+                <p style={{ color:"#6b7280",fontSize:13,marginBottom:20 }}>Staff hours saved + upsell revenue</p>
+                <RevenueImpact data={MOCK.revenue} />
+                <div style={{ background:"white",borderRadius:16,padding:24,border:"1px solid #e5e7eb",marginTop:16 }}>
+                  <h3 style={{ fontSize:15,fontWeight:700,color:"#064e3b",marginBottom:16 }}>💰 Upsell Conversions</h3>
+                  <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:16 }}>
+                    {[["Late Checkout",23,"$575"],["Beach Chair Rentals",41,"$1,435"],["Mid-Stay Cleans",12,"$900"]].map(([l,n,rev]) => (
+                      <div key={l} style={{ background:"#f0fdf4",borderRadius:12,padding:"16px 20px",border:"1px solid #bbf7d0" }}>
+                        <div style={{ fontSize:13,fontWeight:600,color:"#065f46",marginBottom:8 }}>{l}</div>
+                        <div style={{ fontSize:28,fontWeight:800,color:COLORS.primary,fontFamily:"'Playfair Display',serif" }}>{n}</div>
+                        <div style={{ fontSize:12,color:"#6b7280" }}>{rev} revenue</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+            {section === "gaps" && (
+              <>
+                <h2 style={{ fontFamily:"'Playfair Display',serif",fontSize:22,color:"#064e3b",fontWeight:800,marginBottom:4 }}>Knowledge Base Gaps</h2>
+                <p style={{ color:"#6b7280",fontSize:13,marginBottom:20 }}>Questions your AI couldn't confidently answer</p>
+                <KBGapPanel data={MOCK.kbGaps} />
+              </>
+            )}
+            {section === "escalations" && (
+              <>
+                <h2 style={{ fontFamily:"'Playfair Display',serif",fontSize:22,color:"#064e3b",fontWeight:800,marginBottom:4 }}>Escalations</h2>
+                <p style={{ color:"#6b7280",fontSize:13,marginBottom:20 }}>Issues requiring human intervention</p>
+                <EscalationFeed data={MOCK.escalations} />
+              </>
+            )}
+            {section === "settings" && (
+              <div>
+                <h2 style={{ fontFamily:"'Playfair Display',serif",fontSize:22,color:"#064e3b",fontWeight:800,marginBottom:20 }}>Settings & Branding</h2>
+                <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:20 }}>
+                  <div style={{ background:"white",borderRadius:12,padding:24,border:"1px solid #e5e7eb" }}>
+                    <h3 style={{ fontSize:15,fontWeight:700,color:"#064e3b",marginBottom:16 }}>🎨 Brand</h3>
+                    {[["Company Name","Beach Habitats"],["Primary Color","#10b981"],["Support Email","hello@beachhabitats.com"]].map(([l,v]) => (
+                      <div key={l} style={{ marginBottom:14 }}>
+                        <label style={{ fontSize:12,fontWeight:600,color:"#374151",display:"block",marginBottom:5 }}>{l}</label>
+                        <input defaultValue={v} style={{ width:"100%",padding:"9px 12px",border:"1px solid #d1d5db",borderRadius:8,fontSize:13,boxSizing:"border-box" }} />
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ background:"white",borderRadius:12,padding:24,border:"1px solid #e5e7eb" }}>
+                    <h3 style={{ fontSize:15,fontWeight:700,color:"#064e3b",marginBottom:16 }}>🔗 PMS Connections</h3>
+                    {[["Escapia","connected"],["Guesty","disconnected"],["Hostfully","disconnected"],["VRBO","connected"],["Airbnb","coming soon"]].map(([name,status]) => (
+                      <div key={name} style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"11px 0",borderBottom:"1px solid #f3f4f6" }}>
+                        <span style={{ fontSize:14,fontWeight:600,color:"#374151" }}>{name}</span>
+                        <div style={{ display:"flex",alignItems:"center",gap:8 }}>
+                          <div style={{ width:7,height:7,borderRadius:"50%",background:status==="connected"?COLORS.primary:status==="coming soon"?"#9ca3af":"#d1d5db" }} />
+                          <span style={{ fontSize:12,color:status==="connected"?COLORS.primary:"#9ca3af",fontWeight:600 }}>{status}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    // ─── GUEST UI ─────────────────────────────────────────────────────────────
+    const GuestUI = ({ operatorName = "Beach Habitats", operatorLogo = null }) => {
+      const [messages, setMessages] = useState([{ from:"ai", text:`Welcome to ${operatorName}! 🌴 I'm your personal concierge. Ask me anything — WiFi, checkout, local spots, or anything you need!` }]);
+      const [input, setInput] = useState("");
+      const [listening, setListening] = useState(false);
+      const [typing, setTyping] = useState(false);
+      const ref = useRef(null);
+      const replies = {
+        wifi:"WiFi: CoastalVibes_5G / Password: SunsetView2024 🌊",
+        checkout:"Checkout is 10:00 AM. I'll send a reminder at 9am! Late checkout available — just ask.",
+        restaurant:"🦞 The Crab Shack (0.3mi) — fresh Gulf seafood\n🍕 Rosemary Beach Pizzeria (0.5mi)\n☕ Sunrise Cafe (0.2mi) — best breakfast on 30A",
+        beach:"Nearest beach access is 2 blocks east. 🏖️ Want me to book beach chair rentals for $35/day?",
+        parking:"You have 1 assigned spot (#14) in the covered garage.",
+        default:"Great question! Let me pull that up. Is there anything else I can help with? 🌴",
+      };
+      const getReply = (m) => {
+        const t = m.toLowerCase();
+        if (t.includes("wifi")||t.includes("password")) return replies.wifi;
+        if (t.includes("checkout")||t.includes("check out")) return replies.checkout;
+        if (t.includes("restaurant")||t.includes("food")||t.includes("eat")) return replies.restaurant;
+        if (t.includes("beach")) return replies.beach;
+        if (t.includes("park")) return replies.parking;
+        return replies.default;
+      };
+      const send = (text = input) => {
+        if (!text.trim()) return;
+        setMessages(p => [...p, { from:"guest", text }]);
+        setInput(""); setTyping(true);
+        setTimeout(() => { setTyping(false); setMessages(p => [...p, { from:"ai", text:getReply(text) }]); }, 1200);
+      };
+      useEffect(() => { ref.current?.scrollIntoView({ behavior:"smooth" }); }, [messages, typing]);
+      return (
+        <div style={{ height:"100%",display:"flex",flexDirection:"column",background:"#f8fafc",fontFamily:"'Inter',sans-serif" }}>
+          <div style={{ background:"linear-gradient(135deg,#022c22,#065f46)",padding:"14px 18px",display:"flex",alignItems:"center",gap:12 }}>
+            <div style={{ width:40,height:40,borderRadius:"50%",background:"rgba(255,255,255,0.15)",display:"flex",alignItems:"center",justifyContent:"center",border:"2px solid rgba(255,255,255,0.3)" }}>
+              {operatorLogo ? <img src={operatorLogo} alt="logo" style={{ width:26,height:26,objectFit:"contain" }} /> : <PalmTree size={20} color="white" />}
+            </div>
+            <div style={{ flex:1 }}>
+              <div style={{ color:"white",fontWeight:700,fontSize:14 }}>{operatorName} Concierge</div>
+              <div style={{ display:"flex",alignItems:"center",gap:5,color:"#34d399",fontSize:11 }}>
+                <span style={{ width:5,height:5,borderRadius:"50%",background:"#34d399",display:"inline-block" }} />Online · Responds instantly
+              </div>
+            </div>
+          </div>
+          <div style={{ padding:"10px 14px",background:"white",borderBottom:"1px solid #e5e7eb",display:"flex",gap:6,overflowX:"auto" }}>
+            {["WiFi Password","Checkout Time","Restaurant Recs","Beach Access"].map(q => (
+              <button key={q} onClick={() => send(q)} style={{ background:"#f0fdf4",border:"1px solid #10b981",borderRadius:100,padding:"5px 12px",fontSize:11,color:"#065f46",fontWeight:600,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0 }}>{q}</button>
+            ))}
+          </div>
+          <div style={{ flex:1,overflowY:"auto",padding:"16px 14px" }}>
+            {messages.map((msg,i) => (
+              <div key={i} style={{ marginBottom:10,display:"flex",justifyContent:msg.from==="guest"?"flex-end":"flex-start",alignItems:"flex-end",gap:7 }}>
+                {msg.from==="ai" && <div style={{ width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,#10b981,#065f46)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0 }}><PalmTree size={14} color="white" /></div>}
+                <div style={{ maxWidth:"74%",background:msg.from==="guest"?"linear-gradient(135deg,#065f46,#10b981)":"white",color:msg.from==="guest"?"white":"#1f2937",borderRadius:msg.from==="guest"?"16px 16px 4px 16px":"16px 16px 16px 4px",padding:"10px 14px",fontSize:13,lineHeight:1.6,boxShadow:"0 2px 8px rgba(0,0,0,0.05)",whiteSpace:"pre-line" }}>
+                  {msg.text}
+                </div>
+              </div>
+            ))}
+            {typing && (
+              <div style={{ display:"flex",alignItems:"center",gap:7,marginBottom:10 }}>
+                <div style={{ width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,#10b981,#065f46)",display:"flex",alignItems:"center",justifyContent:"center" }}><PalmTree size={14} color="white" /></div>
+                <div style={{ background:"white",borderRadius:"16px 16px 16px 4px",padding:"12px 16px",boxShadow:"0 2px 8px rgba(0,0,0,0.05)" }}>
+                  <div style={{ display:"flex",gap:3 }}>
+                    {[0,1,2].map(i => <div key={i} style={{ width:6,height:6,borderRadius:"50%",background:"#10b981",opacity:0.6+i*0.2 }} />)}
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={ref} />
+          </div>
+          <div style={{ padding:"10px 14px",background:"white",borderTop:"1px solid #e5e7eb" }}>
+            <div style={{ display:"flex",gap:8,alignItems:"center",background:"#f1f5f9",borderRadius:100,padding:"7px 7px 7px 14px" }}>
+              <button onClick={() => setListening(!listening)} style={{ width:34,height:34,borderRadius:"50%",border:"none",cursor:"pointer",background:listening?"linear-gradient(135deg,#10b981,#065f46)":"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0 }}>
+                <PalmTree size={20} color={listening?"white":"#10b981"} />
+              </button>
+              <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key==="Enter"&&send()} placeholder="Ask me anything about your stay..." style={{ flex:1,border:"none",background:"transparent",outline:"none",fontSize:13,color:"#1f2937" }} />
+              <button onClick={() => send()} style={{ width:34,height:34,borderRadius:"50%",background:"linear-gradient(135deg,#10b981,#065f46)",border:"none",cursor:"pointer",color:"white",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center" }}>→</button>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ─── DEMO PAGE ────────────────────────────────────────────────────────────
+    const DemoPage = () => {
+      const [tab, setTab] = useState("guest");
+      const [opName, setOpName] = useState("Beach Habitats");
+      const [logo, setLogo] = useState(null);
+      return (
+        <div style={{ minHeight:"100vh",background:"#f8fafc",paddingTop:80,fontFamily:"'Inter',sans-serif" }}>
+          <div style={{ maxWidth:1200,margin:"0 auto",padding:"40px 24px" }}>
+            <h1 style={{ fontFamily:"'Playfair Display',serif",fontSize:38,color:"#064e3b",fontWeight:800,marginBottom:8 }}>Interactive Demo</h1>
+            <p style={{ color:"#6b7280",fontSize:15,marginBottom:28 }}>Try both sides of the platform live.</p>
+            <div style={{ display:"flex",gap:8,marginBottom:28 }}>
+              {[["guest","🏖️ Guest UI"],["dashboard","📊 Operator Dashboard"]].map(([t,l]) => (
+                <button key={t} onClick={() => setTab(t)} style={{ background:tab===t?"linear-gradient(135deg,#065f46,#10b981)":"white",color:tab===t?"white":"#374151",border:"1px solid "+(tab===t?"transparent":"#e5e7eb"),borderRadius:10,padding:"10px 24px",fontSize:14,fontWeight:600,cursor:"pointer" }}>{l}</button>
+              ))}
+            </div>
+            {tab === "guest" && (
+              <div style={{ display:"grid",gridTemplateColumns:"280px 1fr",gap:28,alignItems:"start" }}>
+                <div style={{ background:"white",borderRadius:16,padding:22,border:"1px solid #e5e7eb" }}>
+                  <h3 style={{ fontWeight:700,color:"#064e3b",marginBottom:16,fontSize:15 }}>🎨 White-Label Setup</h3>
+                  <div style={{ marginBottom:16 }}>
+                    <label style={{ fontSize:12,fontWeight:600,color:"#374151",display:"block",marginBottom:5 }}>Company Name</label>
+                    <input value={opName} onChange={e => setOpName(e.target.value)} style={{ width:"100%",padding:"9px 11px",border:"1px solid #d1d5db",borderRadius:8,fontSize:13,outline:"none",boxSizing:"border-box" }} />
+                  </div>
+                  <div style={{ marginBottom:16 }}>
+                    <label style={{ fontSize:12,fontWeight:600,color:"#374151",display:"block",marginBottom:5 }}>Upload Logo</label>
+                    <label style={{ display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",border:"2px dashed #10b981",borderRadius:10,padding:"18px",cursor:"pointer",background:"#f0fdf4",color:"#065f46",fontSize:12,fontWeight:500,gap:6 }}>
+                      {logo ? <img src={logo} alt="logo" style={{ height:44,objectFit:"contain" }} /> : <><span style={{ fontSize:24 }}>📸</span><span>Drop or click to upload</span></>}
+                      <input type="file" accept="image/*" onChange={e => { const f=e.target.files[0]; if(f){const r=new FileReader();r.onloadend=()=>setLogo(r.result);r.readAsDataURL(f);} }} style={{ display:"none" }} />
+                    </label>
+                  </div>
+                  <div style={{ background:"#f0fdf4",borderRadius:10,padding:12,fontSize:12,color:"#065f46",border:"1px solid #bbf7d0" }}>
+                    <strong>🌴 Palm Tree = Voice</strong>
+                    <p style={{ margin:"6px 0 0",lineHeight:1.5,color:"#047857",fontSize:11 }}>Bottom-left palm icon activates voice input for guests.</p>
+                  </div>
+                </div>
+                <div style={{ display:"flex",justifyContent:"center" }}>
+                  <div style={{ width:370,height:660,background:"#1a1a2e",borderRadius:38,padding:14,boxShadow:"0 40px 100px rgba(0,0,0,0.3)",border:"7px solid #2a2a3e" }}>
+                    <div style={{ width:"100%",height:"100%",borderRadius:26,overflow:"hidden" }}>
+                      <GuestUI operatorName={opName} operatorLogo={logo} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            {tab === "dashboard" && <OperatorDashboard />}
+          </div>
+        </div>
+      );
+    };
+
+    // ─── OPERATORS PAGE ───────────────────────────────────────────────────────
+    const OperatorsPage = ({ setPage }) => (
+      <div style={{ minHeight:"100vh",paddingTop:80,fontFamily:"'Inter',sans-serif" }}>
+        <div style={{ background:"linear-gradient(160deg,#022c22,#064e3b)",padding:"64px 40px",textAlign:"center" }}>
+          <h1 style={{ fontFamily:"'Playfair Display',serif",fontSize:52,color:"white",fontWeight:800,marginBottom:16 }}>Built for VR<br/><span style={{ color:"#34d399" }}>Operators</span></h1>
+          <p style={{ color:"#a7f3d0",fontSize:18,maxWidth:560,margin:"0 auto 36px" }}>Stop answering the same 20 questions. Give your guests 5-star service around the clock.</p>
+          <button onClick={() => setPage("signup")} style={{ background:"linear-gradient(135deg,#10b981,#059669)",color:"white",border:"none",borderRadius:12,padding:"16px 40px",fontSize:17,fontWeight:700,cursor:"pointer" }}>Start Free Trial</button>
+        </div>
+        <div style={{ background:"#f0fdf4",padding:"80px 40px" }}>
+          <div style={{ maxWidth:900,margin:"0 auto" }}>
+            <h2 style={{ fontFamily:"'Playfair Display',serif",fontSize:38,color:"#064e3b",fontWeight:800,textAlign:"center",marginBottom:48 }}>Live in Under an Hour</h2>
+            <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:24 }}>
+              {[["01","Connect Your PMS","Escapia, Guesty, Hostfully","15 min"],["02","Upload Brand Assets","Logo, colors, AI personality","10 min"],["03","Answer 20 Questions","Your rules, amenities, local spots","20 min"],["04","Go Live","Share the guest portal link","Instant"]].map(([n,t,d,time]) => (
+                <div key={n} style={{ background:"white",borderRadius:16,padding:28,boxShadow:"0 4px 16px rgba(0,0,0,0.06)" }}>
+                  <div style={{ fontSize:36,fontWeight:900,color:"#bbf7d0",fontFamily:"'Playfair Display',serif",lineHeight:1,marginBottom:10 }}>{n}</div>
+                  <h3 style={{ fontSize:15,fontWeight:700,color:"#064e3b",marginBottom:6 }}>{t}</h3>
+                  <p style={{ fontSize:13,color:"#6b7280",lineHeight:1.6,marginBottom:10 }}>{d}</p>
+                  <div style={{ fontSize:12,color:COLORS.primary,fontWeight:700 }}>⏱ ~{time}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+
+    // ─── PRICING PAGE ─────────────────────────────────────────────────────────
+    const PricingPage = ({ setPage }) => {
+      const [annual, setAnnual] = useState(false);
+      const plans = [
+        { name:"Starter", price:annual?79:99, units:"Up to 15 units", features:["AI Chat Concierge","Basic Analytics","1 PMS Integration","White-label branding","Email support"], color:COLORS.primary, popular:false },
+        { name:"Growth", price:annual?199:249, units:"Up to 50 units", features:["Everything in Starter","Voice AI","Full Analytics Suite","Inquiry Heatmap","KB Gap Alerts","3 PMS Integrations","Operator Health Score"], color:COLORS.dark, popular:true },
+        { name:"Enterprise", price:annual?399:499, units:"Unlimited units", features:["Everything in Growth","Revenue Dashboard","Dedicated AI agent","Multi-operator","API access","Dedicated CSM"], color:"#022c22", popular:false },
+      ];
+      return (
+        <div style={{ minHeight:"100vh",paddingTop:80,background:"#f8fafc",fontFamily:"'Inter',sans-serif" }}>
+          <div style={{ maxWidth:1100,margin:"0 auto",padding:"60px 24px" }}>
+            <div style={{ textAlign:"center",marginBottom:48 }}>
+              <h1 style={{ fontFamily:"'Playfair Display',serif",fontSize:48,color:"#064e3b",fontWeight:800,marginBottom:12 }}>Simple, Transparent Pricing</h1>
+              <p style={{ color:"#6b7280",fontSize:17,marginBottom:28 }}>Start free for 14 days. No credit card required.</p>
+              <div style={{ display:"inline-flex",background:"white",borderRadius:100,padding:4,border:"1px solid #e5e7eb",gap:4 }}>
+                {["Monthly","Annual (save 20%)"].map((l,i) => (
+                  <button key={i} onClick={() => setAnnual(i===1)} style={{ background:annual===(i===1)?"linear-gradient(135deg,#065f46,#10b981)":"transparent",color:annual===(i===1)?"white":"#374151",border:"none",borderRadius:100,padding:"8px 20px",fontSize:14,fontWeight:600,cursor:"pointer" }}>{l}</button>
+                ))}
+              </div>
+            </div>
+            <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:24 }}>
+              {plans.map((p,i) => (
+                <div key={i} style={{ background:p.popular?"linear-gradient(160deg,#022c22,#065f46)":"white",borderRadius:20,padding:32,border:p.popular?"none":"1px solid #e5e7eb",boxShadow:p.popular?"0 20px 60px rgba(6,95,70,0.3)":"0 4px 16px rgba(0,0,0,0.06)",position:"relative",transform:p.popular?"scale(1.03)":"none" }}>
+                  {p.popular && <div style={{ position:"absolute",top:-12,left:"50%",transform:"translateX(-50%)",background:"#10b981",color:"white",fontSize:11,fontWeight:700,padding:"4px 14px",borderRadius:100 }}>MOST POPULAR</div>}
+                  <div style={{ color:p.popular?"#6ee7b7":COLORS.primary,fontSize:13,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:6 }}>{p.name}</div>
+                  <div style={{ display:"flex",alignItems:"flex-end",gap:3,marginBottom:4 }}>
+                    <span style={{ fontSize:46,fontWeight:800,color:p.popular?"white":"#064e3b",fontFamily:"'Playfair Display',serif",lineHeight:1 }}>${p.price}</span>
+                    <span style={{ fontSize:13,color:p.popular?"#a7f3d0":"#6b7280",paddingBottom:8 }}>/mo</span>
+                  </div>
+                  <div style={{ fontSize:13,color:p.popular?"#a7f3d0":"#6b7280",marginBottom:24 }}>{p.units}</div>
+                  <div style={{ marginBottom:24 }}>
+                    {p.features.map((f,fi) => (
+                      <div key={fi} style={{ display:"flex",alignItems:"center",gap:8,marginBottom:9 }}>
+                        <div style={{ width:16,height:16,borderRadius:"50%",background:p.popular?"rgba(52,211,153,0.2)":"#f0fdf4",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0 }}>
+                          <span style={{ fontSize:9,color:p.popular?"#34d399":COLORS.primary }}>✓</span>
+                        </div>
+                        <span style={{ fontSize:13,color:p.popular?"#d1fae5":"#374151" }}>{f}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <button onClick={() => setPage("signup")} style={{ width:"100%",background:p.popular?"linear-gradient(135deg,#10b981,#059669)":"#f0fdf4",color:p.popular?"white":"#065f46",border:"none",borderRadius:10,padding:"13px",fontSize:14,fontWeight:700,cursor:"pointer" }}>Start Free Trial →</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ─── SIGNUP PAGE ──────────────────────────────────────────────────────────
+    const SignupPage = () => {
+      const [step, setStep] = useState(1);
+      const [form, setForm] = useState({ name:"",email:"",company:"",units:"",pms:"" });
+      return (
+        <div style={{ minHeight:"100vh",paddingTop:80,background:"linear-gradient(160deg,#022c22,#064e3b)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Inter',sans-serif" }}>
+          <div style={{ background:"white",borderRadius:24,padding:"44px 38px",width:"100%",maxWidth:460,margin:24 }}>
+            <div style={{ textAlign:"center",marginBottom:28 }}>
+              <PalmTree size={40} color="#10b981" />
+              <h2 style={{ fontFamily:"'Playfair Display',serif",fontSize:26,color:"#064e3b",fontWeight:800,marginTop:12,marginBottom:4 }}>Get Started Free</h2>
+              <p style={{ color:"#6b7280",fontSize:13 }}>14-day trial · No credit card needed</p>
+            </div>
+            <div style={{ display:"flex",gap:6,marginBottom:24 }}>
+              {[1,2,3].map(s => <div key={s} style={{ flex:1,height:4,borderRadius:2,background:step>=s?"#10b981":"#e5e7eb",transition:"background 0.3s" }} />)}
+            </div>
+            {step === 1 && (
+              <div>
+                {[["Full Name","name","text"],["Email","email","email"],["Company Name","company","text"]].map(([l,k,t]) => (
+                  <div key={k} style={{ marginBottom:14 }}>
+                    <label style={{ fontSize:12,fontWeight:600,color:"#374151",display:"block",marginBottom:5 }}>{l}</label>
+                    <input type={t} value={form[k]} onChange={e => setForm({...form,[k]:e.target.value})} style={{ width:"100%",padding:"11px 13px",border:"1px solid #d1d5db",borderRadius:9,fontSize:13,outline:"none",boxSizing:"border-box" }} />
+                  </div>
+                ))}
+                <button onClick={() => setStep(2)} style={{ width:"100%",background:"linear-gradient(135deg,#065f46,#10b981)",color:"white",border:"none",borderRadius:10,padding:13,fontSize:15,fontWeight:700,cursor:"pointer",marginTop:6 }}>Continue →</button>
+              </div>
+            )}
+            {step === 2 && (
+              <div>
+                {[["How many units?",["1–15","16–50","51–150","150+"],"units"],["Current PMS",["Escapia","Guesty","Hostfully","VRBO","Other"],"pms"]].map(([l,opts,k]) => (
+                  <div key={k} style={{ marginBottom:16 }}>
+                    <label style={{ fontSize:12,fontWeight:600,color:"#374151",display:"block",marginBottom:5 }}>{l}</label>
+                    <select value={form[k]} onChange={e => setForm({...form,[k]:e.target.value})} style={{ width:"100%",padding:"11px 13px",border:"1px solid #d1d5db",borderRadius:9,fontSize:13,outline:"none" }}>
+                      <option>Select…</option>
+                      {opts.map(o => <option key={o}>{o}</option>)}
+                    </select>
+                  </div>
+                ))}
+                <div style={{ display:"flex",gap:10,marginTop:8 }}>
+                  <button onClick={() => setStep(1)} style={{ flex:1,background:"#f3f4f6",color:"#374151",border:"none",borderRadius:10,padding:13,fontSize:14,fontWeight:600,cursor:"pointer" }}>← Back</button>
+                  <button onClick={() => setStep(3)} style={{ flex:2,background:"linear-gradient(135deg,#065f46,#10b981)",color:"white",border:"none",borderRadius:10,padding:13,fontSize:15,fontWeight:700,cursor:"pointer" }}>Continue →</button>
+                </div>
+              </div>
+            )}
+            {step === 3 && (
+              <div style={{ textAlign:"center" }}>
+                <div style={{ fontSize:60,marginBottom:14 }}>🎉</div>
+                <h3 style={{ fontSize:22,fontWeight:800,color:"#064e3b",fontFamily:"'Playfair Display',serif",marginBottom:8 }}>You're all set!</h3>
+                <p style={{ color:"#6b7280",fontSize:14,lineHeight:1.6,marginBottom:24 }}>We've reserved your account for <strong>{form.email||"your email"}</strong>. Check your inbox for your setup link.</p>
+                <div style={{ background:"#f0fdf4",border:"1px solid #bbf7d0",borderRadius:12,padding:14,fontSize:13,color:"#065f46",lineHeight:1.9 }}>
+                  1. Confirm your email<br/>2. Connect your PMS<br/>3. Upload your logo<br/>4. Go live 🚀
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    // ─── APP ──────────────────────────────────────────────────────────────────
+    function App() {
+      const [page, setPage] = useState("home");
+      return (
+        <div style={{ minHeight:"100vh" }}>
+          <Nav page={page} setPage={setPage} />
+          {page === "home" && <HomePage setPage={setPage} />}
+          {page === "demo" && <DemoPage />}
+          {page === "operators" && <OperatorsPage setPage={setPage} />}
+          {page === "pricing" && <PricingPage setPage={setPage} />}
+          {page === "signup" && <SignupPage />}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>

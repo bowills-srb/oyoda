@@ -1,0 +1,33 @@
+{
+  "fixture_id": "direct/008_matthew_morrison",
+  "platform": "direct",
+  "source_channel": "email",
+  "source_provider": "gmail",
+  "headers": {
+    "From": "Guest 010 <guest_010@example.test>",
+    "Reply-To": "guest_010@example.test",
+    "Message-ID": "19e3624d13215fd0",
+    "X-Thread-Id": "19e3624d13215fd0",
+    "X-Oyvoda-Parser-Used": "pre_booking_transport_adapter"
+  },
+  "subject": "Re: Payment received for 116 W Summersweet Lane",
+  "plain_text": "We are scheduled to arrive on June 4. Per the instructions, we cannot\r\naccess the property until 4:00 in the afternoon. Would we be able to rent\r\nthe home for a half day to gain access earlier? I ask because we are\r\ntraveling with small children ages three, two and one. Our preference would\r\nbe to drive through the night and arrive in the morning if possible for\r\nefficient travel and overall sanity.\r\n\r\nPlease let us know what can be done to accommodate.\r\n\r\nYou can reach me on my cell at +1-555-0100 to discuss if easier.\r\n\r\nI appreciate it!\r\n\r\nBest,\r\nMatt\r\n\r\nOn Wed, Apr 29, 2026 at 12:19 PM Beach Habitats 30A Payment Notification <\r\nsender@homeaway.com> wrote:",
+  "raw_html": "",
+  "llm_extracted_fields": {
+    "latest_guest_message": "We are scheduled to arrive on June 4. Per the instructions, we cannot access the property until 4:00 in the afternoon. Would we be able to rent the home for a half day to gain access earlier? I ask because we are traveling with small children ages three, two and one. Our preference would be to drive through the night and arrive in the morning if possible for efficient travel and overall sanity. Please let us know what can be done to accommodate. You can reach me on my cell at +1-555-0100 to discuss if easier. I appreciate it! Best, Matt",
+    "property_code_or_name": "Property_010",
+    "sender_name": "Guest 010",
+    "sender_email": "guest_010@example.test",
+    "requested_guests": null,
+    "requested_check_in": "2026-06-04",
+    "requested_check_out": null
+  },
+  "provenance": {
+    "tenant_id": "e07980b2-a990-4b24-91d1-c8cb71ab70e1",
+    "draft_id": "INQ-46B69200",
+    "created_at": "2026-05-17 13:35:49.119163+00",
+    "gmail_message_id": "19e3624d13215fd0",
+    "parser_source_live": "llm_email_extractor_groq",
+    "parser_used_live": "pre_booking_transport_adapter"
+  }
+}

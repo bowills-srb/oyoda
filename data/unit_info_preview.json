@@ -1,0 +1,62 @@
+[
+  {
+    "UNIT CODE":"100SL2C",
+    "ADDRESS":"100 Spooky Lane Unit 2C ",
+    "COMMUNITY":"Blue Mountain",
+    "BEDROOMS":4.0,
+    "BATHROOMS":3.5,
+    "PROPERTY GUIDE":"https:\/\/guide.breezeway.io\/ghLqa53bphI",
+    "HOUSEKEEPER":"Ann Hepding  (850)687-3777",
+    "WIFI NAME":"SeaHaunts2c",
+    "WIFI PASSWORD":"chatt1093",
+    "NOTES":"No Bikes here. Big Fish Bike Rentals"
+  },
+  {
+    "UNIT CODE":"100SL2D",
+    "ADDRESS":"100 S Spooky Lane Unit 2D ",
+    "COMMUNITY":"Blue Mountain",
+    "BEDROOMS":5.0,
+    "BATHROOMS":4.5,
+    "PROPERTY GUIDE":"https:\/\/guide.breezeway.io\/2jYl6rcvbO8",
+    "HOUSEKEEPER":"Ann Hepding  (850)687-3777",
+    "WIFI NAME":"Haunt2d",
+    "WIFI PASSWORD":"Welcome1!",
+    "NOTES":"No Bikes here. Big Fish Bike Rentals"
+  },
+  {
+    "UNIT CODE":"102-1785",
+    "ADDRESS":"1785 E County Hwy 30A Unit 102",
+    "COMMUNITY":"Watercolor",
+    "BEDROOMS":5.0,
+    "BATHROOMS":4.0,
+    "PROPERTY GUIDE":"https:\/\/guide.breezeway.io\/6YRphTYrDO8",
+    "HOUSEKEEPER":"Andrea Guzman (850) 353-1702\t",
+    "WIFI NAME":"102-1785",
+    "WIFI PASSWORD":"watercolor360",
+    "NOTES":null
+  },
+  {
+    "UNIT CODE":"103CPW",
+    "ADDRESS":"103 Compass Point II",
+    "COMMUNITY":"Watersound",
+    "BEDROOMS":2.0,
+    "BATHROOMS":2.5,
+    "PROPERTY GUIDE":"https:\/\/guide.breezeway.io\/j3c3ax3vNSs",
+    "HOUSEKEEPER":"Nori Ramirez (850)481-5595\t",
+    "WIFI NAME":"compasspoint guest",
+    "WIFI PASSWORD":42421772,
+    "NOTES":null
+  },
+  {
+    "UNIT CODE":"104-1785",
+    "ADDRESS":"1785 E County Hwy 30A Unit 104",
+    "COMMUNITY":"Watercolor",
+    "BEDROOMS":4.0,
+    "BATHROOMS":3.0,
+    "PROPERTY GUIDE":"https:\/\/guide.breezeway.io\/EakZFjJZyL4",
+    "HOUSEKEEPER":"Catalina Rios (850)775-6948\t",
+    "WIFI NAME":null,
+    "WIFI PASSWORD":"wcwc2013",
+    "NOTES":null
+  }
+]

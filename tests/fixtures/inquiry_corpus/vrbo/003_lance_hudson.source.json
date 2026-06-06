@@ -1,0 +1,33 @@
+{
+  "fixture_id": "vrbo/003_lance_hudson",
+  "platform": "vrbo",
+  "source_channel": "email",
+  "source_provider": "gmail",
+  "headers": {
+    "From": "Guest 013 <sender@messages.homeaway.com>",
+    "Reply-To": "uuid@messages.homeaway.com",
+    "Message-ID": "19e31d93094ecc08",
+    "X-Thread-Id": "19e31d93094ecc08",
+    "X-Oyvoda-Parser-Used": "pre_booking_transport_adapter"
+  },
+  "subject": "Inquiry from Guest 013: May 31 - Jun 4, 2026 - Vrbo #4934657",
+  "plain_text": "Hello, Guest 013 is interested in your property.\n\nProperty:\n        External ID 2403-000013\n        #4934657\nUnit:\n        unit_5508820\nDates:\n        May 31 - Jun 4, 2026, 4 nights\nGuests:\n        6 adults, 2 children\nTraveler Name:\n        Guest 013\nTraveler Phone:\n        Available when booked\nInquiry from:\n        Vrbo\n        https://www.vrbo.com\n\nFurther info\n\nGood afternoon. I have a couple of older guests and am wanting to know if you are able to drive the golf cart to the beach access? Can you park it there?\n\nRespond to this Inquiry\n\nhttps://www.vrbo.com/supply/interaction?interactionId=70d90c3f-41d5-41b6-83fe-f805a2e5fa2e&propertyId=122466541&utm_campaign=VRBO_OWN_INQUIRY_PPS&utm_term=20260516&utm_source=SYS&utm_medium=email&utm_content=respond\n\n-------We're here to help. Visit our Help Centre for useful info and FAQs.\n\n© 2026 Vrbo\n\nTerms & conditions\nhttps://www.vrbo.com/lp/b/terms-of-service?locale=en_US&pos=VRBO&siteid=9001001\n\nContact Us\nhttps://help.vrbo.com/contact\n\nPrivacy\nhttps://www.vrbo.com/lp/b/privacy-policy?locale=en_US&pos=VRBO&siteid=9001001",
+  "raw_html": "",
+  "llm_extracted_fields": {
+    "latest_guest_message": "Good afternoon. I have a couple of older guests and am wanting to know if you are able to drive the golf cart to the beach access? Can you park it there?",
+    "property_code_or_name": "unit_013",
+    "sender_name": "Guest 013",
+    "sender_email": "unit_013",
+    "requested_guests": 8,
+    "requested_check_in": "2026-05-31",
+    "requested_check_out": "2026-06-04"
+  },
+  "provenance": {
+    "tenant_id": "e07980b2-a990-4b24-91d1-c8cb71ab70e1",
+    "draft_id": "INQ-8BAAA898",
+    "created_at": "2026-05-16 17:35:33.441994+00",
+    "gmail_message_id": "19e31d93094ecc08",
+    "parser_source_live": "llm_email_extractor_groq",
+    "parser_used_live": "pre_booking_transport_adapter"
+  }
+}

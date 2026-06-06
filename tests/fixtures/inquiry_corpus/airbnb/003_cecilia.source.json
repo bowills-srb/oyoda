@@ -1,0 +1,33 @@
+{
+  "fixture_id": "airbnb/003_cecilia",
+  "platform": "airbnb",
+  "source_channel": "email",
+  "source_provider": "gmail",
+  "headers": {
+    "From": "Airbnb <express@airbnb.com>",
+    "Reply-To": "reply@reply.airbnb.com",
+    "Message-ID": "19e31055045d04ee",
+    "X-Thread-Id": "19e31055045d04ee",
+    "X-Oyvoda-Parser-Used": "pre_booking_transport_adapter"
+  },
+  "subject": "RE: Inquiry for Royal Blue | Golf Cart + Dedicated Beach Access, May 30 – Jun 2",
+  "plain_text": "%opentrack%\r\nhttps://www.airbnb.com/?c=.pi80.pkTUVTU0FHSU5HX05FV19NRVNTQUdFX0VNQUlMX0RJR0VTVA%3D%3D&euid=c6423e16-5fd1-3135-5b6d-aaa722e02e38\r\n\r\n\r\nINQUIRY FOR ROYAL BLUE | GOLF CART + DEDICATED BEACH ACCESS, MAY 30 – JUN 2\r\n\r\nFor your protection and safety, always communicate through Airbnb\r\n[https://www.airbnb.com/help/article/209?c=.pi80.pkTUVTU0FHSU5HX05FV19NRVNTQUdFX0VNQUlMX0RJR0VTVA%3D%3D&euid=c6423e16-5fd1-3135-5b6d-aaa722e02e38].\r\n\r\n   Guest 014\r\n   \r\n   Booker\r\n   \r\n   Hey! My brother in law (Eric/Hermina Bonilla) booked this\r\n   rental for our family trip June 2-6.\r\n   \r\n   I was wondering if there was anyway I could have the address\r\n   early (I know most airbnbs won’t release the address until\r\n   the day before the trip start) but I’m trying to book us a\r\n   second golf cart and they need the delivery address). It\r\n   would so helpful if this was possible!\r\n   \r\n   Thanks.\r\n\r\nReview inquiry\r\n[https://www.airbnb.com/hosting/thread/+1-555-0100?thread_type=home_booking&inbox_type=host&c=.pi80.pkTUVTU0FHSU5HX05FV19NRVNTQUdFX0VNQUlMX0RJR0VTVA%3D%3D&euid=c6423e16-5fd1-3135-5b6d-aaa722e02e38]\r\n\r\nReply\r\n[https://www.airbnb.com/hosting/thread/+1-555-0100?thread_type=home_booking&inbox_type=host&c=.pi80.pkTUVTU0FHSU5HX05FV19NRVNTQUdFX0VNQUlMX0RJR0VTVA%3D%3D&euid=c6423e16-5fd1-3135-5b6d-aaa722e02e38]\r\n\r\nYou can also respond by replying directly to this email.\r\n\r\n\r\nhttps://www.airbnb.com/rooms/+1-555-010015937164?c=.pi80.pkTUVTU0FHSU5HX05FV19NRVNTQUdFX0VNQUlMX0RJR0VTVA%3D%3D&euid=c6423e16-5fd1-3135-5b6d-aaa722e02e38\r\n\r\nROYAL BLUE | GOLF CART + DEDICATED BEACH ACCESS       \r\n\r\nHome - Entire home/apt hosted by Beach Habitats 30A\r\n\r\nCheck-in       Checkout\r\n               \r\n               \r\n               \r\n               \r\nSATURDAY       TUESDAY\r\n               \r\nMay 30, 2026   June 2, 2026\r\n               \r\n4:00 PM        9:00 AM\r\n\r\n\r\nGUESTS\r\n\r\n1 adult\r\n\r\n\r\n\r\nGet the app.\r\n\r\nThe fastest, easiest way to Airbnb.\r\n\r\n   https://www.airbnb.com/external_link?c=.pi80.pkTUVTU0FHSU5HX05FV19NRVNTQUdFX0VNQUlMX0RJR0VTVA%3D%3D&euid=c6423e16-5fd1-3135-5b6d-aaa722e02e38&url=https%3A%2F%2Fairbnb.sng.link%2FA6f9up%2Fdvs6%3F_smtype%3D3%26pcid%3D.pi80.pkTUVTU0FHSU5HX05FV19NRVNTQUdFX0VNQUlMX0RJR0VTVA%3D%3D   https://www.airbnb.com/external_link?c=.pi80.pkTUVTU0FHSU5HX05FV19NRVNTQUdFX0VNQUlMX0RJR0VTVA%3D%3D&euid=c6423e16-5fd1-3135-5b6d-aaa722e02e38&url=https%3A%2F%2Fairbnb.sng.link%2FA6f9up%2Fqh0lc%3F_dl%3Dairbnb%3A%2F%2Fs%2Fhomes%26_smtype%3D3%26pcid%3D.pi80.pkTUVTU0FHSU5HX05FV19NRVNTQUdFX0VNQUlMX0RJR0VTVA%3D%3D   \r\n\r\nAirbnb, Inc.,\r\n888 Brannan St., San Francisco, CA 94103, USA\r\n\r\nUpdate your email preferences\r\n[https://www.airbnb.com/account-settings/notifications?c=.pi80.pkTUVTU0FHSU5HX05FV19NRVNTQUdFX0VNQUlMX0RJR0VTVA%3D%3D&euid=c6423e16-5fd1-3135-5b6d-aaa722e02e38]\r\nto choose which emails you get or unsubscribe\r\n[https://www.airbnb.com/account-settings/email-unsubscribe?mac=wS7aOINN2eLGy8X8V_XkwHLaf8A=&token=eyJ1dWlkIjoiYzY0MjNlMTYtNWZkMS0zMTM1LTViNmQtYWFhNzIyZTAyZTM",
+  "raw_html": "",
+  "llm_extracted_fields": {
+    "latest_guest_message": "Hey! My brother in law (Eric/Hermina Bonilla) booked this rental for our family trip June 2-6. I was wondering if there was anyway I could have the address early (I know most airbnbs won’t release the address until the day before the trip start) but I’m trying to book us a second golf cart and they need the delivery address). It would so helpful if this was possible! Thanks.",
+    "property_code_or_name": "unit_014",
+    "sender_name": "Guest 014",
+    "sender_email": "unit_014",
+    "requested_guests": 1,
+    "requested_check_in": "2026-05-30",
+    "requested_check_out": "2026-06-02"
+  },
+  "provenance": {
+    "tenant_id": "e07980b2-a990-4b24-91d1-c8cb71ab70e1",
+    "draft_id": "INQ-8B5268CF",
+    "created_at": "2026-05-16 13:45:33.812313+00",
+    "gmail_message_id": "19e31055045d04ee",
+    "parser_source_live": "llm_email_extractor_groq",
+    "parser_used_live": "pre_booking_transport_adapter"
+  }
+}

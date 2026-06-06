@@ -1,0 +1,36 @@
+/*
+ * Component-scoped layout for Shell.
+ * Only grid-template-column animation and the 860px responsive override
+ * live here — both require transitions on grid columns that Tailwind
+ * cannot express cleanly with arbitrary variants + inline style combined.
+ * All visual styling is in Shell.tsx via Tailwind utilities.
+ */
+
+.shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: var(--app-topbar-height) minmax(0, 1fr);
+}
+
+.frame {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  transition: grid-template-columns 220ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.frameExpanded {
+  grid-template-columns: 260px minmax(0, 1fr);
+}
+
+@media (max-width: 860px) {
+  .shell {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .frame,
+  .frameExpanded {
+    grid-template-columns: 1fr;
+  }
+}

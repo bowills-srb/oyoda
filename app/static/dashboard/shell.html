@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oyvoda — Operator Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body, #root { height: 100%; background: #08090f; color: #f4f6fa; font-family: 'DM Sans', sans-serif; }
+  #loading { display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100vh; gap: 18px; background: #08090f; color: #5a7090; }
+  .logo { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 38px; font-weight: 500;
+    color: #f0ebe3; letter-spacing: -0.02em; }
+  .dots { display: flex; gap: 6px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #c87832;
+    animation: pulse 1.4s ease-in-out infinite; }
+  .dot:nth-child(2) { animation-delay: .2s; }
+  .dot:nth-child(3) { animation-delay: .4s; }
+  .loading-label { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; opacity: .5; }
+  @keyframes pulse { 0%,60%,100%{opacity:.25} 30%{opacity:1} }
+</style>
+</head>
+<body>
+<div id="loading">
+  <div class="logo">oyvoda</div>
+  <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  <div class="loading-label">Loading dashboard</div>
+</div>
+<div id="root"></div>
+
+<!-- React + dependencies from CDN -->
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
+<script>
+  window.React = React;
+  window.ReactDOM = ReactDOM;
+  window.PropTypes = PropTypes;
+</script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.5.0/Recharts.min.js"></script>
+<script>
+  var _r = Recharts;
+  var LineChart=_r.LineChart,Line=_r.Line,BarChart=_r.BarChart,Bar=_r.Bar,
+      XAxis=_r.XAxis,YAxis=_r.YAxis,CartesianGrid=_r.CartesianGrid,
+      Tooltip=_r.Tooltip,Legend=_r.Legend,ResponsiveContainer=_r.ResponsiveContainer,
+      PieChart=_r.PieChart,Pie=_r.Pie,Cell=_r.Cell,AreaChart=_r.AreaChart,
+      Area=_r.Area,RadarChart=_r.RadarChart,Radar=_r.Radar,PolarGrid=_r.PolarGrid,
+      PolarAngleAxis=_r.PolarAngleAxis,ComposedChart=_r.ComposedChart;
+</script>
+
+<!-- Dashboard app — compiled from frontend/dashboard/oyvoda-v10.jsx -->
+<script src="/static/dashboard/oyvoda-dashboard.js"></script>
+
+</body>
+</html>

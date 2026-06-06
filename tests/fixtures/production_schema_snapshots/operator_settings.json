@@ -1,0 +1,136 @@
+{
+  "alembic_version": "080_operator_policies_market_id_corrective",
+  "captured_at_utc": "2026-05-18T11:23:22.410372+00:00",
+  "columns": [
+    {
+      "column_default": null,
+      "column_name": "tenant_id",
+      "data_type": "uuid",
+      "is_nullable": false,
+      "udt_name": "uuid"
+    },
+    {
+      "column_default": null,
+      "column_name": "operator_id",
+      "data_type": "uuid",
+      "is_nullable": false,
+      "udt_name": "uuid"
+    },
+    {
+      "column_default": "95",
+      "column_name": "prebooking_autosend_threshold",
+      "data_type": "integer",
+      "is_nullable": false,
+      "udt_name": "int4"
+    },
+    {
+      "column_default": "70",
+      "column_name": "escalation_urgency_threshold",
+      "data_type": "integer",
+      "is_nullable": false,
+      "udt_name": "int4"
+    },
+    {
+      "column_default": "40",
+      "column_name": "kb_gap_detection_threshold",
+      "data_type": "integer",
+      "is_nullable": false,
+      "udt_name": "int4"
+    },
+    {
+      "column_default": "'Your Concierge'::text",
+      "column_name": "ai_concierge_name",
+      "data_type": "text",
+      "is_nullable": false,
+      "udt_name": "text"
+    },
+    {
+      "column_default": "true",
+      "column_name": "notify_emergency",
+      "data_type": "boolean",
+      "is_nullable": false,
+      "udt_name": "bool"
+    },
+    {
+      "column_default": "true",
+      "column_name": "notify_maintenance",
+      "data_type": "boolean",
+      "is_nullable": false,
+      "udt_name": "bool"
+    },
+    {
+      "column_default": "true",
+      "column_name": "notify_prebooking",
+      "data_type": "boolean",
+      "is_nullable": false,
+      "udt_name": "bool"
+    },
+    {
+      "column_default": "false",
+      "column_name": "notify_kb_gaps",
+      "data_type": "boolean",
+      "is_nullable": false,
+      "udt_name": "bool"
+    },
+    {
+      "column_default": "true",
+      "column_name": "notify_weekly_analytics",
+      "data_type": "boolean",
+      "is_nullable": false,
+      "udt_name": "bool"
+    },
+    {
+      "column_default": "'[]'::jsonb",
+      "column_name": "kb_suppressed_categories",
+      "data_type": "jsonb",
+      "is_nullable": false,
+      "udt_name": "jsonb"
+    },
+    {
+      "column_default": "false",
+      "column_name": "ai_paused",
+      "data_type": "boolean",
+      "is_nullable": false,
+      "udt_name": "bool"
+    },
+    {
+      "column_default": null,
+      "column_name": "ai_paused_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": true,
+      "udt_name": "timestamptz"
+    },
+    {
+      "column_default": "'{}'::jsonb",
+      "column_name": "extra",
+      "data_type": "jsonb",
+      "is_nullable": false,
+      "udt_name": "jsonb"
+    },
+    {
+      "column_default": "now()",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": false,
+      "udt_name": "timestamptz"
+    },
+    {
+      "column_default": "now()",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": false,
+      "udt_name": "timestamptz"
+    }
+  ],
+  "indexes": [
+    {
+      "columns": [
+        "tenant_id"
+      ],
+      "indexdef": "CREATE UNIQUE INDEX operator_settings_pkey ON public.operator_settings USING btree (tenant_id)",
+      "indexname": "operator_settings_pkey",
+      "is_unique": true
+    }
+  ],
+  "table": "operator_settings"
+}

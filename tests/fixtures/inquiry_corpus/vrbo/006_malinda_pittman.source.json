@@ -1,0 +1,33 @@
+{
+  "fixture_id": "vrbo/006_malinda_pittman",
+  "platform": "vrbo",
+  "source_channel": "email",
+  "source_provider": "gmail",
+  "headers": {
+    "From": "Guest 020 <sender@messages.homeaway.com>",
+    "Reply-To": "uuid@messages.homeaway.com",
+    "Message-ID": "19e1923a45970c0c",
+    "X-Thread-Id": "6b762c20-4d94-4cd5-8862-efcfe01d4268",
+    "X-Oyvoda-Parser-Used": "ota_parser_vrbo"
+  },
+  "subject": "Reservation from Guest 020: Jul 11 - Jul 18, 2026 - Vrbo #listing_020",
+  "plain_text": "Good evening, I was wanting to make a payment with a different card. Are you able to help with this? Or do I need to call?",
+  "raw_html": "",
+  "llm_extracted_fields": {
+    "latest_guest_message": "Good evening, I was wanting to make a payment with a different card. Are you able to help with this? Or do I need to call?",
+    "property_code_or_name": "Property_020",
+    "sender_name": "Guest 020",
+    "sender_email": "guest_020@example.test",
+    "requested_guests": 12,
+    "requested_check_in": "2026-07-11",
+    "requested_check_out": "2026-07-18"
+  },
+  "provenance": {
+    "tenant_id": "e07980b2-a990-4b24-91d1-c8cb71ab70e1",
+    "draft_id": "INQ-BF860CDF",
+    "created_at": "2026-05-11 22:25:14.786863+00",
+    "gmail_message_id": "19e1923a45970c0c",
+    "parser_source_live": "ota_parser_vrbo",
+    "parser_used_live": "ota_parser_vrbo"
+  }
+}

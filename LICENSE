@@ -1,0 +1,230 @@
+OYVODA PROPRIETARY SOFTWARE LICENSE
+====================================
+
+Copyright (c) 2026 D. Hunter McKenzie. All rights reserved.
+
+This software and its associated source code, documentation, configuration,
+data schemas, design assets, prompts, model artifacts, and any derivative
+works thereof (collectively, the "Software") are the proprietary and
+confidential property of D. Hunter McKenzie (the "Licensor"). The Software
+is protected by copyright, trade secret, and other intellectual property
+laws of the United States and other jurisdictions.
+
+THIS IS NOT OPEN SOURCE SOFTWARE. No rights are granted to any person or
+entity by virtue of access to the Software, the publication of the
+Software's source repository, or the inclusion of this LICENSE file
+therein, except as expressly set forth in a separate written agreement
+signed by the Licensor.
+
+
+1. NO LICENSE GRANTED BY DEFAULT
+--------------------------------
+
+Access to the Software, whether through public hosting, source code
+repositories, accidental disclosure, employment, contracting, evaluation,
+or any other means, does NOT constitute a license to use, copy, modify,
+distribute, sublicense, sell, publicly display, publicly perform, create
+derivative works from, reverse engineer, decompile, or otherwise exploit
+the Software in any form. All such rights are expressly reserved by the
+Licensor.
+
+Any use of the Software requires a separate written license agreement
+signed by the Licensor. In the absence of such an agreement, you are
+permitted ONLY to:
+
+  (a) view the source code through legitimate means for the sole purpose
+      of evaluating whether to request a license from the Licensor; and
+
+  (b) discuss the Software's existence and general purpose, but not its
+      implementation details, internal architecture, prompts, model
+      configurations, or any non-public technical information.
+
+All other uses are prohibited.
+
+
+2. EXPLICITLY PROHIBITED CONDUCT
+--------------------------------
+
+Without a separate written license from the Licensor, you may NOT:
+
+  (a) copy, fork, mirror, archive, or otherwise reproduce the Software or
+      any portion thereof, in any medium, for any purpose;
+
+  (b) modify, adapt, translate, port, or create derivative works based on
+      the Software or any portion thereof;
+
+  (c) distribute, publish, sublicense, sell, rent, lease, lend, or
+      otherwise transfer the Software or any portion thereof to any third
+      party, whether for compensation or not;
+
+  (d) host, deploy, operate, or otherwise run the Software as a service
+      offered to any third party, whether free or paid;
+
+  (e) use the Software, in whole or in part, to train, fine-tune,
+      evaluate, benchmark, or otherwise develop any machine learning model,
+      large language model, embedding model, or other artificial
+      intelligence system, whether the resulting system is open or closed;
+
+  (f) extract, scrape, ingest, or otherwise harvest the Software's source
+      code, prompts, system messages, knowledge base content, model
+      configurations, or other artifacts for inclusion in any dataset,
+      corpus, or training pipeline;
+
+  (g) reverse engineer, decompile, disassemble, or attempt to derive the
+      source code, internal structure, prompts, model parameters, or
+      algorithms of any compiled, hosted, or otherwise non-source-form
+      portion of the Software, except to the limited extent that such
+      activity is permitted by applicable law notwithstanding this
+      prohibition;
+
+  (h) remove, alter, obscure, or fail to reproduce any copyright,
+      trademark, attribution, or proprietary notice contained in or on
+      the Software;
+
+  (i) use the Software, or any name, mark, design, or branding associated
+      with the Software, including but not limited to "Oyvoda", in any
+      manner that suggests affiliation with, endorsement by, or
+      sponsorship by the Licensor; or
+
+  (j) assist, enable, or induce any third party to engage in any of the
+      foregoing.
+
+
+3. CONFIDENTIALITY
+------------------
+
+The Software, including its source code, architecture, design decisions,
+prompts, model configurations, customer data, telemetry, internal
+documentation, and any other non-public information disclosed in
+connection with the Software (collectively, "Confidential Information"),
+constitutes the trade secrets and confidential information of the
+Licensor. Any person or entity that comes into possession of Confidential
+Information, by any means, shall:
+
+  (a) hold the Confidential Information in strict confidence;
+
+  (b) not disclose the Confidential Information to any third party
+      without the Licensor's prior written consent;
+
+  (c) use the Confidential Information solely for the purpose, if any,
+      for which it was disclosed by the Licensor; and
+
+  (d) upon the Licensor's request, promptly return or destroy all copies
+      of the Confidential Information in such person or entity's
+      possession or control, and certify such return or destruction in
+      writing.
+
+This obligation of confidentiality is perpetual and survives the
+termination of any agreement between the recipient and the Licensor.
+
+
+4. INTELLECTUAL PROPERTY OWNERSHIP
+----------------------------------
+
+The Licensor retains all right, title, and interest in and to the
+Software, including all intellectual property rights therein. No transfer
+of ownership of any portion of the Software, or any intellectual property
+right therein, occurs by virtue of this LICENSE or by virtue of any
+person's or entity's access to the Software.
+
+Any feedback, suggestions, improvements, bug reports, or contributions of
+any kind submitted to the Licensor in connection with the Software shall,
+upon submission, become the sole and exclusive property of the Licensor,
+and the submitting party hereby assigns to the Licensor all right, title,
+and interest in and to such feedback, suggestions, improvements, bug
+reports, or contributions.
+
+
+5. TERMINATION
+--------------
+
+Any limited permission granted under Section 1 terminates automatically
+and without notice upon any breach of this LICENSE. Upon termination, all
+persons and entities affected must immediately cease all access to and
+use of the Software and destroy any copies in their possession or
+control.
+
+The provisions of Sections 2, 3, 4, 6, 7, 8, and 9 survive any
+termination of this LICENSE.
+
+
+6. NO WARRANTY
+--------------
+
+THE SOFTWARE IS PROVIDED "AS IS," WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND
+NON-INFRINGEMENT. IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY CLAIM,
+DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR
+OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR
+THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+7. LIMITATION OF LIABILITY
+--------------------------
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE LICENSOR SHALL NOT
+BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR
+PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS, REVENUE, DATA, OR GOODWILL,
+ARISING OUT OF OR RELATING TO THE SOFTWARE OR THIS LICENSE, WHETHER BASED
+IN CONTRACT, TORT (INCLUDING NEGLIGENCE), STRICT LIABILITY, OR ANY OTHER
+THEORY, AND WHETHER OR NOT THE LICENSOR HAS BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGES.
+
+
+8. ENFORCEMENT AND REMEDIES
+---------------------------
+
+The Licensor shall be entitled to seek injunctive relief, specific
+performance, and any other equitable remedies, in addition to any other
+remedies available at law or in equity, for any breach or threatened
+breach of this LICENSE, without the necessity of posting a bond or other
+security. The recipient of the Software acknowledges that damages alone
+may be inadequate to remedy a breach of this LICENSE, given the
+proprietary and confidential nature of the Software.
+
+The prevailing party in any action to enforce this LICENSE shall be
+entitled to recover its reasonable attorneys' fees and costs.
+
+
+9. GOVERNING LAW AND JURISDICTION
+---------------------------------
+
+This LICENSE shall be governed by and construed in accordance with the
+laws of the State of Florida, United States of America, without regard
+to its conflict of laws principles. Any action or proceeding arising out
+of or relating to this LICENSE or the Software shall be brought
+exclusively in the state or federal courts located in Walton County,
+Florida, and each party irrevocably submits to the personal jurisdiction
+of such courts.
+
+
+10. SEVERABILITY AND ENTIRE AGREEMENT
+-------------------------------------
+
+If any provision of this LICENSE is held to be invalid, illegal, or
+unenforceable by a court of competent jurisdiction, the remaining
+provisions shall remain in full force and effect, and the invalid,
+illegal, or unenforceable provision shall be reformed to the minimum
+extent necessary to make it valid, legal, and enforceable while
+preserving its original intent to the greatest extent possible.
+
+This LICENSE constitutes the entire agreement between any recipient of
+the Software and the Licensor with respect to the Software, except where
+the Licensor has entered into a separate written agreement that
+expressly supersedes or supplements this LICENSE. No oral or written
+representations, statements, or agreements other than those expressly
+set forth herein or in such a separate written agreement shall be of any
+force or effect.
+
+
+11. CONTACT
+-----------
+
+For licensing inquiries, partnership inquiries, or any other questions
+regarding this LICENSE, contact:
+
+    D. Hunter McKenzie
+    hunter@oyvoda.com
+
+Last updated: 28 May 2026

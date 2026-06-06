@@ -1,0 +1,423 @@
+#!/usr/bin/env python3
+"""
+Guest Concierge Data Service
+
+Provides guest context data for the voice concierge.
+This module queries the Beach Habitats database to provide:
+- Current guest information (who's staying where)
+- Property details and amenities
+- Booking context (arrival date, length of stay, etc.)
+- Local area recommendations
+
+INTEGRATION WITH VOICE:
+This can be imported as a module or run as a FastAPI service.
+
+USAGE AS MODULE:
+    from guest_concierge_service import GuestConciergeService
+    
+    service = GuestConciergeService()
+    context = service.get_guest_context(property_code="134MC")
+
+USAGE AS API:
+    uvicorn guest_concierge_service:app --port 8001
+    
+    GET /api/v1/guest/{property_code}
+    GET /api/v1/guest/{property_code}/context
+    GET /api/v1/local/{community}
+"""
+
+import os
+from datetime import date, datetime, timedelta
+from typing import Any, Dict, List, Optional
+from dataclasses import dataclass, asdict, field
+
+import psycopg2
+from psycopg2.extras import RealDictCursor
+
+# Local area data
+try:
+    from services.local_area_data import (
+        get_nearby_dining, get_dining_by_tag, get_beach_access,
+        get_activities, get_groceries_and_essentials, get_emergency_info,
+        get_local_context_for_community,
+        DINING, ACTIVITIES, BEACH_ACCESS, GROCERIES, EMERGENCY
+    )
+    HAS_LOCAL_DATA = True
+except ImportError:
+    HAS_LOCAL_DATA = False
+
+# Optional FastAPI for API mode
+try:
+    from fastapi import FastAPI, HTTPException
+    from fastapi.middleware.cors import CORSMiddleware
+    HAS_FASTAPI = True
+except ImportError:
+    HAS_FASTAPI = False
+
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql://rental:rental@localhost:5433/rental_revenue"
+)
+
+
+@dataclass
+class GuestContext:
+    """Context object for voice concierge."""
+    
+    # Property info
+    property_code: str
+    property_name: str
+    address: str = ""
+    
+    # Current booking
+    has_active_booking: bool = False
+    check_in_date: Optional[date] = None
+    check_out_date: Optional[date] = None
+    nights_total: int = 0
+    nights_elapsed: int = 0
+    nights_remaining: int = 0
+    is_arrival_day: bool = False
+    is_departure_day: bool = False
+    
+    # Property details
+    bedrooms: int = 0
+    bathrooms: float = 0
+    sleeps: int = 0
+    community: str = ""
+    
+    # Check-in info
+    check_in_time: str = ""
+    check_out_time: str = ""
+    wifi_network: str = ""
+    wifi_password: str = ""
+    lock_type: str = ""
+    property_guide_url: str = ""
+    
+    # Amenities
+    has_pool: bool = False
+    pool_heated: bool = False
+    has_hot_tub: bool = False
+    has_bikes: bool = False
+    bike_count: int = 0
+    has_beach_gear: bool = False
+    has_grill: bool = False
+    has_washer_dryer: bool = False
+    pets_allowed: bool = False
+    
+    # House rules
+    quiet_hours_start: str = ""
+    quiet_hours_end: str = ""
+    max_occupancy: int = 0
+    
+    # Metadata
+    data_freshness: datetime = None
+
+
+class GuestConciergeService:
+    """Service for providing guest context to voice concierge."""
+    
+    def __init__(self, database_url: str = None):
+        self.database_url = database_url or DATABASE_URL
+    
+    def _get_connection(self):
+        return psycopg2.connect(self.database_url, cursor_factory=RealDictCursor)
+    
+    def get_active_booking(self, property_code: str, as_of_date: date = None) -> Optional[Dict]:
+        """Get the active booking for a property on a given date."""
+        as_of_date = as_of_date or date.today()
+        
+        with self._get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT 
+                        property_code, check_in, check_out, nights,
+                        source, scraped_at
+                    FROM property_bookings
+                    WHERE property_code = %s
+                    AND check_in <= %s AND check_out >= %s
+                    ORDER BY check_in DESC LIMIT 1
+                """, (property_code, as_of_date, as_of_date))
+                
+                row = cur.fetchone()
+                return dict(row) if row else None
+    
+    def get_property_details(self, property_code: str) -> Optional[Dict]:
+        """Get property details."""
+        with self._get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT 
+                        property_code, address_street, address_city,
+                        address_state, address_zip, community,
+                        bedrooms, bathrooms, sleeps,
+                        check_in_time, check_out_time,
+                        wifi_network, wifi_password, lock_type,
+                        property_guide_url, has_pool, pool_heated,
+                        has_hot_tub, has_grill, has_bikes, bike_count,
+                        has_beach_gear, has_washer_dryer, pets_allowed,
+                        max_occupancy, quiet_hours_start, quiet_hours_end,
+                        updated_at
+                    FROM properties
+                    WHERE property_code = %s
+                """, (property_code,))
+                
+                row = cur.fetchone()
+                return dict(row) if row else None
+    
+    def get_guest_context(self, property_code: str, as_of_date: date = None) -> GuestContext:
+        """Get full guest context for voice concierge."""
+        as_of_date = as_of_date or date.today()
+        
+        property_data = self.get_property_details(property_code)
+        if not property_data:
+            return GuestContext(
+                property_code=property_code,
+                property_name=property_code,
+                data_freshness=datetime.now()
+            )
+        
+        booking = self.get_active_booking(property_code, as_of_date)
+        
+        # Extract property name
+        address_street = property_data.get('address_street', '')
+        if ' - ' in address_street:
+            property_name = address_street.split(' - ')[0]
+        else:
+            property_name = address_street
+        
+        full_address = f"{address_street}, {property_data.get('address_city', '')}, {property_data.get('address_state', '')} {property_data.get('address_zip', '')}"
+        
+        context = GuestContext(
+            property_code=property_code,
+            property_name=property_name,
+            address=full_address,
+            bedrooms=property_data.get('bedrooms', 0) or 0,
+            bathrooms=float(property_data.get('bathrooms', 0) or 0),
+            sleeps=property_data.get('sleeps', 0) or 0,
+            community=str(property_data.get('community', '') or ''),
+            check_in_time=property_data.get('check_in_time', '') or '',
+            check_out_time=property_data.get('check_out_time', '') or '',
+            wifi_network=property_data.get('wifi_network', '') or '',
+            wifi_password=property_data.get('wifi_password', '') or '',
+            lock_type=property_data.get('lock_type', '') or '',
+            property_guide_url=property_data.get('property_guide_url', '') or '',
+            has_pool=property_data.get('has_pool', False) or False,
+            pool_heated=property_data.get('pool_heated', False) or False,
+            has_hot_tub=property_data.get('has_hot_tub', False) or False,
+            has_bikes=property_data.get('has_bikes', False) or False,
+            bike_count=property_data.get('bike_count', 0) or 0,
+            has_beach_gear=property_data.get('has_beach_gear', False) or False,
+            has_grill=property_data.get('has_grill', False) or False,
+            has_washer_dryer=property_data.get('has_washer_dryer', False) or False,
+            pets_allowed=property_data.get('pets_allowed', False) or False,
+            quiet_hours_start=property_data.get('quiet_hours_start', '') or '',
+            quiet_hours_end=property_data.get('quiet_hours_end', '') or '',
+            max_occupancy=property_data.get('max_occupancy', 0) or 0,
+            data_freshness=property_data.get('updated_at', datetime.now()),
+        )
+        
+        if booking:
+            check_in = booking['check_in']
+            check_out = booking['check_out']
+            context.has_active_booking = True
+            context.check_in_date = check_in
+            context.check_out_date = check_out
+            context.nights_total = booking['nights'] or (check_out - check_in).days
+            context.nights_elapsed = (as_of_date - check_in).days
+            context.nights_remaining = (check_out - as_of_date).days
+            context.is_arrival_day = (check_in == as_of_date)
+            context.is_departure_day = (check_out == as_of_date)
+        
+        return context
+    
+    def get_local_recommendations(self, community: str) -> Dict:
+        """Get local area recommendations for a community."""
+        if not HAS_LOCAL_DATA:
+            return {}
+        
+        return {
+            "dining": [
+                {"name": p.name, "description": p.description, 
+                 "price_level": p.price_level, "phone": p.phone,
+                 "walkable": community in p.walkable_from, "tags": p.tags}
+                for p in get_nearby_dining(community, max_results=8)
+            ],
+            "beach_access": [
+                {"name": b.name, "description": b.description,
+                 "amenities": b.amenities, "parking": b.parking}
+                for b in get_beach_access(community)
+            ],
+            "activities": [
+                {"name": a.name, "description": a.description,
+                 "phone": a.phone, "tags": a.tags}
+                for a in get_activities(community)
+            ],
+            "groceries": [
+                {"name": g.name, "description": g.description,
+                 "hours": g.hours, "walkable": community in g.walkable_from}
+                for g in get_groceries_and_essentials(community)
+            ],
+            "emergency": [
+                {"name": e.name, "description": e.description,
+                 "phone": e.phone, "hours": e.hours}
+                for e in get_emergency_info()
+            ],
+        }
+    
+    def format_context_for_llm(self, context: GuestContext, include_local: bool = True) -> str:
+        """Format guest context for LLM system prompt injection."""
+        lines = []
+        
+        lines.append(f"## Current Guest Context")
+        lines.append(f"Property: {context.property_name} ({context.property_code})")
+        lines.append(f"Address: {context.address}")
+        lines.append(f"Size: {context.bedrooms} bedrooms, {context.bathrooms} bathrooms, sleeps {context.sleeps}")
+        
+        if context.community:
+            lines.append(f"Community: {context.community}")
+        
+        if context.has_active_booking:
+            lines.append(f"\n### Current Stay")
+            lines.append(f"Check-in: {context.check_in_date} at {context.check_in_time}")
+            lines.append(f"Check-out: {context.check_out_date} at {context.check_out_time}")
+            lines.append(f"Total nights: {context.nights_total}")
+            
+            if context.is_arrival_day:
+                lines.append("**This is their ARRIVAL DAY - welcome them warmly!**")
+            elif context.is_departure_day:
+                lines.append("**This is their DEPARTURE DAY - wish them safe travels!**")
+            else:
+                lines.append(f"Day {context.nights_elapsed + 1} of {context.nights_total}")
+                lines.append(f"Nights remaining: {context.nights_remaining}")
+        
+        lines.append(f"\n### Property Amenities")
+        amenities = []
+        if context.has_pool:
+            amenities.append("heated pool" if context.pool_heated else "pool")
+        if context.has_hot_tub:
+            amenities.append("hot tub")
+        if context.has_bikes and context.bike_count > 0:
+            amenities.append(f"{context.bike_count} bikes")
+        if context.has_beach_gear:
+            amenities.append("beach gear")
+        if context.has_grill:
+            amenities.append("grill")
+        if context.has_washer_dryer:
+            amenities.append("washer/dryer")
+        lines.append(f"Available: {', '.join(amenities) if amenities else 'standard amenities'}")
+        
+        if context.wifi_network:
+            lines.append(f"\n### WiFi")
+            lines.append(f"Network: {context.wifi_network}")
+            lines.append(f"Password: {context.wifi_password}")
+        
+        if context.property_guide_url:
+            lines.append(f"\n### Property Guide")
+            lines.append(f"Full guide: {context.property_guide_url}")
+        
+        if context.quiet_hours_start and context.quiet_hours_end:
+            lines.append(f"\n### House Rules")
+            lines.append(f"Quiet hours: {context.quiet_hours_start} - {context.quiet_hours_end}")
+        
+        # Add local area context
+        if include_local and HAS_LOCAL_DATA and context.community:
+            lines.append(get_local_context_for_community(context.community))
+        
+        return '\n'.join(lines)
+
+
+# =============================================================================
+# FastAPI Application
+# =============================================================================
+
+if HAS_FASTAPI:
+    app = FastAPI(
+        title="Beach Habitats Guest Concierge API",
+        description="Provides guest context for voice concierge",
+        version="1.0.0"
+    )
+    
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    
+    service = GuestConciergeService()
+    
+    @app.get("/api/v1/guest/{property_code}")
+    def get_guest_info(property_code: str):
+        """Get guest context for a property."""
+        context = service.get_guest_context(property_code)
+        return asdict(context)
+    
+    @app.get("/api/v1/guest/{property_code}/context")
+    def get_guest_context_formatted(property_code: str):
+        """Get formatted guest context for LLM injection."""
+        context = service.get_guest_context(property_code)
+        return {
+            "property_code": property_code,
+            "context": asdict(context),
+            "llm_prompt": service.format_context_for_llm(context),
+        }
+    
+    @app.get("/api/v1/local/{community}")
+    def get_local_recommendations(community: str):
+        """Get local area recommendations for a community."""
+        return service.get_local_recommendations(community)
+    
+    @app.get("/api/v1/local/{community}/dining")
+    def get_local_dining(community: str, tag: str = None):
+        """Get dining recommendations."""
+        if not HAS_LOCAL_DATA:
+            return []
+        if tag:
+            return [{"name": p.name, "description": p.description, 
+                     "price_level": p.price_level, "tags": p.tags}
+                    for p in get_dining_by_tag(tag)]
+        return [{"name": p.name, "description": p.description,
+                 "price_level": p.price_level, "walkable": community in p.walkable_from}
+                for p in get_nearby_dining(community, max_results=10)]
+    
+    @app.get("/api/v1/emergency")
+    def get_emergency_services():
+        """Get emergency services info."""
+        if not HAS_LOCAL_DATA:
+            return []
+        return [{"name": e.name, "description": e.description,
+                 "phone": e.phone, "hours": e.hours}
+                for e in get_emergency_info()]
+
+
+# =============================================================================
+# CLI for testing
+# =============================================================================
+
+if __name__ == "__main__":
+    import sys
+    
+    service = GuestConciergeService()
+    
+    if len(sys.argv) < 2:
+        print("Usage: python guest_concierge_service.py <property_code>")
+        print("\nExample: python guest_concierge_service.py 134MC")
+        sys.exit(1)
+    
+    property_code = sys.argv[1]
+    
+    print(f"\n{'='*70}")
+    print(f"GUEST CONTEXT: {property_code}")
+    print(f"{'='*70}\n")
+    
+    context = service.get_guest_context(property_code)
+    
+    print("Raw Context:")
+    for key, value in asdict(context).items():
+        if value:
+            print(f"  {key}: {value}")
+    
+    print(f"\n{'='*70}")
+    print("LLM Prompt Format:")
+    print(f"{'='*70}\n")
+    print(service.format_context_for_llm(context))

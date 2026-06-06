@@ -1,0 +1,19 @@
+{
+  "fixture_id": "airbnb/003_cecilia",
+  "description": "airbnb inquiry captured from live Beach Habitats inbound traffic",
+  "expected_route_contains": "airbnb",
+  "expected_pipeline_output": {
+    "platform": "airbnb",
+    "parser_source_contains": "",
+    "guest_name": "Guest 014",
+    "latest_guest_message_contains": [
+      "Hey! My brother in law (Eric/Hermina Bonilla) booked this rental for our family "
+    ],
+    "requested_check_in": "2026-05-30",
+    "requested_check_out": "2026-06-02",
+    "requested_guests": 1,
+    "platform_listing_id": "",
+    "platform_unit_id": "",
+    "property_reference_token": "unit_014"
+  }
+}

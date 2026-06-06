@@ -1,0 +1,301 @@
+{
+  "alembic_version": "080_operator_policies_market_id_corrective",
+  "captured_at_utc": "2026-05-18T11:23:21.718453+00:00",
+  "columns": [
+    {
+      "column_default": "gen_random_uuid()",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": false,
+      "udt_name": "uuid"
+    },
+    {
+      "column_default": null,
+      "column_name": "operator_id",
+      "data_type": "character varying",
+      "is_nullable": true,
+      "udt_name": "varchar"
+    },
+    {
+      "column_default": "'4:00 PM'::character varying",
+      "column_name": "check_in_time",
+      "data_type": "character varying",
+      "is_nullable": true,
+      "udt_name": "varchar"
+    },
+    {
+      "column_default": "'10:00 AM'::character varying",
+      "column_name": "check_out_time",
+      "data_type": "character varying",
+      "is_nullable": true,
+      "udt_name": "varchar"
+    },
+    {
+      "column_default": "true",
+      "column_name": "late_checkout_available",
+      "data_type": "boolean",
+      "is_nullable": true,
+      "udt_name": "bool"
+    },
+    {
+      "column_default": "'2:00 PM'::character varying",
+      "column_name": "late_checkout_max_time",
+      "data_type": "character varying",
+      "is_nullable": true,
+      "udt_name": "varchar"
+    },
+    {
+      "column_default": "50.0",
+      "column_name": "late_checkout_fee",
+      "data_type": "double precision",
+      "is_nullable": true,
+      "udt_name": "float8"
+    },
+    {
+      "column_default": "false",
+      "column_name": "late_checkout_requires_approval",
+      "data_type": "boolean",
+      "is_nullable": true,
+      "udt_name": "bool"
+    },
+    {
+      "column_default": "true",
+      "column_name": "early_checkin_available",
+      "data_type": "boolean",
+      "is_nullable": true,
+      "udt_name": "bool"
+    },
+    {
+      "column_default": "'1:00 PM'::character varying",
+      "column_name": "early_checkin_earliest",
+      "data_type": "character varying",
+      "is_nullable": true,
+      "udt_name": "varchar"
+    },
+    {
+      "column_default": "0.0",
+      "column_name": "early_checkin_fee",
+      "data_type": "double precision",
+      "is_nullable": true,
+      "udt_name": "float8"
+    },
+    {
+      "column_default": "true",
+      "column_name": "early_checkin_subject_to_availability",
+      "data_type": "boolean",
+      "is_nullable": true,
+      "udt_name": "bool"
+    },
+    {
+      "column_default": "30",
+      "column_name": "cancellation_full_refund_days",
+      "data_type": "integer",
+      "is_nullable": true,
+      "udt_name": "int4"
+    },
+    {
+      "column_default": "14",
+      "column_name": "cancellation_partial_refund_days",
+      "data_type": "integer",
+      "is_nullable": true,
+      "udt_name": "int4"
+    },
+    {
+      "column_default": "50",
+      "column_name": "cancellation_partial_refund_percent",
+      "data_type": "integer",
+      "is_nullable": true,
+      "udt_name": "int4"
+    },
+    {
+      "column_default": "'no'::character varying",
+      "column_name": "pets_allowed",
+      "data_type": "character varying",
+      "is_nullable": true,
+      "udt_name": "varchar"
+    },
+    {
+      "column_default": "0.0",
+      "column_name": "pet_fee",
+      "data_type": "double precision",
+      "is_nullable": true,
+      "udt_name": "float8"
+    },
+    {
+      "column_default": null,
+      "column_name": "pet_max_weight",
+      "data_type": "integer",
+      "is_nullable": true,
+      "udt_name": "int4"
+    },
+    {
+      "column_default": "'[]'::jsonb",
+      "column_name": "pet_restricted_breeds",
+      "data_type": "jsonb",
+      "is_nullable": true,
+      "udt_name": "jsonb"
+    },
+    {
+      "column_default": null,
+      "column_name": "pet_notes",
+      "data_type": "text",
+      "is_nullable": true,
+      "udt_name": "text"
+    },
+    {
+      "column_default": "false",
+      "column_name": "pool_heat_available",
+      "data_type": "boolean",
+      "is_nullable": true,
+      "udt_name": "bool"
+    },
+    {
+      "column_default": "50.0",
+      "column_name": "pool_heat_daily_fee",
+      "data_type": "double precision",
+      "is_nullable": true,
+      "udt_name": "float8"
+    },
+    {
+      "column_default": "48",
+      "column_name": "pool_heat_advance_notice_hours",
+      "data_type": "integer",
+      "is_nullable": true,
+      "udt_name": "int4"
+    },
+    {
+      "column_default": "false",
+      "column_name": "beach_chairs_included",
+      "data_type": "boolean",
+      "is_nullable": true,
+      "udt_name": "bool"
+    },
+    {
+      "column_default": "'[]'::jsonb",
+      "column_name": "beach_chair_rental_partners",
+      "data_type": "jsonb",
+      "is_nullable": true,
+      "udt_name": "jsonb"
+    },
+    {
+      "column_default": "'{}'::jsonb",
+      "column_name": "discount_policies",
+      "data_type": "jsonb",
+      "is_nullable": true,
+      "udt_name": "jsonb"
+    },
+    {
+      "column_default": "'{}'::jsonb",
+      "column_name": "additional_policies",
+      "data_type": "jsonb",
+      "is_nullable": true,
+      "udt_name": "jsonb"
+    },
+    {
+      "column_default": null,
+      "column_name": "support_phone",
+      "data_type": "character varying",
+      "is_nullable": true,
+      "udt_name": "varchar"
+    },
+    {
+      "column_default": null,
+      "column_name": "support_email",
+      "data_type": "character varying",
+      "is_nullable": true,
+      "udt_name": "varchar"
+    },
+    {
+      "column_default": null,
+      "column_name": "emergency_phone",
+      "data_type": "character varying",
+      "is_nullable": true,
+      "udt_name": "varchar"
+    },
+    {
+      "column_default": "'{}'::jsonb",
+      "column_name": "upsell_rates",
+      "data_type": "jsonb",
+      "is_nullable": true,
+      "udt_name": "jsonb"
+    },
+    {
+      "column_default": null,
+      "column_name": "upsell_rates_configured",
+      "data_type": "boolean",
+      "is_nullable": true,
+      "udt_name": "bool"
+    },
+    {
+      "column_default": "now()",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": false,
+      "udt_name": "timestamptz"
+    },
+    {
+      "column_default": "now()",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": false,
+      "udt_name": "timestamptz"
+    },
+    {
+      "column_default": null,
+      "column_name": "tenant_id",
+      "data_type": "uuid",
+      "is_nullable": true,
+      "udt_name": "uuid"
+    },
+    {
+      "column_default": null,
+      "column_name": "market_id",
+      "data_type": "character varying",
+      "is_nullable": true,
+      "udt_name": "varchar"
+    }
+  ],
+  "indexes": [
+    {
+      "columns": [
+        "market_id"
+      ],
+      "indexdef": "CREATE INDEX ix_operator_policies_market_id ON public.operator_policies USING btree (market_id)",
+      "indexname": "ix_operator_policies_market_id",
+      "is_unique": false
+    },
+    {
+      "columns": [
+        "operator_id"
+      ],
+      "indexdef": "CREATE INDEX ix_operator_policies_operator_id ON public.operator_policies USING btree (operator_id)",
+      "indexname": "ix_operator_policies_operator_id",
+      "is_unique": false
+    },
+    {
+      "columns": [
+        "operator_id"
+      ],
+      "indexdef": "CREATE UNIQUE INDEX operator_policies_operator_id_key ON public.operator_policies USING btree (operator_id)",
+      "indexname": "operator_policies_operator_id_key",
+      "is_unique": true
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "indexdef": "CREATE UNIQUE INDEX operator_policies_pkey ON public.operator_policies USING btree (id)",
+      "indexname": "operator_policies_pkey",
+      "is_unique": true
+    },
+    {
+      "columns": [
+        "tenant_id"
+      ],
+      "indexdef": "CREATE UNIQUE INDEX ux_operator_policies_tenant_id ON public.operator_policies USING btree (tenant_id) WHERE (tenant_id IS NOT NULL)",
+      "indexname": "ux_operator_policies_tenant_id",
+      "is_unique": true
+    }
+  ],
+  "table": "operator_policies"
+}

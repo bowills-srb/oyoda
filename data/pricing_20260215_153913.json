@@ -1,0 +1,227 @@
+[
+  {
+    "property_code": "134MC",
+    "property_slug": "134-mystic-cobalt",
+    "quotes": [
+      {
+        "property_code": "134MC",
+        "check_in": "2026-02-24",
+        "check_out": "2026-02-27",
+        "nights": 3,
+        "lodging": 2747.5,
+        "cleaning_fee": 0.0,
+        "taxes": 329.71,
+        "total": 3077.21,
+        "adr": 915.8333333333334,
+        "scraped_at": "2026-02-15T15:38:24.099155"
+      },
+      {
+        "property_code": "134MC",
+        "check_in": "2026-04-09",
+        "check_out": "2026-04-12",
+        "nights": 3,
+        "lodging": 4112.5,
+        "cleaning_fee": 0.0,
+        "taxes": 493.51,
+        "total": 4606.01,
+        "adr": 1370.8333333333333,
+        "scraped_at": "2026-02-15T15:38:26.113110"
+      },
+      {
+        "property_code": "134MC",
+        "check_in": "2026-04-19",
+        "check_out": "2026-04-22",
+        "nights": 3,
+        "lodging": 3126.5,
+        "cleaning_fee": 0.0,
+        "taxes": 375.19,
+        "total": 3501.69,
+        "adr": 1042.1666666666667,
+        "scraped_at": "2026-02-15T15:38:28.125369"
+      }
+    ],
+    "avg_adr": 1109.611111111111,
+    "min_adr": 915.8333333333334,
+    "max_adr": 1370.8333333333333
+  },
+  {
+    "property_code": "108SLW",
+    "property_slug": "108-silver-laurel-way",
+    "quotes": [
+      {
+        "property_code": "108SLW",
+        "check_in": "2026-02-16",
+        "check_out": "2026-02-19",
+        "nights": 3,
+        "lodging": 2648.5,
+        "cleaning_fee": 0.0,
+        "taxes": 317.83,
+        "total": 2966.33,
+        "adr": 882.8333333333334,
+        "scraped_at": "2026-02-15T15:38:33.830699"
+      },
+      {
+        "property_code": "108SLW",
+        "check_in": "2026-03-22",
+        "check_out": "2026-03-25",
+        "nights": 3,
+        "lodging": 3104.5,
+        "cleaning_fee": 0.0,
+        "taxes": 372.55,
+        "total": 3477.05,
+        "adr": 1034.8333333333333,
+        "scraped_at": "2026-02-15T15:38:35.845947"
+      },
+      {
+        "property_code": "108SLW",
+        "check_in": "2026-04-12",
+        "check_out": "2026-04-15",
+        "nights": 3,
+        "lodging": 2661.5,
+        "cleaning_fee": 0.0,
+        "taxes": 319.39,
+        "total": 2980.89,
+        "adr": 887.1666666666666,
+        "scraped_at": "2026-02-15T15:38:37.857028"
+      }
+    ],
+    "avg_adr": 934.9444444444445,
+    "min_adr": 882.8333333333334,
+    "max_adr": 1034.8333333333333
+  },
+  {
+    "property_code": "17LL",
+    "property_slug": "17-lyonia-lane",
+    "quotes": [
+      {
+        "property_code": "17LL",
+        "check_in": "2026-02-16",
+        "check_out": "2026-02-19",
+        "nights": 3,
+        "lodging": 2659.5,
+        "cleaning_fee": 0.0,
+        "taxes": 319.15,
+        "total": 2978.65,
+        "adr": 886.5,
+        "scraped_at": "2026-02-15T15:38:44.176281"
+      },
+      {
+        "property_code": "17LL",
+        "check_in": "2026-03-28",
+        "check_out": "2026-03-31",
+        "nights": 3,
+        "lodging": 3023.5,
+        "cleaning_fee": 0.0,
+        "taxes": 362.83,
+        "total": 3386.33,
+        "adr": 1007.8333333333334,
+        "scraped_at": "2026-02-15T15:38:46.190773"
+      },
+      {
+        "property_code": "17LL",
+        "check_in": "2026-04-11",
+        "check_out": "2026-04-14",
+        "nights": 3,
+        "lodging": 2652.5,
+        "cleaning_fee": 0.0,
+        "taxes": 318.31,
+        "total": 2970.81,
+        "adr": 884.1666666666666,
+        "scraped_at": "2026-02-15T15:38:48.201018"
+      }
+    ],
+    "avg_adr": 926.1666666666666,
+    "min_adr": 884.1666666666666,
+    "max_adr": 1007.8333333333334
+  },
+  {
+    "property_code": "359SC",
+    "property_slug": "359-spartina-circle",
+    "quotes": [
+      {
+        "property_code": "359SC",
+        "check_in": "2026-02-16",
+        "check_out": "2026-02-19",
+        "nights": 3,
+        "lodging": 2385.5,
+        "cleaning_fee": 0.0,
+        "taxes": 286.27,
+        "total": 2671.77,
+        "adr": 795.1666666666666,
+        "scraped_at": "2026-02-15T15:38:56.881801"
+      },
+      {
+        "property_code": "359SC",
+        "check_in": "2026-04-11",
+        "check_out": "2026-04-14",
+        "nights": 3,
+        "lodging": 2664.5,
+        "cleaning_fee": 0.0,
+        "taxes": 319.75,
+        "total": 2984.25,
+        "adr": 888.1666666666666,
+        "scraped_at": "2026-02-15T15:38:58.893022"
+      },
+      {
+        "property_code": "359SC",
+        "check_in": "2026-04-23",
+        "check_out": "2026-04-26",
+        "nights": 3,
+        "lodging": 2853.5,
+        "cleaning_fee": 0.0,
+        "taxes": 342.43,
+        "total": 3195.93,
+        "adr": 951.1666666666666,
+        "scraped_at": "2026-02-15T15:39:00.911277"
+      }
+    ],
+    "avg_adr": 878.1666666666666,
+    "min_adr": 795.1666666666666,
+    "max_adr": 951.1666666666666
+  },
+  {
+    "property_code": "48SWC",
+    "property_slug": "48-seawalk-circle",
+    "quotes": [
+      {
+        "property_code": "48SWC",
+        "check_in": "2026-02-20",
+        "check_out": "2026-02-23",
+        "nights": 3,
+        "lodging": 6404.0,
+        "cleaning_fee": 0.0,
+        "taxes": 768.48,
+        "total": 7172.48,
+        "adr": 2134.6666666666665,
+        "scraped_at": "2026-02-15T15:39:09.416192"
+      },
+      {
+        "property_code": "48SWC",
+        "check_in": "2026-03-14",
+        "check_out": "2026-03-17",
+        "nights": 3,
+        "lodging": 9232.0,
+        "cleaning_fee": 0.0,
+        "taxes": 1107.84,
+        "total": 10339.84,
+        "adr": 3077.3333333333335,
+        "scraped_at": "2026-02-15T15:39:11.428078"
+      },
+      {
+        "property_code": "48SWC",
+        "check_in": "2026-04-11",
+        "check_out": "2026-04-14",
+        "nights": 3,
+        "lodging": 7184.0,
+        "cleaning_fee": 0.0,
+        "taxes": 862.08,
+        "total": 8046.08,
+        "adr": 2394.6666666666665,
+        "scraped_at": "2026-02-15T15:39:13.439458"
+      }
+    ],
+    "avg_adr": 2535.5555555555557,
+    "min_adr": 2134.6666666666665,
+    "max_adr": 3077.3333333333335
+  }
+]

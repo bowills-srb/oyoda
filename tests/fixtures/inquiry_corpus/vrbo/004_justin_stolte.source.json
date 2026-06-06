@@ -1,0 +1,33 @@
+{
+  "fixture_id": "vrbo/004_justin_stolte",
+  "platform": "vrbo",
+  "source_channel": "email",
+  "source_provider": "gmail",
+  "headers": {
+    "From": "Guest 018 <sender@messages.homeaway.com>",
+    "Reply-To": "uuid@messages.homeaway.com",
+    "Message-ID": "19e19a1cfe00919d",
+    "X-Thread-Id": "4f5f00ef-5d41-425d-8e50-bf8ac7929dfe",
+    "X-Oyvoda-Parser-Used": "ota_parser_vrbo"
+  },
+  "subject": "Inquiry from Guest 018: Jun 30 - Jul 11, 2026 - Vrbo #listing_018",
+  "plain_text": "Does this house have a golf cart?",
+  "raw_html": "",
+  "llm_extracted_fields": {
+    "latest_guest_message": "Does this house have a golf cart?",
+    "property_code_or_name": "Property_018",
+    "sender_name": "Guest 018",
+    "sender_email": "guest_018@example.test",
+    "requested_guests": 6,
+    "requested_check_in": "2026-06-30",
+    "requested_check_out": "2026-07-11"
+  },
+  "provenance": {
+    "tenant_id": "e07980b2-a990-4b24-91d1-c8cb71ab70e1",
+    "draft_id": "INQ-F5E1A3D9",
+    "created_at": "2026-05-12 00:43:02.680356+00",
+    "gmail_message_id": "19e19a1cfe00919d",
+    "parser_source_live": "ota_parser_vrbo",
+    "parser_used_live": "ota_parser_vrbo"
+  }
+}

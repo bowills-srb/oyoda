@@ -1,0 +1,19 @@
+{
+  "fixture_id": "airbnb/004_kaitlin",
+  "description": "airbnb inquiry captured from live Beach Habitats inbound traffic",
+  "expected_route_contains": "airbnb",
+  "expected_pipeline_output": {
+    "platform": "airbnb",
+    "parser_source_contains": "",
+    "guest_name": "Guest 015",
+    "latest_guest_message_contains": [
+      "No worries! Thank you so much!"
+    ],
+    "requested_check_in": "2026-05-15",
+    "requested_check_out": "2026-05-18",
+    "requested_guests": 14,
+    "platform_listing_id": "",
+    "platform_unit_id": "",
+    "property_reference_token": "unit_015"
+  }
+}

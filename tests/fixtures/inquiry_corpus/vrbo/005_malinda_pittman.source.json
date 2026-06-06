@@ -1,0 +1,33 @@
+{
+  "fixture_id": "vrbo/005_malinda_pittman",
+  "platform": "vrbo",
+  "source_channel": "email",
+  "source_provider": "gmail",
+  "headers": {
+    "From": "Guest 019 <sender@messages.homeaway.com>",
+    "Reply-To": "uuid@messages.homeaway.com",
+    "Message-ID": "19e1935bcbafd50e",
+    "X-Thread-Id": "19e1923a45970c0c",
+    "X-Oyvoda-Parser-Used": "llm_email_extractor_groq"
+  },
+  "subject": "Reservation from Guest 019: Jul 11 - Jul 18, 2026 - Vrbo #4710762",
+  "plain_text": "Vrbo: Guest 019 has replied to your message\n\nCan you send me a number to call please?\n\n-------We're here to help. Visit our Help Centre for useful info and FAQs.\n\n© 2026 Vrbo\n\nTerms & conditions\nhttps://www.vrbo.com/lp/b/terms-of-service?locale=en_US&pos=VRBO&siteid=9001001\n\nContact Us\nhttps://help.vrbo.com/contact\n\nPrivacy\nhttps://www.vrbo.com/lp/b/privacy-policy?locale=en_US&pos=VRBO&siteid=9001001",
+  "raw_html": "",
+  "llm_extracted_fields": {
+    "latest_guest_message": "Can you send me a number to call please?",
+    "property_code_or_name": "unit_019",
+    "sender_name": "Guest 019",
+    "sender_email": "guest_019@example.test",
+    "requested_guests": null,
+    "requested_check_in": "2026-07-11",
+    "requested_check_out": "2026-07-18"
+  },
+  "provenance": {
+    "tenant_id": "e07980b2-a990-4b24-91d1-c8cb71ab70e1",
+    "draft_id": "INQ-E3CEE0A2",
+    "created_at": "2026-05-11 22:45:30.33997+00",
+    "gmail_message_id": "19e1935bcbafd50e",
+    "parser_source_live": "llm_email_extractor_groq",
+    "parser_used_live": "llm_email_extractor_groq"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "fixture_id": "airbnb/005_cindy",
+  "platform": "airbnb",
+  "source_channel": "email",
+  "source_provider": "gmail",
+  "headers": {
+    "From": "Airbnb <express@airbnb.com>",
+    "Reply-To": "reply@reply.airbnb.com",
+    "Message-ID": "19e246fa69172537",
+    "X-Thread-Id": "19e246fa69172537",
+    "X-Oyvoda-Parser-Used": "pre_booking_transport_adapter"
+  },
+  "subject": "RE: Inquiry for Here Comes the Sun | Private Pool + Soaking Spa, Aug 20 – 23",
+  "plain_text": "%opentrack%\r\nhttps://www.airbnb.com/?c=.pi80.pkTUVTU0FHSU5HX05FV19NRVNTQUdFX0VNQUlMX0RJR0VTVA%3D%3D&euid=4ffed7fe-b592-8401-f954-0272bc39c7f4\r\n\r\n\r\nINQUIRY FOR HERE COMES THE SUN | PRIVATE POOL + SOAKING SPA, AUG 20 – 23\r\n\r\nFor your protection and safety, always communicate through Airbnb\r\n[https://www.airbnb.com/help/article/209?c=.pi80.pkTUVTU0FHSU5HX05FV19NRVNTQUdFX0VNQUlMX0RJR0VTVA%3D%3D&euid=4ffed7fe-b592-8401-f954-0272bc39c7f4].\r\n\r\n   Guest 016\r\n   \r\n   Booker\r\n   \r\n   Hello.\r\n   Please share if the community offers round the clock\r\n   surveillance? If not, what measures/services are put in\r\n   place to ensure safety and security in an unfamiliar space?\r\n   \r\n   Also, we’re clean freaks. Please share the accessibility of\r\n   maid service during our stay. Also, the process of\r\n   preparedness prior to stay — ie do you require both sheets\r\n   and blankets to be washed prior to new guests arrival, etc.\r\n   \r\n   Thanks\r\n\r\nReview inquiry\r\n[https://www.airbnb.com/hosting/thread/+1-555-0100?thread_type=home_booking&inbox_type=host&c=.pi80.pkTUVTU0FHSU5HX05FV19NRVNTQUdFX0VNQUlMX0RJR0VTVA%3D%3D&euid=4ffed7fe-b592-8401-f954-0272bc39c7f4]\r\n\r\nReply\r\n[https://www.airbnb.com/hosting/thread/+1-555-0100?thread_type=home_booking&inbox_type=host&c=.pi80.pkTUVTU0FHSU5HX05FV19NRVNTQUdFX0VNQUlMX0RJR0VTVA%3D%3D&euid=4ffed7fe-b592-8401-f954-0272bc39c7f4]\r\n\r\nYou can also respond by replying directly to this email.\r\n\r\n\r\nhttps://www.airbnb.com/rooms/+1-555-010092154028?c=.pi80.pkTUVTU0FHSU5HX05FV19NRVNTQUdFX0VNQUlMX0RJR0VTVA%3D%3D&euid=4ffed7fe-b592-8401-f954-0272bc39c7f4\r\n\r\nHERE COMES THE SUN | PRIVATE POOL + SOAKING SPA       \r\n\r\nHome - Entire home/apt hosted by Beach Habitats 30A\r\n\r\nCheck-in          Checkout\r\n                  \r\n                  \r\n                  \r\n                  \r\nTHURSDAY          SUNDAY\r\n                  \r\nAugust 20, 2026   August 23, 2026\r\n                  \r\n4:00 PM           9:00 AM\r\n\r\n\r\nGUESTS\r\n\r\n10 adults\r\n\r\n\r\n\r\nGet the app.\r\n\r\nThe fastest, easiest way to Airbnb.\r\n\r\n   https://www.airbnb.com/external_link?c=.pi80.pkTUVTU0FHSU5HX05FV19NRVNTQUdFX0VNQUlMX0RJR0VTVA%3D%3D&euid=4ffed7fe-b592-8401-f954-0272bc39c7f4&url=https%3A%2F%2Fairbnb.sng.link%2FA6f9up%2Fdvs6%3F_smtype%3D3%26pcid%3D.pi80.pkTUVTU0FHSU5HX05FV19NRVNTQUdFX0VNQUlMX0RJR0VTVA%3D%3D   https://www.airbnb.com/external_link?c=.pi80.pkTUVTU0FHSU5HX05FV19NRVNTQUdFX0VNQUlMX0RJR0VTVA%3D%3D&euid=4ffed7fe-b592-8401-f954-0272bc39c7f4&url=https%3A%2F%2Fairbnb.sng.link%2FA6f9up%2Fqh0lc%3F_dl%3Dairbnb%3A%2F%2Fs%2Fhomes%26_smtype%3D3%26pcid%3D.pi80.pkTUVTU0FHSU5HX05FV19NRVNTQUdFX0VNQUlMX0RJR0VTVA%3D%3D   \r\n\r\nAirbnb, Inc.,\r\n888 Brannan St., San Francisco, CA 94103, USA\r\n\r\nUpdate your email preferences\r\n[https://www.airbnb.com/account-settings/notifications?c=.pi80.pkTUVTU0FHSU5HX05FV19NRVNTQUdFX0VNQUlMX0RJR0VTVA%3D%3D&euid=4ffed7fe-b592-8401-f954-0272bc39c7f4]\r\nto choose which emails you get or unsubscribe\r\n[https://www.airbnb.com/account-settings/email-unsubscribe?mac=4N8TCjFFo1Knlpnu5lrNF4jATE",
+  "raw_html": "",
+  "llm_extracted_fields": {
+    "latest_guest_message": "Hello. Please share if the community offers round the clock surveillance? If not, what measures/services are put in place to ensure safety and security in an unfamiliar space? Also, we’re clean freaks. Please share the accessibility of maid service during our stay. Also, the process of preparedness prior to stay — ie do you require both sheets and blankets to be washed prior to new guests arrival, etc. Thanks",
+    "property_code_or_name": "unit_016",
+    "sender_name": "Guest 016",
+    "sender_email": "unit_016",
+    "requested_guests": 10,
+    "requested_check_in": "2026-08-20",
+    "requested_check_out": "2026-08-23"
+  },
+  "provenance": {
+    "tenant_id": "e07980b2-a990-4b24-91d1-c8cb71ab70e1",
+    "draft_id": "INQ-D3D025F8",
+    "created_at": "2026-05-14 03:05:37.859125+00",
+    "gmail_message_id": "19e246fa69172537",
+    "parser_source_live": "llm_email_extractor_groq",
+    "parser_used_live": "pre_booking_transport_adapter"
+  }
+}

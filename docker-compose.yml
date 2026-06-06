@@ -1,0 +1,207 @@
+services:
+  # =============================================================================
+  # API SERVICE
+  # Database: Supabase (external) — connection string from .env
+  # =============================================================================
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      - ENVIRONMENT=development
+      - API_WORKERS=4
+      - FOCUS_CONCIERGE_ONLY=true
+      - ENABLE_CONCIERGE_MARKET_SIGNALS=true
+      - ENABLE_CONCIERGE_HEALTH_CHECKS=true
+      - ENABLE_MARKET_INTEL_API=false
+      - ENABLE_WATCH_API=false
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    restart: on-failure
+    command: sh -c "uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers ${API_WORKERS:-4}"
+
+  # =============================================================================
+  # CELERY WORKERS
+  # =============================================================================
+  celery-worker-concierge:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      - FOCUS_CONCIERGE_ONLY=true
+      - ENABLE_CONCIERGE_MARKET_SIGNALS=true
+      - ENABLE_CONCIERGE_HEALTH_CHECKS=true
+      - CELERY_CONCIERGE_CONCURRENCY=16
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: on-failure
+    command: >
+      celery -A app.workers.celery_app:celery_app worker
+      --loglevel=INFO
+      --queues=concierge
+      --hostname=concierge@%h
+      --concurrency=${CELERY_CONCIERGE_CONCURRENCY:-16}
+      --prefetch-multiplier=1
+
+  celery-worker-ingestion:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      - FOCUS_CONCIERGE_ONLY=true
+      - ENABLE_CONCIERGE_MARKET_SIGNALS=true
+      - CELERY_INGESTION_CONCURRENCY=6
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: on-failure
+    command: >
+      celery -A app.workers.celery_app:celery_app worker
+      --loglevel=INFO
+      --queues=ingestion
+      --hostname=ingestion@%h
+      --concurrency=${CELERY_INGESTION_CONCURRENCY:-6}
+      --prefetch-multiplier=1
+
+  celery-worker-operations:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      - FOCUS_CONCIERGE_ONLY=true
+      - ENABLE_CONCIERGE_MARKET_SIGNALS=true
+      - CELERY_OPERATIONS_CONCURRENCY=4
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: on-failure
+    command: >
+      celery -A app.workers.celery_app:celery_app worker
+      --loglevel=INFO
+      --queues=operations
+      --hostname=operations@%h
+      --concurrency=${CELERY_OPERATIONS_CONCURRENCY:-4}
+      --prefetch-multiplier=1
+
+  celery-beat:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      - FOCUS_CONCIERGE_ONLY=true
+      - ENABLE_CONCIERGE_MARKET_SIGNALS=true
+      - ENABLE_CONCIERGE_HEALTH_CHECKS=true
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: on-failure
+    command: celery -A app.workers.celery_app:celery_app beat --loglevel=INFO
+
+  # =============================================================================
+  # DATA STORES
+  # =============================================================================
+  # Local DB — fallback while Docker DNS issue is resolved
+  # Supabase is the production DB (all 21 tables already migrated)
+  # To switch back to Supabase: comment out db service, update DATABASE_URL in .env
+  db:
+    image: timescale/timescaledb:latest-pg15
+    environment:
+      - POSTGRES_USER=rental
+      - POSTGRES_PASSWORD=rental
+      - POSTGRES_DB=rental_revenue
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rental -d rental_revenue"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  # =============================================================================
+  # OBSERVABILITY
+  # =============================================================================
+  prometheus:
+    image: prom/prometheus:v2.52.0
+    depends_on:
+      - api
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./docs/concierge_alert_rules.yml:/etc/prometheus/alerts/concierge_alert_rules.yml:ro
+      - prometheus_data:/prometheus
+
+  grafana:
+    image: grafana/grafana:10.4.3
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana_data:/var/lib/grafana
+
+volumes:
+  postgres_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  default:
+    name: oyvoda-network
+    driver: bridge

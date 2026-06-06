@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Oyvoda Command Center Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/dashboard/styles/tokens.css?v=2026-04-20-f">
+  <link rel="stylesheet" href="/static/dashboard/styles/dashboard.css?v=2026-04-20-f">
+  <style>
+    body{overflow:auto}
+    .preview-shell{
+      min-height:100vh;
+      padding:32px 28px 48px;
+      background:
+        radial-gradient(circle at top left, rgba(200,120,50,0.08), transparent 24%),
+        linear-gradient(180deg, #090b12 0%, #08090f 100%);
+    }
+    .preview-banner{
+      max-width:1360px;
+      margin:0 auto 18px;
+      padding:14px 16px;
+      border:1px solid rgba(255,255,255,0.06);
+      border-radius:14px;
+      background:rgba(255,255,255,0.02);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:18px;
+    }
+    .preview-banner-title{
+      font-size:13px;
+      font-weight:600;
+      color:var(--white);
+      margin-bottom:4px;
+    }
+    .preview-banner-sub{
+      font-size:12px;
+      line-height:1.6;
+      color:rgba(240,235,227,0.62);
+      max-width:780px;
+    }
+    .preview-stack{
+      max-width:1360px;
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:28px;
+    }
+    .preview-section{
+      border:1px solid rgba(255,255,255,0.06);
+      border-radius:20px;
+      background:rgba(255,255,255,0.015);
+      padding:22px;
+      box-shadow:0 18px 42px rgba(0,0,0,0.28);
+    }
+    .preview-task-strip{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:10px;
+      margin:0 0 16px;
+    }
+    .preview-task-card{
+      border:1px solid rgba(255,255,255,0.06);
+      background:rgba(255,255,255,0.02);
+      border-radius:14px;
+      padding:12px 14px;
+    }
+    .preview-task-label{
+      font-family:'DM Mono',monospace;
+      font-size:9px;
+      letter-spacing:0.12em;
+      text-transform:uppercase;
+      color:rgba(240,235,227,0.42);
+      margin-bottom:8px;
+    }
+    .preview-task-value{
+      font-size:20px;
+      font-weight:600;
+      color:var(--white);
+      margin-bottom:4px;
+    }
+    .preview-task-sub{
+      font-size:11px;
+      color:rgba(240,235,227,0.56);
+      line-height:1.5;
+    }
+    .preview-shell .split-pane{
+      max-height:none;
+    }
+    .preview-list-row{
+      padding:10px 12px 11px;
+      border-bottom:1px solid rgba(255,255,255,0.04);
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .preview-list-row.active{
+      background:rgba(255,255,255,0.03);
+      border-left:2px solid var(--amber);
+      padding-left:10px;
+    }
+    .preview-list-top,
+    .preview-list-meta,
+    .preview-badges,
+    .preview-row-footer{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .preview-list-title{
+      font-size:12px;
+      font-weight:600;
+      color:var(--white);
+    }
+    .preview-list-sub{
+      font-size:10px;
+      color:rgba(240,235,227,0.5);
+      line-height:1.45;
+    }
+    .preview-mini{
+      font-family:'DM Mono',monospace;
+      font-size:9px;
+      color:rgba(240,235,227,0.34);
+      letter-spacing:0.04em;
+      text-transform:uppercase;
+    }
+    .preview-team-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,0.06);
+      background:rgba(255,255,255,0.03);
+      font-family:'DM Mono',monospace;
+      font-size:9px;
+      letter-spacing:0.06em;
+      text-transform:uppercase;
+      color:rgba(240,235,227,0.55);
+      white-space:nowrap;
+    }
+    .preview-grid-meta{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:8px;
+    }
+    .preview-grid-cell{
+      min-width:0;
+    }
+    .preview-grid-label{
+      font-family:'DM Mono',monospace;
+      font-size:8px;
+      letter-spacing:0.08em;
+      text-transform:uppercase;
+      color:rgba(240,235,227,0.26);
+      margin-bottom:2px;
+    }
+    .preview-grid-value{
+      font-size:10px;
+      color:rgba(240,235,227,0.72);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .preview-neutral-badge{
+      display:inline-flex;
+      align-items:center;
+      padding:3px 7px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,0.07);
+      background:rgba(255,255,255,0.03);
+      color:rgba(240,235,227,0.56);
+      font-family:'DM Mono',monospace;
+      font-size:9px;
+      letter-spacing:0.04em;
+      white-space:nowrap;
+    }
+    .preview-neutral-badge.strong{
+      border-color:rgba(200,120,50,0.16);
+      color:rgba(240,235,227,0.82);
+    }
+    .preview-rail{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+    .preview-rail-card{
+      border:1px solid rgba(26,29,36,0.09);
+      border-radius:12px;
+      background:rgba(255,255,255,0.5);
+      padding:14px;
+    }
+    .preview-rail-card .meta-label{
+      color:rgba(26,29,36,0.48);
+    }
+    .preview-rail-card .meta-value,
+    .preview-rail-card .meta-value.strong{
+      color:#1a1d24;
+    }
+    .preview-summary{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:12px;
+    }
+    .preview-note{
+      font-size:11px;
+      line-height:1.6;
+      color:rgba(26,29,36,0.68);
+    }
+    .preview-thread{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+    .preview-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .preview-caption{
+      margin-top:14px;
+      font-size:11px;
+      color:rgba(240,235,227,0.46);
+      line-height:1.6;
+    }
+    @media (max-width: 1180px){
+      .preview-task-strip,
+      .ops-shell-prebooking,
+      .ops-shell-sessions{
+        grid-template-columns:1fr;
+      }
+      .preview-summary{
+        grid-template-columns:1fr;
+      }
+      .preview-grid-meta{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-shell">
+    <div class="preview-banner">
+      <div>
+        <div class="preview-banner-title">Command Center Preview</div>
+        <div class="preview-banner-sub">Same Oyvoda shell and amber identity, but the actual operator cockpit is brighter and easier to scan. The left side stays triage-heavy, the middle stays conversation-focused, and the right rail becomes a lighter ops surface for routing and context.</div>
+      </div>
+      <div class="badge badge-amber">Preview only</div>
+    </div>
+
+    <div class="preview-stack">
+      <section class="preview-section">
+        <div class="page-header">
+          <div class="page-title-group">
+            <div class="page-eyebrow">Revenue Queue</div>
+            <div class="page-title">Pre-Booking Command</div>
+            <div class="page-sub">Built around one responsibility model: the owner or their assigned team owns the downstream workflow, while settings, vendors, and routing simply support that operator lane.</div>
+          </div>
+          <div class="page-actions">
+            <button class="btn">Team Views</button>
+            <button class="btn btn-primary">Review Drafts</button>
+          </div>
+        </div>
+
+        <div class="preview-task-strip">
+          <div class="preview-task-card">
+            <div class="preview-task-label">Autonomous Review</div>
+            <div class="preview-task-value">7</div>
+            <div class="preview-task-sub">AI actions awaiting owner or team signoff.</div>
+          </div>
+          <div class="preview-task-card">
+            <div class="preview-task-label">Blocked Tasks</div>
+            <div class="preview-task-value">4</div>
+            <div class="preview-task-sub">Knowledge gaps, missing facts, or vendor dependencies.</div>
+          </div>
+          <div class="preview-task-card">
+            <div class="preview-task-label">Unassigned Exceptions</div>
+            <div class="preview-task-value">3</div>
+            <div class="preview-task-sub">Items without an owner or pod assignment.</div>
+          </div>
+          <div class="preview-task-card">
+            <div class="preview-task-label">Owner Attention</div>
+            <div class="preview-task-value">2</div>
+            <div class="preview-task-sub">High-value threads that should not stay in autopilot.</div>
+          </div>
+        </div>
+
+        <div class="ops-metric-grid">
+          <div class="ops-metric-card">
+            <div class="ops-metric-label">Needs Action Now</div>
+            <div class="ops-metric-value">38</div>
+            <div class="ops-metric-sub">Pending operator review</div>
+          </div>
+          <div class="ops-metric-card">
+            <div class="ops-metric-label">Owner / Team Owned</div>
+            <div class="ops-metric-value">14</div>
+            <div class="ops-metric-sub">Assigned to a responsible lane</div>
+          </div>
+          <div class="ops-metric-card">
+            <div class="ops-metric-label">Unassigned</div>
+            <div class="ops-metric-value">6</div>
+            <div class="ops-metric-sub">Needs routing or explicit ownership</div>
+          </div>
+          <div class="ops-metric-card">
+            <div class="ops-metric-label">Draft Ready</div>
+            <div class="ops-metric-value">24</div>
+            <div class="ops-metric-sub">Ready for fast operator send</div>
+          </div>
+        </div>
+
+        <div class="ops-toolbar">
+          <div class="ops-toolbar-copy">
+            <div class="ops-toolbar-title">Team-based views</div>
+            <div class="ops-toolbar-sub">Large operators should move between ownership lanes first, then triage within each lane.</div>
+          </div>
+          <div class="ops-chip-row">
+            <span class="ops-chip ops-chip-active">Owner / Me</span>
+            <span class="ops-chip">Revenue Pod</span>
+            <span class="ops-chip">Unassigned</span>
+            <span class="ops-chip">Autonomous exceptions</span>
+          </div>
+        </div>
+
+        <div class="card" style="overflow:hidden">
+          <div class="ops-shell ops-shell-prebooking" style="height:880px">
+            <div class="split-pane ops-queue-pane pane-border-r">
+              <section class="queue-group">
+                <div class="queue-group-label">
+                  <div class="queue-group-title">Revenue Pod · Needs Review</div>
+                  <div class="queue-group-count">3</div>
+                </div>
+                <div class="queue-group-body">
+                  <div class="preview-list-row active">
+                    <div class="preview-list-top">
+                      <div class="preview-list-title">Arielle Booker</div>
+                      <div class="preview-mini">39m waiting</div>
+                    </div>
+                    <div class="preview-list-sub">Watercolor Cottage | 4 Bd + 4 bikes + Resort</div>
+                    <div class="preview-row-footer">
+                      <span class="preview-team-chip">Revenue pod · Unassigned</span>
+                      <div class="preview-badges">
+                        <span class="preview-neutral-badge">Airbnb</span>
+                        <span class="preview-neutral-badge strong">pricing nuance</span>
+                        <span class="preview-neutral-badge">multi-ask</span>
+                      </div>
+                    </div>
+                    <div class="preview-grid-meta">
+                      <div class="preview-grid-cell">
+                        <div class="preview-grid-label">Stay</div>
+                        <div class="preview-grid-value">Jun 29 - Jul 3</div>
+                      </div>
+                      <div class="preview-grid-cell">
+                        <div class="preview-grid-label">Value</div>
+                        <div class="preview-grid-value">$4.8k est.</div>
+                      </div>
+                      <div class="preview-grid-cell">
+                        <div class="preview-grid-label">Owner</div>
+                        <div class="preview-grid-value">Revenue pod</div>
+                      </div>
+                      <div class="preview-grid-cell">
+                        <div class="preview-grid-label">Task</div>
+                        <div class="preview-grid-value">Review AI draft</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="preview-list-row">
+                    <div class="preview-list-top">
+                      <div class="preview-list-title">Luis Mendez</div>
+                      <div class="preview-mini">56m waiting</div>
+                    </div>
+                    <div class="preview-list-sub">Sunrise & Sunset | group-size exception inquiry</div>
+                    <div class="preview-row-footer">
+                      <span class="preview-team-chip">Owner review</span>
+                      <div class="preview-badges">
+                        <span class="preview-neutral-badge">Airbnb</span>
+                        <span class="preview-neutral-badge strong">occupancy risk</span>
+                      </div>
+                    </div>
+                    <div class="preview-grid-meta">
+                      <div class="preview-grid-cell">
+                        <div class="preview-grid-label">Signal</div>
+                        <div class="preview-grid-value">27 guests</div>
+                      </div>
+                      <div class="preview-grid-cell">
+                        <div class="preview-grid-label">Assigned</div>
+                        <div class="preview-grid-value">Owner</div>
+                      </div>
+                      <div class="preview-grid-cell">
+                        <div class="preview-grid-label">Property</div>
+                        <div class="preview-grid-value">Sunrise & Sunset</div>
+                      </div>
+                      <div class="preview-grid-cell">
+                        <div class="preview-grid-label">Task</div>
+                        <div class="preview-grid-value">Decision needed</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="preview-list-row">
+                    <div class="preview-list-top">
+                      <div class="preview-list-title">Kelly Booker</div>
+                      <div class="preview-mini">1h 12m</div>
+                    </div>
+                    <div class="preview-list-sub">Prominence 30A 4BR | cart quality, review confidence, and fit</div>
+                    <div class="preview-row-footer">
+                      <span class="preview-team-chip">Revenue pod · Alex L.</span>
+                      <div class="preview-badges">
+                        <span class="preview-neutral-badge">Airbnb</span>
+                        <span class="preview-neutral-badge">trust-building</span>
+                      </div>
+                    </div>
+                    <div class="preview-grid-meta">
+                      <div class="preview-grid-cell">
+                        <div class="preview-grid-label">Assigned</div>
+                        <div class="preview-grid-value">Alex L.</div>
+                      </div>
+                      <div class="preview-grid-cell">
+                        <div class="preview-grid-label">Confidence</div>
+                        <div class="preview-grid-value">High</div>
+                      </div>
+                      <div class="preview-grid-cell">
+                        <div class="preview-grid-label">Source</div>
+                        <div class="preview-grid-value">Airbnb</div>
+                      </div>
+                      <div class="preview-grid-cell">
+                        <div class="preview-grid-label">Task</div>
+                        <div class="preview-grid-value">Send or edit</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="queue-group">
+                <div class="queue-group-label">
+                  <div class="queue-group-title">Owner / Team Follow-Up</div>
+                  <div class="queue-group-count">4</div>
+                </div>
+                <div class="queue-group-body">
+                  <div class="preview-list-row">
+                    <div class="preview-list-top">
+                      <div class="preview-list-title">Lauren Collins</div>
+                      <div class="preview-mini">SLA 3h</div>
+                    </div>
+                    <div class="preview-list-sub">Coastal Haven | golf cart confirmation and nearby camp access</div>
+                    <div class="preview-row-footer">
+                      <span class="preview-team-chip">Beach Habitats pod · Jamie P.</span>
+                      <div class="preview-badges">
+                        <span class="preview-neutral-badge">Airbnb</span>
+                        <span class="preview-neutral-badge">draft ready</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="preview-list-row">
+                    <div class="preview-list-top">
+                      <div class="preview-list-title">Amber Barry</div>
+                      <div class="preview-mini">Website form</div>
+                    </div>
+                    <div class="preview-list-sub">Direct inquiry from Beach Habitats site</div>
+                    <div class="preview-row-footer">
+                      <span class="preview-team-chip">Autonomous lane · review sample</span>
+                      <div class="preview-badges">
+                        <span class="preview-neutral-badge">Direct</span>
+                        <span class="preview-neutral-badge">simple FAQ</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="queue-group">
+                <div class="queue-group-label">
+                  <div class="queue-group-title">Unassigned Exceptions</div>
+                  <div class="queue-group-count">2</div>
+                </div>
+                <div class="queue-group-body">
+                  <div class="preview-list-row">
+                    <div class="preview-list-top">
+                      <div class="preview-list-title">Sabina</div>
+                      <div class="preview-mini">Held draft</div>
+                    </div>
+                    <div class="preview-list-sub">Needs verified beach access details before send</div>
+                    <div class="preview-row-footer">
+                      <span class="preview-team-chip">No owner assigned</span>
+                      <div class="preview-badges">
+                        <span class="preview-neutral-badge strong">knowledge gap</span>
+                        <span class="preview-neutral-badge">neighborhood</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <div class="split-pane ops-workspace-pane" style="padding:18px">
+              <div class="ops-pane-header">
+                <div class="ops-pane-eyebrow">Operator cockpit</div>
+                <div class="ops-pane-title">Arielle Booker · Watercolor Cottage</div>
+              </div>
+
+              <div class="preview-thread">
+                <div class="chat-area" style="padding:0;height:auto">
+                  <div class="chat-msg-guest">
+                    <div class="bubble-guest">Hi! I’d like to book June 29 to July 3 and wanted to ask about the actual sleeping setup, beach access, and whether there’s any flexibility if we extend through July 5.</div>
+                    <div class="chat-meta">Latest guest ask · 9:44 PM</div>
+                  </div>
+
+                  <div class="chat-msg-system">
+                    <div class="bubble-system">Routed here because pricing sensitivity, date ambiguity, and multiple asks make this a quality-first pre-booking inquiry.</div>
+                  </div>
+                </div>
+
+                <div class="draft-box">
+                  <div class="draft-header">
+                    <span class="draft-chip">AI draft</span>
+                    <div class="confidence-track">
+                      <div class="confidence-fill" style="width:84%"></div>
+                    </div>
+                    <div class="confidence-label">84% grounded</div>
+                  </div>
+                  <div class="draft-text">Hi Arielle, thanks for reaching out. The home is a strong fit for your dates, and I’m happy to clarify the layout and beach access. The cottage sleeps up to 10 guests comfortably, includes 4 bikes, and is set up for an easy ride to the beach and resort amenities. For extending through July 5, I’d want to confirm availability on the backend first so I can give you an exact answer rather than overpromise. If you’d like, I can check that next and also confirm the exact bed setup room by room.</div>
+                  <div class="draft-actions">
+                    <button class="btn btn-primary">Approve & Send</button>
+                    <button class="btn">Edit Draft</button>
+                    <button class="btn">Escalate</button>
+                  </div>
+                  <div class="learn-note">
+                    <span class="learn-dot"></span>
+                    Knowledge is grounded to property facts and current queue rules.
+                  </div>
+                </div>
+
+                <div class="card" style="margin-bottom:0">
+                  <div class="card-header">
+                    <div>
+                      <div class="card-title">What the operator sees at a glance</div>
+                      <div class="card-sub">This is the part that should feel faster than a normal inbox.</div>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="preview-summary">
+                      <div class="meta-block">
+                        <div class="meta-label">Property match</div>
+                        <div class="meta-value strong">Bound by Airbnb listing + subject match</div>
+                      </div>
+                      <div class="meta-block">
+                        <div class="meta-label">Draft lane</div>
+                        <div class="meta-value strong">Quality-first · Anthropic preferred</div>
+                      </div>
+                      <div class="meta-block">
+                        <div class="meta-label">Asks detected</div>
+                        <div class="meta-value">availability, beach access, sleeping layout, possible extension</div>
+                      </div>
+                      <div class="meta-block">
+                        <div class="meta-label">Risk</div>
+                        <div class="meta-value red">Date extension not yet confirmed</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="split-pane ops-rail-pane" style="padding:18px">
+              <div class="ops-pane-header" style="border-bottom-color:rgba(26,29,36,0.09)">
+                <div class="ops-pane-eyebrow">Ops context</div>
+                <div class="ops-pane-title" style="color:#1a1d24">Routing, ownership, and binding</div>
+              </div>
+
+              <div class="preview-rail">
+                <div class="preview-rail-card">
+                  <div class="meta-block">
+                    <div class="meta-label">Responsible lane</div>
+                    <div class="meta-value strong">Beach Habitats pre-booking pod</div>
+                  </div>
+                  <div class="meta-block">
+                    <div class="meta-label">Assignment</div>
+                    <div class="meta-value">Unassigned · owner or pod member can claim</div>
+                  </div>
+                  <div class="meta-block">
+                    <div class="meta-label">Portfolio</div>
+                    <div class="meta-value">30A luxury homes</div>
+                  </div>
+                </div>
+
+                <div class="preview-rail-card">
+                  <div class="meta-block">
+                    <div class="meta-label">Why this is here</div>
+                    <div class="meta-value strong">Multiple asks + booking extension + persuasive tone matters</div>
+                  </div>
+                  <div class="preview-note">This rail is where a 2,000-unit operator gets trust: clear reason for routing, binding evidence, and whether AI is safe to send or should be reviewed carefully.</div>
+                </div>
+
+                <div class="preview-rail-card">
+                  <div class="meta-block">
+                    <div class="meta-label">Workflow ownership</div>
+                    <div class="meta-value strong">Settings, vendors, and automations support the owner lane rather than replacing it.</div>
+                  </div>
+                </div>
+
+                <div class="preview-rail-card">
+                  <div class="meta-block">
+                    <div class="meta-label">Queue health</div>
+                    <div class="meta-value strong">Oldest open revenue-sensitive item: 1h 12m</div>
+                  </div>
+                  <div class="meta-block">
+                    <div class="meta-label">Inbox audit</div>
+                    <div class="meta-value">142 polled · 38 queued · 11 duplicates · 6 gaps</div>
+                  </div>
+                </div>
+
+                <div class="preview-actions">
+                  <button class="btn btn-primary">Assign</button>
+                  <button class="btn">Open audit</button>
+                  <button class="btn">Re-draft</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="preview-caption">Directionally, this keeps the brand shell dark and premium, but the operator thinking area gets brighter where it matters. That gives us better readability without losing the Oyvoda tone.</div>
+      </section>
+
+      <section class="preview-section">
+        <div class="page-header">
+          <div class="page-title-group">
+            <div class="page-eyebrow">Stay Operations</div>
+            <div class="page-title">Guest Sessions Command</div>
+            <div class="page-sub">Same ownership model, but optimized for stay-phase tasks, proactive automation, and team-based operational follow-through.</div>
+          </div>
+          <div class="page-actions">
+            <button class="btn">My Sessions</button>
+            <button class="btn btn-primary">Open Escalations</button>
+          </div>
+        </div>
+
+        <div class="ops-metric-grid">
+          <div class="ops-metric-card">
+            <div class="ops-metric-label">Arrivals / Prep</div>
+            <div class="ops-metric-value">16</div>
+            <div class="ops-metric-sub">Pre-arrival and arrival-day sessions</div>
+          </div>
+          <div class="ops-metric-card">
+            <div class="ops-metric-label">In Stay Active</div>
+            <div class="ops-metric-value">41</div>
+            <div class="ops-metric-sub">Guests currently in house</div>
+          </div>
+          <div class="ops-metric-card">
+            <div class="ops-metric-label">Open Escalations</div>
+            <div class="ops-metric-value">5</div>
+            <div class="ops-metric-sub">Needs human coordination</div>
+          </div>
+          <div class="ops-metric-card">
+            <div class="ops-metric-label">Post-Stay Follow-Up</div>
+            <div class="ops-metric-value">11</div>
+            <div class="ops-metric-sub">Recovery, reviews, and closeout</div>
+          </div>
+        </div>
+
+        <div class="ops-toolbar">
+          <div class="ops-toolbar-copy">
+            <div class="ops-toolbar-title">Team-based operating views</div>
+            <div class="ops-toolbar-sub">This is where the fast lanes belong: proactive messaging, check-in help, WiFi, parking, and in-stay ops.</div>
+          </div>
+          <div class="ops-chip-row">
+            <span class="ops-chip ops-chip-active">Arrival Team</span>
+            <span class="ops-chip">In-Stay Pod</span>
+            <span class="ops-chip">Escalation Desk</span>
+            <span class="ops-chip">Autonomous review</span>
+          </div>
+        </div>
+
+        <div class="card" style="overflow:hidden">
+          <div class="ops-shell ops-shell-sessions" style="height:760px">
+            <div class="split-pane ops-queue-pane pane-border-r">
+              <section class="queue-group">
+                <div class="queue-group-label">
+                  <div class="queue-group-title">Arrivals / Prep</div>
+                  <div class="queue-group-count">2</div>
+                </div>
+                <div class="queue-group-body">
+                  <div class="preview-list-row active">
+                    <div class="preview-list-top">
+                      <div class="preview-list-title">Dawson Family · WaterColor Retreat</div>
+                      <div class="preview-mini">Arrival today</div>
+                    </div>
+                    <div class="preview-row-footer">
+                      <span class="preview-team-chip">Arrival team · autonomous assist</span>
+                      <div class="preview-badges">
+                        <span class="preview-neutral-badge">proactive touch due</span>
+                        <span class="preview-neutral-badge">code not viewed</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="queue-group">
+                <div class="queue-group-label">
+                  <div class="queue-group-title">Issue Active</div>
+                  <div class="queue-group-count">2</div>
+                </div>
+                <div class="queue-group-body">
+                  <div class="preview-list-row">
+                    <div class="preview-list-top">
+                      <div class="preview-list-title">Monroe Stay · Here Comes the Sun</div>
+                      <div class="preview-mini">Escalated</div>
+                    </div>
+                    <div class="preview-row-footer">
+                      <span class="preview-team-chip">Escalation desk · owner visible</span>
+                      <div class="preview-badges">
+                        <span class="preview-neutral-badge strong">hvac vendor open</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <div class="split-pane ops-workspace-pane" style="padding:18px">
+              <div class="ops-pane-header">
+                <div class="ops-pane-eyebrow">Guest session cockpit</div>
+                <div class="ops-pane-title">Arrival-day thread · WaterColor Retreat</div>
+              </div>
+
+              <div class="chat-area" style="padding:0;height:auto">
+                <div class="chat-msg-system">
+                  <div class="bubble-system">Proactive message recommended now. Guest has not opened the check-in guide, and arrival is in 4 hours.</div>
+                </div>
+                <div class="chat-msg-ai">
+                  <div class="bubble-ai">Hi Dawson family, we’re excited to host you today. Your check-in instructions, door code, parking notes, and WiFi details are all ready. If you’d like, I can resend the quick-arrival summary here so everything is easy to find on the way in.</div>
+                  <div class="chat-meta">Suggested proactive message · Groq fast lane</div>
+                </div>
+                <div class="chat-msg-guest">
+                  <div class="bubble-guest">Can you remind me where we park when we arrive?</div>
+                  <div class="chat-meta">Latest guest turn · 11:14 AM</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="split-pane ops-rail-pane" style="padding:18px">
+              <div class="ops-pane-header" style="border-bottom-color:rgba(26,29,36,0.09)">
+                <div class="ops-pane-eyebrow">Ops context</div>
+                <div class="ops-pane-title" style="color:#1a1d24">Stay phase and action rail</div>
+              </div>
+
+              <div class="preview-rail">
+                <div class="preview-rail-card">
+                  <div class="meta-block">
+                    <div class="meta-label">Phase</div>
+                    <div class="meta-value strong">Arrival day</div>
+                  </div>
+                  <div class="meta-block">
+                    <div class="meta-label">Next best action</div>
+                    <div class="meta-value">Send parking reminder + check-in summary</div>
+                  </div>
+                </div>
+                <div class="preview-rail-card">
+                  <div class="meta-block">
+                    <div class="meta-label">Proactive engine</div>
+                    <div class="meta-value strong">Good fast-lane candidate</div>
+                  </div>
+                  <div class="preview-note">This is the part of the product where Groq-heavy lanes make more sense: tightly grounded, low-ambiguity, operational responses.</div>
+                </div>
+                <div class="preview-rail-card">
+                  <div class="meta-block">
+                    <div class="meta-label">Autonomous tasks</div>
+                    <div class="meta-value strong">Arrival reminder sent · parking summary queued · no human action required unless guest replies with an exception.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</body>
+</html>

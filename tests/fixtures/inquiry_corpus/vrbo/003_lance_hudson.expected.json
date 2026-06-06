@@ -1,0 +1,19 @@
+{
+  "fixture_id": "vrbo/003_lance_hudson",
+  "description": "vrbo inquiry captured from live Beach Habitats inbound traffic",
+  "expected_route_contains": "vrbo",
+  "expected_pipeline_output": {
+    "platform": "vrbo",
+    "parser_source_contains": "",
+    "guest_name": "Guest 013",
+    "latest_guest_message_contains": [
+      "Good afternoon. I have a couple of older guests and am wanting to know if you ar"
+    ],
+    "requested_check_in": "2026-05-31",
+    "requested_check_out": "2026-06-04",
+    "requested_guests": null,
+    "platform_listing_id": "",
+    "platform_unit_id": "",
+    "property_reference_token": "ExternalID:2403-000013"
+  }
+}

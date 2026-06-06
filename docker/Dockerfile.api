@@ -1,0 +1,43 @@
+FROM node:20-slim AS dashboard-v2-builder
+
+WORKDIR /frontend
+
+COPY package.json package-lock.json ./
+COPY app/static/dashboard-v2 ./app/static/dashboard-v2
+
+RUN npm ci
+RUN npm run build:dashboard-v2
+
+
+FROM python:3.11-slim
+
+# Cache-bust arg — increment to force full rebuild
+ARG CACHE_BUST=2
+
+WORKDIR /app
+
+# Consume the build arg so Docker must invalidate downstream layers when it changes.
+RUN echo "CACHE_BUST=${CACHE_BUST}" >/tmp/cache_bust.txt
+
+# Install Python dependencies (production-only, lean build).
+# The production requirements use prebuilt wheels, so avoid pulling in the
+# full Debian compiler toolchain on Railway's space-constrained builders.
+COPY requirements.prod.txt .
+RUN pip install --no-cache-dir -r requirements.prod.txt
+
+# Copy application code
+COPY . .
+COPY --from=dashboard-v2-builder /frontend/app/static/dashboard-v2/dist /app/app/static/dashboard-v2/dist
+
+# Set Python path
+ENV PYTHONPATH=/app
+
+# Expose port
+EXPOSE 8080
+
+# Health check — generous start-period for slow startup (MCP registry, DB pool init)
+HEALTHCHECK --interval=15s --timeout=10s --start-period=60s --retries=5 \
+    CMD python -c "import sys, urllib.request; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=5).getcode() < 400 else 1)" || exit 1
+
+# Run migrations then start the application
+CMD ["sh", "-c", "env ALEMBIC_USE_DIRECT_URL=true alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8080 --workers 1"]

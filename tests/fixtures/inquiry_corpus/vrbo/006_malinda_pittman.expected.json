@@ -1,0 +1,19 @@
+{
+  "fixture_id": "vrbo/006_malinda_pittman",
+  "description": "vrbo inquiry captured from live Beach Habitats inbound traffic",
+  "expected_route_contains": "vrbo",
+  "expected_pipeline_output": {
+    "platform": "vrbo",
+    "parser_source_contains": "",
+    "guest_name": "Guest 020",
+    "latest_guest_message_contains": [
+      "Good evening, I was wanting to make a payment with a different card. Are you abl"
+    ],
+    "requested_check_in": "2026-07-11",
+    "requested_check_out": "2026-07-18",
+    "requested_guests": null,
+    "platform_listing_id": "listing_020",
+    "platform_unit_id": "unit_020",
+    "property_reference_token": "Property_020"
+  }
+}

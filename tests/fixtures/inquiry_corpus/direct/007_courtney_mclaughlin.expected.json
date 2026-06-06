@@ -1,0 +1,19 @@
+{
+  "fixture_id": "direct/007_courtney_mclaughlin",
+  "description": "direct inquiry captured from live Beach Habitats inbound traffic",
+  "expected_route_contains": "direct",
+  "expected_pipeline_output": {
+    "platform": "direct",
+    "parser_source_contains": "",
+    "guest_name": "Guest 009",
+    "latest_guest_message_contains": [
+      "Hi, Any chance this unit would be available for 4 nights instead of 7? Ideally l"
+    ],
+    "requested_check_in": "2026-06-28",
+    "requested_check_out": "2026-07-02",
+    "requested_guests": 4,
+    "platform_listing_id": "",
+    "platform_unit_id": "",
+    "property_reference_token": "unit_009"
+  }
+}

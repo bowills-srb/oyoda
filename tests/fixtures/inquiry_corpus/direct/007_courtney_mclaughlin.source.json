@@ -1,0 +1,33 @@
+{
+  "fixture_id": "direct/007_courtney_mclaughlin",
+  "platform": "direct",
+  "source_channel": "email",
+  "source_provider": "gmail",
+  "headers": {
+    "From": "Guest 009 <guest_009@example.test>",
+    "Reply-To": "guest_009@example.test",
+    "Message-ID": "19e36df98d70d37f",
+    "X-Thread-Id": "19e36df98d70d37f",
+    "X-Oyvoda-Parser-Used": "llm_email_extractor_groq"
+  },
+  "subject": "Idle Hour (Santa Rosa Beach, FL - 32459)",
+  "plain_text": "Submitted on Sunday, May 17, 2026 - 11:58\r\nSubmitted by anonymous user: 74.89.153.183\r\nSubmitted values are:\r\n\r\nFIrst Name: Courtney\r\nLast Name: McLaughlin\r\nEmail: guest_009@example.test\r\nPhone Number:\r\nArrival Date: Sun, 06/28/2026\r\nDeparture Date: Thu, 07/02/2026\r\nAdults: 2\r\nChildren: 2\r\nComments/Questions:\r\nHi,\r\n\r\nAny chance this unit would be available for 4 nights instead of 7? Ideally\r\nlooking to stay from 6/28-7/2. Thank you!\r\nListing of Interest: Idle Hour\r\nPage Path: /30a-vacation-rentals/idle-hour\r\nCity: Santa Rosa Beach\r\nState Province Code: FL\r\nPostal Code: 32459\r\nCountry Code: US\r\n\r\n\r\nThe results of this submission may be viewed at:\r\nhttps://www.beachhabitats30a.com/node/3/submission/22930",
+  "raw_html": "",
+  "llm_extracted_fields": {
+    "latest_guest_message": "Hi, Any chance this unit would be available for 4 nights instead of 7? Ideally looking to stay from 6/28-7/2. Thank you!",
+    "property_code_or_name": "unit_009",
+    "sender_name": "Guest 009",
+    "sender_email": "guest_009@example.test",
+    "requested_guests": 4,
+    "requested_check_in": "2026-06-28",
+    "requested_check_out": "2026-07-02"
+  },
+  "provenance": {
+    "tenant_id": "e07980b2-a990-4b24-91d1-c8cb71ab70e1",
+    "draft_id": "INQ-EA30A96F",
+    "created_at": "2026-05-17 17:00:28.930323+00",
+    "gmail_message_id": "19e36df98d70d37f",
+    "parser_source_live": "llm_email_extractor_groq",
+    "parser_used_live": "llm_email_extractor_groq"
+  }
+}

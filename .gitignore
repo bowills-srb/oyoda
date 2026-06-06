@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+.venv311/
+venv/
+.migration_venv/
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Environment — NEVER commit secrets
+.env
+.env.*
+!.env.example
+
+# Docker volumes / data
+pgdata/
+redis-data/
+
+# Compiled dashboard (regenerate with: node scripts/build-dashboard.js)
+app/static/dashboard/oyvoda-dashboard.js
+
+# IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp
+~$*.xlsx
+
+# Logs
+*.log
+logs/
+
+# Local script outputs
+scripts/output/
+
+# Local operator spreadsheets / exports at repo root
+/*.xlsx
+
+# Coverage
+.coverage
+htmlcov/
+
+# Alembic
+alembic/versions/*.pyc
+ENET_API_Package/

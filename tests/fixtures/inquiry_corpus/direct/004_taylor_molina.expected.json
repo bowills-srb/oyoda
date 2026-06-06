@@ -1,0 +1,19 @@
+{
+  "fixture_id": "direct/004_taylor_molina",
+  "description": "direct inquiry captured from live Beach Habitats inbound traffic",
+  "expected_route_contains": "direct",
+  "expected_pipeline_output": {
+    "platform": "direct",
+    "parser_source_contains": "",
+    "guest_name": "Guest 004",
+    "latest_guest_message_contains": [
+      "Hi, I was wondering if it would be possible to host some type of gathering at yo"
+    ],
+    "requested_check_in": "2026-11-05",
+    "requested_check_out": "2026-11-08",
+    "requested_guests": 8,
+    "platform_listing_id": "",
+    "platform_unit_id": "",
+    "property_reference_token": "Property_004"
+  }
+}

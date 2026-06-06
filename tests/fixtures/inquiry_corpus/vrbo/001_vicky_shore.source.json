@@ -1,0 +1,33 @@
+{
+  "fixture_id": "vrbo/001_vicky_shore",
+  "platform": "vrbo",
+  "source_channel": "email",
+  "source_provider": "gmail",
+  "headers": {
+    "From": "Guest 008 <sender@messages.homeaway.com>",
+    "Reply-To": "uuid@messages.homeaway.com",
+    "Message-ID": "fixture-vrbo/001_vicky_shore",
+    "X-Thread-Id": "thread-vrbo/001_vicky_shore",
+    "X-Oyvoda-Parser-Used": ""
+  },
+  "subject": "",
+  "plain_text": "We are staying 19-24 and would like to add on staying through the 25 to check out on Monday.",
+  "raw_html": "",
+  "llm_extracted_fields": {
+    "latest_guest_message": "We are staying 19-24 and would like to add on staying through the 25 to check out on Monday.",
+    "property_code_or_name": "unit_008",
+    "sender_name": "Guest 008",
+    "sender_email": "unit_008",
+    "requested_guests": 3,
+    "requested_check_in": "2026-06-01",
+    "requested_check_out": "2026-06-06"
+  },
+  "provenance": {
+    "tenant_id": "e07980b2-a990-4b24-91d1-c8cb71ab70e1",
+    "draft_id": "INQ-C1D0068D",
+    "created_at": "2026-05-17 18:07:16.126424+00",
+    "gmail_message_id": "",
+    "parser_source_live": "",
+    "parser_used_live": ""
+  }
+}
