@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Oyvoda v3 — design tokens.
+  Dark, calm, typography-forward. One warm accent for the employee's voice;
+  everything else is restrained so the writing carries the interface.
+*/
+:root {
+  --bg: #0a0b0d;
+  --panel: #0e1013;
+  --raised: #14171b;
+  --hover: #16191e;
+  --selected: #1a1e24;
+
+  --hairline: rgba(255, 255, 255, 0.06);
+  --line: rgba(255, 255, 255, 0.10);
+
+  --ink: #e9ebee;
+  --muted: #9aa1ac;
+  --faint: #626873;
+
+  /* Warm gold — the employee speaking. */
+  --accent: #e3bd86;
+
+  /* Channels: text / email / voice */
+  --ch-text: #82a9f6;
+  --ch-email: #c79bf0;
+  --ch-voice: #6fd4b4;
+
+  /* Priority */
+  --high: #f08a8f;
+  --med: #e6bd5c;
+  --low: #8b919e;
+
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-feature-settings: "cv05" 1, "ss01" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Quiet, thin scrollbars so panels feel calm. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.10);
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
