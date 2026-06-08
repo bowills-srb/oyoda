@@ -83,6 +83,7 @@ export const FEED: FeedUpdate[] = [
   {
     kind: "update",
     id: "u-lookout-checkin",
+    governedBy: ["seed-checkin-timing"],
     channel: "email",
     at: "2026-06-08T08:40:00",
     tag: "checkin",
@@ -113,6 +114,7 @@ export const FEED: FeedUpdate[] = [
   {
     kind: "update",
     id: "u-smoke-battery",
+    governedBy: ["seed-spend-cap"],
     channel: "voice",
     at: "2026-06-08T07:36:00",
     tag: "resolved",
@@ -166,6 +168,7 @@ export const FEED: FeedUpdate[] = [
   {
     kind: "update",
     id: "u-plumber-pelican",
+    governedBy: ["seed-spend-cap"],
     channel: "voice",
     at: "2026-06-08T03:48:00",
     tag: "resolved",
@@ -256,12 +259,14 @@ export const DECISIONS: Decision[] = [
   {
     kind: "decision",
     id: "d-ac-beachhouse",
+    governedBy: ["seed-spend-cap"],
     channel: "voice",
     at: "2026-06-08T09:26:00",
     priority: "high",
     property: "Beach House",
     guest: "The Castellano family",
     ask: "The Beach House AC is fully out and it's 91°F — do I send the emergency tech, or move the family?",
+    briefLine: "the Beach House AC is out in a heat advisory with two young kids on site",
     detail:
       "Two kids on site. The emergency repair is $850, which is over your $500 auto-approve limit, so I stopped to ask.",
     reasoning: {
@@ -316,6 +321,7 @@ export const DECISIONS: Decision[] = [
     property: "Dauphin Cottage",
     guest: "Mr. Pearson",
     ask: "A guest wants a full refund after one night over 'cleanliness,' but the check-in photos look clean to me. How do you want to play it?",
+    briefLine: "a guest is asking for a full refund I don’t think is fair",
     detail:
       "It's a money decision with conflicting evidence, so I haven't replied. The turnover was photo-verified clean 90 minutes before check-in.",
     reasoning: {
@@ -365,6 +371,7 @@ export const DECISIONS: Decision[] = [
   {
     kind: "decision",
     id: "d-okonkwo-discount",
+    governedBy: ["seed-returning-discount"],
     channel: "text",
     at: "2026-06-08T07:58:00",
     priority: "medium",

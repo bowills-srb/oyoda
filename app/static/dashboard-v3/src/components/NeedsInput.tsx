@@ -44,8 +44,19 @@ function DecisionCard({
       </p>
       <div className="mt-2.5 flex items-center justify-between gap-3">
         <MetaLine parts={[item.property, item.guest]} />
-        <span className="shrink-0 text-[11.5px] tabular-nums text-faint">
-          {relative(item.at)}
+        <span className="flex shrink-0 items-center gap-2">
+          {item.governedBy && item.governedBy.length > 0 && (
+            <span
+              title="Following your standing guidance"
+              className="text-[11px]"
+              style={{ color: "var(--accent)" }}
+            >
+              ✦ guided
+            </span>
+          )}
+          <span className="text-[11.5px] tabular-nums text-faint">
+            {relative(item.at)}
+          </span>
         </span>
       </div>
     </button>

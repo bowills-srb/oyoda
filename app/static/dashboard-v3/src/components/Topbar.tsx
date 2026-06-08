@@ -15,6 +15,8 @@ export function Topbar({
   watching,
   need,
   urgent,
+  learned,
+  onOpenGuidance,
 }: {
   operator: string;
   now: Date;
@@ -23,6 +25,8 @@ export function Topbar({
   watching: number;
   need: number;
   urgent: number;
+  learned: number;
+  onOpenGuidance: () => void;
 }) {
   const calm = urgent === 0;
   return (
@@ -70,6 +74,17 @@ export function Topbar({
         <span className="hidden text-[12px] text-faint md:inline">
           Last check-in · {clock(lastCheckIn)}
         </span>
+        <button
+          type="button"
+          onClick={onOpenGuidance}
+          title="What I've learned from you"
+          className="inline-flex items-center gap-1.5 rounded-full border border-hairline px-2.5 py-1 text-[12px] text-muted transition-colors hover:border-line hover:text-ink"
+        >
+          <span aria-hidden style={{ color: "var(--accent)" }}>
+            ✦
+          </span>
+          {learned} learned
+        </button>
         <span
           className="grid h-7 w-7 place-items-center rounded-full text-[12px] font-semibold text-bg"
           style={{ background: "var(--accent)" }}

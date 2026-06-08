@@ -1,8 +1,35 @@
 import { Fragment } from "react";
 
+import type { Brief } from "../lib/brief";
 import { dayPart, relative } from "../lib/time";
 import type { FeedUpdate, UpdateTag } from "../types";
 import { ChannelTag, MetaLine, MicroLabel } from "./atoms";
+
+function MorningBrief({ brief }: { brief: Brief }) {
+  return (
+    <div className="shrink-0 border-b border-hairline px-5 pb-4 pt-5">
+      <div className="mb-2.5 flex items-center gap-2">
+        <span aria-hidden style={{ color: "var(--accent)" }}>
+          ✦
+        </span>
+        <MicroLabel accent>Your morning brief</MicroLabel>
+      </div>
+      <div className="space-y-2">
+        {brief.lines.map((line, i) => (
+          <p key={i} className="text-[14.5px] leading-relaxed text-ink/90">
+            {line}
+          </p>
+        ))}
+      </div>
+      <p
+        className="mt-3 border-l-2 pl-3 text-[14.5px] font-medium leading-relaxed text-ink"
+        style={{ borderColor: "var(--accent)" }}
+      >
+        {brief.action}
+      </p>
+    </div>
+  );
+}
 
 const TAG_LABEL: Record<UpdateTag, string> = {
   handled: "Handled",
@@ -53,17 +80,20 @@ function FeedRow({
 
 export function EmployeeFeed({
   items,
+  brief,
   selectedId,
   onSelect,
 }: {
   items: FeedUpdate[];
+  brief: Brief;
   selectedId: string | null;
   onSelect: (id: string) => void;
 }) {
   let lastPart = "";
   return (
     <section className="flex h-full min-h-0 flex-col border-r border-hairline">
-      <header className="shrink-0 px-5 pb-3 pt-5">
+      <MorningBrief brief={brief} />
+      <header className="shrink-0 px-5 pb-3 pt-4">
         <h2 className="text-[15px] font-semibold text-ink">Since you checked in</h2>
         <p className="mt-0.5 text-[12.5px] text-muted">
           What I’ve done, decided, and noticed — newest first.

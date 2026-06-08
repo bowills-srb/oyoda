@@ -61,6 +61,8 @@ export interface FeedUpdate {
   /** What actually happened as a result. */
   outcome: string;
   draft?: Draft;
+  /** Ids of guidance rules that shaped how I handled this. */
+  governedBy?: string[];
 }
 
 export interface DecisionOption {
@@ -84,11 +86,33 @@ export interface Decision {
   ask: string;
   /** One extra line of context shown on the center card. */
   detail: string;
+  /** A crisp phrasing of this for the morning brief, if it's brief-worthy. */
+  briefLine?: string;
   reasoning: Reasoning;
   /** What I'd do if you just said "go." */
   proposal: string;
   draft?: Draft;
   options: DecisionOption[];
+  /** Ids of guidance rules I'm already applying to this situation. */
+  governedBy?: string[];
 }
 
 export type WorkItem = FeedUpdate | Decision;
+
+/**
+ * A standing instruction Lanier has taught me. The teaching loop: every time
+ * she corrects or redirects me, it becomes one of these — scoped, persistent,
+ * and applied to future work.
+ *
+ * `scope` is a property name, or "*" for the whole portfolio.
+ */
+export type GuidanceScope = string;
+
+export interface GuidanceRule {
+  id: string;
+  scope: GuidanceScope;
+  instruction: string;
+  createdAt: string;
+  /** Where this came from, in my words ("You taught me on the Beach House AC"). */
+  source: string;
+}

@@ -1,7 +1,15 @@
 import { useState } from "react";
 
+import { ALL_PROPERTIES, rulesByIds, scopeLabel } from "../lib/guidance";
 import { clock } from "../lib/time";
-import type { Decision, DecisionOption, FeedUpdate, WorkItem } from "../types";
+import type {
+  Decision,
+  DecisionOption,
+  FeedUpdate,
+  GuidanceRule,
+  GuidanceScope,
+  WorkItem,
+} from "../types";
 import {
   ChannelTag,
   DataGrid,
@@ -16,19 +24,15 @@ interface Handlers {
   onClose: () => void;
   onResolve: (decision: Decision, option: DecisionOption) => void;
   onRedirect: (decision: Decision, note: string) => void;
-  onCoach: (update: FeedUpdate, note: string) => void;
+  /** The teaching loop: store a standing rule, scoped, in my words. */
+  onTeach: (note: string, scope: GuidanceScope, source: string) => void;
+  onRemoveRule: (id: string) => void;
 }
 
-/** A collapsible "tell me differently" affordance with a small composer. */
+/** A one-off composer for redirecting a single decision. */
 function RedirectBox({
-  label,
-  placeholder,
-  cta,
   onSubmit,
 }: {
-  label: string;
-  placeholder: string;
-  cta: string;
   onSubmit: (note: string) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -40,7 +44,7 @@ function RedirectBox({
         onClick={() => setOpen(true)}
         className="text-[13px] font-medium text-accent transition-opacity hover:opacity-80"
       >
-        {label}
+        Or tell me differently →
       </button>
     );
   }
@@ -50,7 +54,7 @@ function RedirectBox({
         autoFocus
         value={note}
         onChange={(e) => setNote(e.target.value)}
-        placeholder={placeholder}
+        placeholder="e.g. Move them to Pelican Perch and send a $150 dinner credit for the trouble."
         rows={3}
         className="w-full resize-none rounded-lg border border-hairline bg-bg px-3 py-2 text-[13.5px] leading-relaxed text-ink placeholder:text-faint focus:outline-none focus:ring-1 focus:ring-accent/50"
       />
@@ -71,7 +75,95 @@ function RedirectBox({
           onClick={() => onSubmit(note.trim())}
           className="rounded-lg bg-accent px-3 py-1.5 text-[13px] font-semibold text-bg transition-opacity disabled:opacity-40"
         >
-          {cta}
+          Send it back to me
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/** Teach a standing rule. Scope toggles between this property and the portfolio. */
+function TeachBox({
+  label,
+  property,
+  source,
+  onTeach,
+}: {
+  label: string;
+  property?: string;
+  source: string;
+  onTeach: (note: string, scope: GuidanceScope, source: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [note, setNote] = useState("");
+  const [wide, setWide] = useState(false);
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="text-[13px] font-medium text-accent transition-opacity hover:opacity-80"
+      >
+        {label}
+      </button>
+    );
+  }
+  const scope: GuidanceScope = property && !wide ? property : ALL_PROPERTIES;
+  return (
+    <div className="rounded-xl border border-hairline bg-panel p-3">
+      <textarea
+        autoFocus
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        placeholder="e.g. Always call me before dispatching a vendor here, even small jobs."
+        rows={3}
+        className="w-full resize-none rounded-lg border border-hairline bg-bg px-3 py-2 text-[13.5px] leading-relaxed text-ink placeholder:text-faint focus:outline-none focus:ring-1 focus:ring-accent/50"
+      />
+      {property && (
+        <div className="mt-2.5 flex items-center gap-1.5">
+          <span className="mr-1 text-[12px] text-muted">Applies to</span>
+          {[
+            { on: false, label: property },
+            { on: true, label: "Every property" },
+          ].map((opt) => (
+            <button
+              key={opt.label}
+              type="button"
+              onClick={() => setWide(opt.on)}
+              className={[
+                "rounded-full border px-2.5 py-1 text-[12px] transition-colors",
+                wide === opt.on
+                  ? "border-line bg-selected text-ink"
+                  : "border-hairline text-muted hover:text-ink",
+              ].join(" ")}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+      <div className="mt-2.5 flex items-center justify-end gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            setOpen(false);
+            setNote("");
+          }}
+          className="rounded-lg px-3 py-1.5 text-[13px] text-muted hover:text-ink"
+        >
+          Never mind
+        </button>
+        <button
+          type="button"
+          disabled={!note.trim()}
+          onClick={() => {
+            onTeach(note.trim(), scope, source);
+            setOpen(false);
+            setNote("");
+          }}
+          className="rounded-lg bg-accent px-3 py-1.5 text-[13px] font-semibold text-bg transition-opacity disabled:opacity-40"
+        >
+          Save guidance
         </button>
       </div>
     </div>
@@ -101,12 +193,50 @@ function Prose({ children }: { children: React.ReactNode }) {
   );
 }
 
+/** The standing rules already shaping this item — the visible payoff of teaching. */
+function GoverningRules({
+  ids,
+  rules,
+}: {
+  ids: string[] | undefined;
+  rules: GuidanceRule[];
+}) {
+  const applied = rulesByIds(ids, rules);
+  if (applied.length === 0) return null;
+  return (
+    <Block title="What I'm already following here">
+      <ul className="space-y-2">
+        {applied.map((rule) => (
+          <li
+            key={rule.id}
+            className="flex gap-2.5 rounded-lg border border-hairline bg-panel px-3 py-2.5"
+          >
+            <span aria-hidden className="mt-px shrink-0 text-accent">
+              ✦
+            </span>
+            <div>
+              <p className="text-[13.5px] leading-relaxed text-ink/90">
+                {rule.instruction}
+              </p>
+              <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.1em] text-faint">
+                {scopeLabel(rule.scope)}
+              </p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </Block>
+  );
+}
+
 function UpdateBody({
   item,
-  onCoach,
+  rules,
+  onTeach,
 }: {
   item: FeedUpdate;
-  onCoach: (update: FeedUpdate, note: string) => void;
+  rules: GuidanceRule[];
+  onTeach: Handlers["onTeach"];
 }) {
   return (
     <div className="space-y-6">
@@ -129,6 +259,8 @@ function UpdateBody({
         <Prose>{item.reasoning.thought}</Prose>
       </Block>
 
+      <GoverningRules ids={item.governedBy} rules={rules} />
+
       <Block title="What I decided">
         <Prose>{item.decision}</Prose>
       </Block>
@@ -148,11 +280,13 @@ function UpdateBody({
           I handled this on my own. If I read it wrong, teach me — I’ll apply it
           next time.
         </p>
-        <RedirectBox
+        <TeachBox
           label="Adjust how I handle this →"
-          placeholder="e.g. Always call me before dispatching a vendor to the Beach House, even small jobs."
-          cta="Save guidance"
-          onSubmit={(note) => onCoach(item, note)}
+          property={item.property}
+          source={`You taught me on the ${item.property} ${
+            item.tag === "noticed" ? "watch" : "update"
+          }`}
+          onTeach={onTeach}
         />
       </div>
     </div>
@@ -171,12 +305,16 @@ function optionClasses(option: DecisionOption): string {
 
 function DecisionBody({
   item,
+  rules,
   onResolve,
   onRedirect,
+  onTeach,
 }: {
   item: Decision;
-  onResolve: (decision: Decision, option: DecisionOption) => void;
-  onRedirect: (decision: Decision, note: string) => void;
+  rules: GuidanceRule[];
+  onResolve: Handlers["onResolve"];
+  onRedirect: Handlers["onRedirect"];
+  onTeach: Handlers["onTeach"];
 }) {
   return (
     <div className="space-y-6">
@@ -196,6 +334,8 @@ function DecisionBody({
       <Block title="How I thought about it">
         <Prose>{item.reasoning.thought}</Prose>
       </Block>
+
+      <GoverningRules ids={item.governedBy} rules={rules} />
 
       <Block title="What I’m proposing">
         <Prose>{item.proposal}</Prose>
@@ -225,13 +365,102 @@ function DecisionBody({
           ))}
         </div>
         <div className="pt-1">
-          <RedirectBox
-            label="Or tell me differently →"
-            placeholder="e.g. Move them to Pelican Perch and send a $150 dinner credit for the trouble."
-            cta="Send it back to me"
-            onSubmit={(note) => onRedirect(item, note)}
-          />
+          <RedirectBox onSubmit={(note) => onRedirect(item, note)} />
         </div>
+      </div>
+
+      <div className="space-y-2 border-t border-hairline pt-5">
+        <p className="text-[13px] text-muted">
+          Want me to handle situations like this on my own next time?
+        </p>
+        <TeachBox
+          label="Teach me a standing rule →"
+          property={item.property}
+          source={`You taught me on the ${item.property} decision`}
+          onTeach={onTeach}
+        />
+      </div>
+    </div>
+  );
+}
+
+function GuidanceBody({
+  rules,
+  onTeach,
+  onRemove,
+}: {
+  rules: GuidanceRule[];
+  onTeach: Handlers["onTeach"];
+  onRemove: (id: string) => void;
+}) {
+  const portfolio = rules.filter((r) => r.scope === ALL_PROPERTIES);
+  const perProperty = rules.filter((r) => r.scope !== ALL_PROPERTIES);
+
+  function Group({ title, list }: { title: string; list: GuidanceRule[] }) {
+    if (list.length === 0) return null;
+    return (
+      <Block title={title}>
+        <ul className="space-y-2">
+          {list.map((rule) => (
+            <li
+              key={rule.id}
+              className="group flex items-start gap-2.5 rounded-lg border border-hairline bg-panel px-3 py-2.5"
+            >
+              <span aria-hidden className="mt-px shrink-0 text-accent">
+                ✦
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-[13.5px] leading-relaxed text-ink/90">
+                  {rule.instruction}
+                </p>
+                <p className="mt-1 text-[11px] text-faint">
+                  {scopeLabel(rule.scope)} · {rule.source}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => onRemove(rule.id)}
+                className="shrink-0 rounded-md px-1.5 py-0.5 text-[12px] text-faint opacity-0 transition hover:text-high group-hover:opacity-100"
+              >
+                Unlearn
+              </button>
+            </li>
+          ))}
+        </ul>
+      </Block>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <header className="space-y-1.5">
+        <p className="text-[16px] leading-snug text-ink">
+          Here’s everything you’ve taught me.
+        </p>
+        <p className="text-[13px] leading-relaxed text-muted">
+          I apply these on my own, so the work gets more yours over time. Remove
+          any and I’ll stop — or teach me a new one below.
+        </p>
+      </header>
+
+      {rules.length === 0 ? (
+        <p className="text-[13.5px] text-muted">
+          Nothing yet. As you correct and redirect me, what you teach me lands
+          here.
+        </p>
+      ) : (
+        <>
+          <Group title="Across the portfolio" list={portfolio} />
+          <Group title="Property-specific" list={perProperty} />
+        </>
+      )}
+
+      <div className="border-t border-hairline pt-5">
+        <TeachBox
+          label="Teach me something new →"
+          source="Added directly"
+          onTeach={onTeach}
+        />
       </div>
     </div>
   );
@@ -259,17 +488,26 @@ function RestingState() {
 
 function DrawerBody({
   item,
+  showGuidance,
+  rules,
   handlers,
 }: {
   item: WorkItem | null;
+  showGuidance: boolean;
+  rules: GuidanceRule[];
   handlers: Handlers;
 }) {
-  if (!item) return <RestingState />;
+  if (!showGuidance && !item) return <RestingState />;
+  const heading = showGuidance
+    ? "What I've learned"
+    : item?.kind === "decision"
+      ? "Decision"
+      : "Context";
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="flex shrink-0 items-center justify-between border-b border-hairline px-5 py-3.5">
         <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-faint">
-          {item.kind === "decision" ? "Decision" : "Context"}
+          {heading}
         </span>
         <button
           type="button"
@@ -288,15 +526,23 @@ function DrawerBody({
         </button>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
-        {item.kind === "decision" ? (
+        {showGuidance ? (
+          <GuidanceBody
+            rules={rules}
+            onTeach={handlers.onTeach}
+            onRemove={handlers.onRemoveRule}
+          />
+        ) : item?.kind === "decision" ? (
           <DecisionBody
             item={item}
+            rules={rules}
             onResolve={handlers.onResolve}
             onRedirect={handlers.onRedirect}
+            onTeach={handlers.onTeach}
           />
-        ) : (
-          <UpdateBody item={item} onCoach={handlers.onCoach} />
-        )}
+        ) : item ? (
+          <UpdateBody item={item} rules={rules} onTeach={handlers.onTeach} />
+        ) : null}
       </div>
     </div>
   );
@@ -304,20 +550,34 @@ function DrawerBody({
 
 export function ContextDrawer({
   item,
+  showGuidance,
+  rules,
   handlers,
 }: {
   item: WorkItem | null;
+  showGuidance: boolean;
+  rules: GuidanceRule[];
   handlers: Handlers;
 }) {
-  // Remount on selection change so any open composer resets cleanly.
-  const body = <DrawerBody key={item?.id ?? "empty"} item={item} handlers={handlers} />;
+  // Remount on what's shown so any open composer resets cleanly.
+  const bodyKey = showGuidance ? "guidance" : (item?.id ?? "empty");
+  const body = (
+    <DrawerBody
+      key={bodyKey}
+      item={item}
+      showGuidance={showGuidance}
+      rules={rules}
+      handlers={handlers}
+    />
+  );
+  const open = showGuidance || item !== null;
   return (
     <>
       {/* Inline column on wide screens — always present, rests when empty. */}
       <aside className="hidden h-full min-h-0 bg-panel lg:block">{body}</aside>
 
-      {/* Slide-over on narrow screens — only when something is selected. */}
-      {item && (
+      {/* Slide-over on narrow screens — only when something is shown. */}
+      {open && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
