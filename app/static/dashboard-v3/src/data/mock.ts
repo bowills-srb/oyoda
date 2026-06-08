@@ -1,4 +1,4 @@
-import type { Decision, FeedUpdate } from "../types";
+import type { Decision, FeedUpdate, Property } from "../types";
 
 /*
   A realistic morning for a short-term-rental portfolio. The threads cross:
@@ -16,6 +16,84 @@ export const PORTFOLIO = {
   propertyCount: 12,
   lastCheckIn: "2026-06-07T21:38:00",
 };
+
+/*
+  The portfolio at a glance — where every unit stands this morning, before
+  anything is flagged. The properties named in the feed and decisions carry
+  the live threads; the rest fill out a believable 12-unit operation. The
+  strip is a spatial map: scan first, then dive into what's surfaced below.
+*/
+export const PROPERTIES: Property[] = [
+  {
+    name: "Beach House",
+    status: "occupied",
+    guest: "The Castellano family",
+    note: "AC is out in the heat advisory — waiting on your call.",
+  },
+  {
+    name: "The Lookout",
+    status: "turning",
+    guest: "Hendersons arrive 4 PM",
+    note: "Flipped and ready; tonight's guests inbound.",
+  },
+  {
+    name: "Dauphin Cottage",
+    status: "occupied",
+    guest: "Mr. Pearson",
+    note: "Refund dispute open; Okonkwos softly held for Thanksgiving.",
+  },
+  {
+    name: "Pelican Perch",
+    status: "occupied",
+    guest: "Unit 4B guest",
+    note: "Plumber confirmed for 8 AM on the slow drain.",
+  },
+  {
+    name: "Sandpiper Suite",
+    status: "vacant",
+    note: "Thermostat I'm watching; 30-day inquiry pending.",
+  },
+  {
+    name: "Dune Walk",
+    status: "occupied",
+    guest: "The Ferraro party",
+    note: "Quiet — mid-stay, nothing open.",
+  },
+  {
+    name: "Harbor Loft",
+    status: "occupied",
+    guest: "Wei & Tran",
+    note: "Quiet — checks out Thursday.",
+  },
+  {
+    name: "Cypress Bungalow",
+    status: "vacant",
+    note: "Open until the 12th; no issues.",
+  },
+  {
+    name: "Magnolia House",
+    status: "turning",
+    guest: "Arrival 5 PM",
+    note: "Turnover in progress, on schedule.",
+  },
+  {
+    name: "Saltgrass Cabin",
+    status: "occupied",
+    guest: "The Okafor party",
+    note: "Quiet — long stay, all calm.",
+  },
+  {
+    name: "Tidewater Flat",
+    status: "vacant",
+    note: "Open midweek; routine.",
+  },
+  {
+    name: "Gulfview Penthouse",
+    status: "occupied",
+    guest: "Ms. Albright",
+    note: "Quiet — anniversary stay, flowers delivered.",
+  },
+];
 
 export const FEED: FeedUpdate[] = [
   {

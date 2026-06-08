@@ -3,9 +3,10 @@ import { useMemo, useState } from "react";
 import { ContextDrawer } from "./components/ContextDrawer";
 import { EmployeeFeed } from "./components/EmployeeFeed";
 import { NeedsInput } from "./components/NeedsInput";
+import { PropertyStrip } from "./components/PropertyStrip";
 import { Topbar } from "./components/Topbar";
 import { composeBrief } from "./lib/brief";
-import { DECISIONS, FEED, PORTFOLIO } from "./data/mock";
+import { DECISIONS, FEED, PORTFOLIO, PROPERTIES } from "./data/mock";
 import { ALL_PROPERTIES, loadRules, saveRules, scopeLabel } from "./lib/guidance";
 import { NOW } from "./lib/time";
 import type {
@@ -23,6 +24,7 @@ export default function App() {
   const [rules, setRules] = useState<GuidanceRule[]>(() => loadRules());
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showGuidance, setShowGuidance] = useState(false);
+  const [activeProperty, setActiveProperty] = useState<string | null>(null);
 
   const selected: WorkItem | null = useMemo(() => {
     if (!selectedId) return null;
@@ -52,7 +54,25 @@ export default function App() {
     source: Decision,
     summary: string,
     decisionLine: string,
+    editedBody?: string,
   ) {
+    // If Lanier edited the draft before approving, send her exact words.
+    const wasEdited =
+      editedBody !== undefined &&
+      source.draft !== undefined &&
+      editedBody.trim() !== source.draft.body.trim();
+    const draft = source.draft
+      ? {
+          ...source.draft,
+          body: editedBody ?? source.draft.body,
+          sent: true,
+        }
+      : undefined;
+    const observed = [{ label: "Your call", value: decisionLine }];
+    if (wasEdited) {
+      observed.push({ label: "Message", value: "Sent in your wording" });
+    }
+
     const entry: FeedUpdate = {
       kind: "update",
       id: `${source.id}-done-${Date.now()}`,
@@ -61,16 +81,18 @@ export default function App() {
       tag: "handled",
       property: source.property,
       guest: source.guest,
-      summary,
+      summary: wasEdited
+        ? `${summary} I sent it in the wording you edited, word for word.`
+        : summary,
       governedBy: source.governedBy,
       reasoning: {
-        observed: [{ label: "Your call", value: decisionLine }],
+        observed,
         thought:
           "You made the call and I carried it out right away. Here’s exactly what I did, so there’s nothing ambiguous between us.",
       },
       decision: decisionLine,
       outcome: summary,
-      draft: source.draft ? { ...source.draft, sent: true } : undefined,
+      draft,
     };
     prependFeed(entry);
     setDecisions((prev) => prev.filter((d) => d.id !== source.id));
@@ -78,8 +100,29 @@ export default function App() {
     setShowGuidance(false);
   }
 
-  function handleResolve(decision: Decision, option: DecisionOption) {
-    logResolution(decision, option.resultSummary, option.label);
+  function handleResolve(
+    decision: Decision,
+    option: DecisionOption,
+    editedBody?: string,
+  ) {
+    logResolution(decision, option.resultSummary, option.label, editedBody);
+  }
+
+  /** Defer a decision; it drops into the Snoozed group until she wakes it. */
+  function handleSnooze(decision: Decision, until: string) {
+    setDecisions((prev) =>
+      prev.map((d) => (d.id === decision.id ? { ...d, snoozedUntil: until } : d)),
+    );
+    setSelectedId(null);
+    setShowGuidance(false);
+  }
+
+  function handleWake(id: string) {
+    setDecisions((prev) =>
+      prev.map((d) =>
+        d.id === id ? { ...d, snoozedUntil: undefined } : d,
+      ),
+    );
   }
 
   function handleRedirect(decision: Decision, note: string) {
@@ -131,8 +174,17 @@ export default function App() {
 
   const handled = feed.filter((f) => f.tag !== "noticed").length;
   const watching = feed.filter((f) => f.tag === "noticed").length;
-  const urgent = decisions.filter((d) => d.priority === "high").length;
+  const active = decisions.filter((d) => !d.snoozedUntil);
+  const urgent = active.filter((d) => d.priority === "high").length;
   const brief = useMemo(() => composeBrief(feed, decisions), [feed, decisions]);
+
+  // The portfolio strip filters both panels to one property at a time.
+  const shownFeed = activeProperty
+    ? feed.filter((f) => f.property === activeProperty)
+    : feed;
+  const shownDecisions = activeProperty
+    ? decisions.filter((d) => d.property === activeProperty)
+    : decisions;
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-bg text-ink">
@@ -142,22 +194,30 @@ export default function App() {
         lastCheckIn={PORTFOLIO.lastCheckIn}
         handled={handled}
         watching={watching}
-        need={decisions.length}
+        need={active.length}
         urgent={urgent}
         learned={rules.length}
         onOpenGuidance={() => setShowGuidance(true)}
       />
+      <PropertyStrip
+        properties={PROPERTIES}
+        feed={feed}
+        decisions={decisions}
+        activeProperty={activeProperty}
+        onSelectProperty={setActiveProperty}
+      />
       <main className="grid min-h-0 flex-1 grid-cols-1 overflow-y-auto lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)_minmax(0,0.96fr)] lg:overflow-hidden">
         <EmployeeFeed
-          items={feed}
+          items={shownFeed}
           brief={brief}
           selectedId={selectedId}
           onSelect={select}
         />
         <NeedsInput
-          items={decisions}
+          items={shownDecisions}
           selectedId={selectedId}
           onSelect={select}
+          onWake={handleWake}
         />
         <ContextDrawer
           item={selected}
@@ -170,6 +230,7 @@ export default function App() {
             },
             onResolve: handleResolve,
             onRedirect: handleRedirect,
+            onSnooze: handleSnooze,
             onTeach: handleTeach,
             onRemoveRule: handleRemoveRule,
           }}

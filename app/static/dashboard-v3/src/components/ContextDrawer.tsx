@@ -1,10 +1,12 @@
 import { useState } from "react";
 
+import { CHANNEL } from "../lib/channel";
 import { ALL_PROPERTIES, rulesByIds, scopeLabel } from "../lib/guidance";
 import { clock } from "../lib/time";
 import type {
   Decision,
   DecisionOption,
+  Draft,
   FeedUpdate,
   GuidanceRule,
   GuidanceScope,
@@ -22,11 +24,169 @@ import {
 
 interface Handlers {
   onClose: () => void;
-  onResolve: (decision: Decision, option: DecisionOption) => void;
+  /** Resolve a decision. `editedBody` carries any edits made to the draft. */
+  onResolve: (
+    decision: Decision,
+    option: DecisionOption,
+    editedBody?: string,
+  ) => void;
   onRedirect: (decision: Decision, note: string) => void;
+  /** Defer a decision until a human-labelled later moment. */
+  onSnooze: (decision: Decision, until: string) => void;
   /** The teaching loop: store a standing rule, scoped, in my words. */
   onTeach: (note: string, scope: GuidanceScope, source: string) => void;
   onRemoveRule: (id: string) => void;
+}
+
+/** Preset deferral moments, plus a free-text option. */
+const SNOOZE_PRESETS = ["this afternoon", "2:00 PM", "this evening", "after turnover"];
+
+function SnoozeBox({ onSnooze }: { onSnooze: (until: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const [custom, setCustom] = useState("");
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="text-[13px] font-medium text-muted transition-colors hover:text-ink"
+      >
+        ☾ Not now — remind me later →
+      </button>
+    );
+  }
+  return (
+    <div className="rounded-xl border border-hairline bg-panel p-3">
+      <p className="mb-2 text-[12.5px] text-muted">
+        I’ll keep this warm and bring it back when you say.
+      </p>
+      <div className="flex flex-wrap gap-1.5">
+        {SNOOZE_PRESETS.map((label) => (
+          <button
+            key={label}
+            type="button"
+            onClick={() => onSnooze(label)}
+            className="rounded-full border border-hairline px-2.5 py-1 text-[12px] text-ink transition-colors hover:border-line hover:bg-hover"
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      <div className="mt-2.5 flex items-center gap-2">
+        <input
+          type="text"
+          value={custom}
+          onChange={(e) => setCustom(e.target.value)}
+          placeholder="or in your words…"
+          className="flex-1 rounded-lg border border-hairline bg-bg px-2.5 py-1.5 text-[12.5px] text-ink placeholder:text-faint focus:border-line focus:outline-none focus:ring-1 focus:ring-accent/40"
+        />
+        <button
+          type="button"
+          disabled={!custom.trim()}
+          onClick={() => onSnooze(custom.trim())}
+          className="rounded-lg bg-accent px-3 py-1.5 text-[12.5px] font-semibold text-bg transition-opacity disabled:opacity-40"
+        >
+          Snooze
+        </button>
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          className="rounded-lg px-2 py-1.5 text-[12.5px] text-muted hover:text-ink"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * A proposed (unsent) draft Lanier can edit in place before approving — so
+ * approving is genuine review, not a rubber stamp. Sent drafts use the plain
+ * read-only DraftCard.
+ */
+function EditableDraft({
+  draft,
+  value,
+  edited,
+  onChange,
+  onReset,
+}: {
+  draft: Draft;
+  value: string;
+  edited: boolean;
+  onChange: (v: string) => void;
+  onReset: () => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const meta = CHANNEL[draft.channel];
+  return (
+    <div className="rounded-xl border border-hairline bg-raised">
+      <div className="flex items-center justify-between gap-2 border-b border-hairline px-3.5 py-2">
+        <div className="flex items-center gap-2">
+          <ChannelTag channel={draft.channel} />
+          <span className="text-[12px] text-muted">
+            to <span className="text-ink">{draft.to}</span>
+          </span>
+        </div>
+        {editing ? (
+          <div className="flex items-center gap-2">
+            {edited && (
+              <button
+                type="button"
+                onClick={onReset}
+                className="text-[11.5px] text-faint hover:text-ink"
+              >
+                Reset
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setEditing(false)}
+              className="text-[11.5px] font-semibold text-accent hover:opacity-80"
+            >
+              Done
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className="text-[11.5px] font-medium text-accent transition-opacity hover:opacity-80"
+          >
+            {edited ? "Edited ✓ · edit" : "Edit"}
+          </button>
+        )}
+      </div>
+      <div className="px-3.5 py-3">
+        {draft.subject && (
+          <p className="mb-1.5 text-[13px] font-semibold text-ink">
+            {draft.subject}
+          </p>
+        )}
+        {editing ? (
+          <textarea
+            autoFocus
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            rows={6}
+            className="w-full resize-none rounded-lg border border-hairline bg-bg px-3 py-2 text-[13.5px] leading-relaxed text-ink focus:border-line focus:outline-none focus:ring-1 focus:ring-accent/40"
+          />
+        ) : (
+          <p className="whitespace-pre-line text-[13.5px] leading-relaxed text-ink/90">
+            {value}
+          </p>
+        )}
+        <p className="mt-2 text-[11.5px] text-faint">
+          {editing
+            ? `These are the exact words I’ll ${
+                draft.channel === "voice" ? "say" : "send"
+              }.`
+            : `I’ll ${draft.channel === "voice" ? "say" : "send"} this as ${meta.label.toLowerCase()} when you approve — edit it first if you’d like.`}
+        </p>
+      </div>
+    </div>
+  );
 }
 
 /** A one-off composer for redirecting a single decision. */
@@ -308,14 +468,23 @@ function DecisionBody({
   rules,
   onResolve,
   onRedirect,
+  onSnooze,
   onTeach,
 }: {
   item: Decision;
   rules: GuidanceRule[];
   onResolve: Handlers["onResolve"];
   onRedirect: Handlers["onRedirect"];
+  onSnooze: Handlers["onSnooze"];
   onTeach: Handlers["onTeach"];
 }) {
+  const original = item.draft?.body ?? "";
+  const [body, setBody] = useState(original);
+  const edited = body.trim() !== original.trim();
+  // Only a draft-sending option carries my edits; declining doesn't send it.
+  const resolve = (option: DecisionOption) =>
+    onResolve(item, option, option.kind === "decline" ? undefined : body);
+
   return (
     <div className="space-y-6">
       <header className="space-y-2.5">
@@ -343,29 +512,43 @@ function DecisionBody({
 
       {item.draft && (
         <Block title={draftHeading(item.draft.channel, item.draft.sent)}>
-          <DraftCard draft={item.draft} />
+          <EditableDraft
+            draft={item.draft}
+            value={body}
+            edited={edited}
+            onChange={setBody}
+            onReset={() => setBody(original)}
+          />
         </Block>
       )}
 
       <div className="space-y-3 border-t border-hairline pt-5">
         <SectionTitle>Your call</SectionTitle>
+        {edited && (
+          <p className="text-[12.5px] text-accent">
+            You’ve edited the message — I’ll send your version.
+          </p>
+        )}
         <div className="space-y-2">
           {item.options.map((option) => (
             <button
               key={option.id}
               type="button"
-              onClick={() => onResolve(item, option)}
+              onClick={() => resolve(option)}
               className={[
                 "w-full rounded-xl px-4 py-2.5 text-left text-[14px] transition-colors",
                 optionClasses(option),
               ].join(" ")}
             >
-              {option.label}
+              {edited && option.kind !== "decline"
+                ? `${option.label} — as you edited it`
+                : option.label}
             </button>
           ))}
         </div>
-        <div className="pt-1">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1">
           <RedirectBox onSubmit={(note) => onRedirect(item, note)} />
+          <SnoozeBox onSnooze={(until) => onSnooze(item, until)} />
         </div>
       </div>
 
@@ -538,6 +721,7 @@ function DrawerBody({
             rules={rules}
             onResolve={handlers.onResolve}
             onRedirect={handlers.onRedirect}
+            onSnooze={handlers.onSnooze}
             onTeach={handlers.onTeach}
           />
         ) : item ? (

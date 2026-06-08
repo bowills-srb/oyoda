@@ -95,9 +95,27 @@ export interface Decision {
   options: DecisionOption[];
   /** Ids of guidance rules I'm already applying to this situation. */
   governedBy?: string[];
+  /**
+   * Set when Lanier defers this for later. The decision drops out of the
+   * active list into a quiet "Snoozed" group until she's ready — a human
+   * label like "2:00 PM" or "after turnover", not a hard timer.
+   */
+  snoozedUntil?: string;
 }
 
 export type WorkItem = FeedUpdate | Decision;
+
+/** Where a property stands right now, for the portfolio overview strip. */
+export type PropertyStatus = "occupied" | "vacant" | "turning";
+
+export interface Property {
+  name: string;
+  status: PropertyStatus;
+  /** Current guest, when occupied. */
+  guest?: string;
+  /** One quiet line on the unit's current state, in my voice. */
+  note: string;
+}
 
 /**
  * A standing instruction Lanier has taught me. The teaching loop: every time
