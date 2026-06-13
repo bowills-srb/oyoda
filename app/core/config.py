@@ -13,8 +13,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
     
+    # `.env.local` holds committed local-dev defaults (V1.0 prototype); `.env`
+    # holds a developer's real/secret overrides and is gitignored. Both are
+    # optional. When a key appears in more than one source, the precedence is:
+    # real environment variables > `.env` > `.env.local`.
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=(".env.local", ".env"),
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore"

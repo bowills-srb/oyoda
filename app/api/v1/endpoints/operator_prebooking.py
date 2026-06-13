@@ -937,7 +937,11 @@ async def list_messages(
                         s.check_out,
                         s.created_at,
                         s.last_message_at,
-                        s.last_message_preview
+                        (SELECT cm.content
+                           FROM concierge_messages cm
+                          WHERE cm.session_id = s.session_id
+                          ORDER BY cm.created_at DESC
+                          LIMIT 1)                AS last_message_preview
                       FROM concierge_guest_sessions s
                       WHERE s.tenant_id = CAST(:tid AS uuid)
                         AND s.status NOT IN ('expired', 'closed')

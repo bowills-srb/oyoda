@@ -13,10 +13,26 @@ from sqlalchemy import Column, MetaData, PrimaryKeyConstraint, String, Table
 from sqlalchemy import engine_from_config, pool
 from alembic import context
 from alembic.ddl.impl import DefaultImpl
-from db.migrations.url_config import resolve_migration_url
 
 # Ensure project root is on path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+sys.path.insert(0, _PROJECT_ROOT)
+
+# Load local dotenv files so `alembic upgrade head` resolves DATABASE_URL /
+# ALEMBIC_DATABASE_URL during local development without manual `export`s.
+# Real environment variables still win (override=False); `.env` overrides
+# `.env.local` to mirror the app's config precedence.
+try:
+    from dotenv import load_dotenv
+
+    # Load `.env` before `.env.local` so that, with override=False, real
+    # overrides in `.env` take precedence over committed `.env.local` defaults.
+    for _dotenv_name in (".env", ".env.local"):
+        load_dotenv(os.path.join(_PROJECT_ROOT, _dotenv_name), override=False)
+except Exception:
+    pass
+
+from db.migrations.url_config import resolve_migration_url
 
 # Alembic Config object
 config = context.config
@@ -89,6 +105,20 @@ def run_migrations_online() -> None:
         # harnesses to opt into `sslmode=disable` explicitly.
         connect_args={"connect_timeout": 30},
     )
+
+    # Fresh-DB bootstrap: ensure alembic_version can hold this repo's long
+    # revision identifiers (>32 chars). Alembic <1.18 hardcodes VARCHAR(32)
+    # when it auto-creates the table, and the DefaultImpl.version_table_impl
+    # override above is a no-op on those versions. Pre-create the table wide
+    # in its own committed transaction so a clean-database `upgrade head`
+    # doesn't truncate the version string mid-run.
+    with connectable.connect() as bootstrap_connection:
+        bootstrap_connection.exec_driver_sql(
+            "CREATE TABLE IF NOT EXISTS alembic_version ("
+            f"version_num VARCHAR({VERSION_TABLE_COLUMN_LENGTH}) NOT NULL, "
+            "CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num))"
+        )
+        bootstrap_connection.commit()
 
     with connectable.connect() as connection:
         context.configure(

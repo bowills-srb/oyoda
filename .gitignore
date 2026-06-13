@@ -18,6 +18,9 @@ npm-debug.log*
 .env
 .env.*
 !.env.example
+# .env.local is the committed local-dev template (stubs only, no real secrets).
+# Real/secret overrides belong in .env (above), which is gitignored.
+!.env.local
 
 # Docker volumes / data
 pgdata/
