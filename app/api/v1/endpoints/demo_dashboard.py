@@ -18,7 +18,7 @@ import os
 from datetime import datetime
 from functools import lru_cache
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Body, Depends
 from fastapi.responses import HTMLResponse, JSONResponse
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -51,6 +51,14 @@ _ROUTING_LABELS = {
     "routed_to_action_auto_off": "Routed to you — autonomy off",
     "routed_to_action_kb_gap": "Routed to you — knowledge gap detected",
     "routed_to_action_policy_review": "Routed to you — policy review needed",
+}
+_CSOURCE_LABELS = {
+    "model_composer": "Drafted by the model composer",
+    "held_for_review": "Held for human review",
+    "exception_fallback": "Exception fallback",
+    "gap_blocked": "Blocked by a knowledge gap",
+    "deterministic_known_fact": "Answered from known property facts",
+    "intent_only": "Intent classified only",
 }
 
 
@@ -121,9 +129,9 @@ async def build_demo_payload(db: AsyncSession) -> dict:
         # for the requested party size, best-fit (smallest that fits) first.
         candidates = []
         if not bound and guests:
-            fits = [info for info in prop_info.values() if (info["sleeps"] or 0) >= guests]
-            for info in sorted(fits, key=lambda i: i["sleeps"] or 0):
-                candidates.append({"name": info["name"], "note": f"sleeps {info['sleeps']}"})
+            fits = [(code_, info) for code_, info in prop_info.items() if (info["sleeps"] or 0) >= guests]
+            for code_, info in sorted(fits, key=lambda ci: ci[1]["sleeps"] or 0):
+                candidates.append({"name": info["name"], "note": f"sleeps {info['sleeps']}", "code": code_})
 
         messages = [{"dir": "inbound", "text": r["message_text"] or "", "at": _iso(r["received_at"]), "kind": "message"}]
         if r["final_reply"]:
@@ -142,6 +150,9 @@ async def build_demo_payload(db: AsyncSession) -> dict:
             "ai": {
                 "intent": _INTENT_LABELS.get(r["intent"], (r["intent"] or "—").title()),
                 "confidence": round(conf * 100),
+                "intent_confidence": round(float(r["intent_confidence"] or 0) * 100),
+                "draft_confidence": round(float(r["draft_confidence"] if r["draft_confidence"] is not None else conf) * 100),
+                "confidence_source": _CSOURCE_LABELS.get(str(r["confidence_source"]), str(r["confidence_source"] or "")),
                 "asks": asks,
                 "bound_property": prop_label if bound else None,
                 "candidates": candidates,
@@ -217,3 +228,24 @@ async def demo_page(db: AsyncSession = Depends(get_async_session)):
 @router.get("/api/conversations")
 async def demo_conversations(db: AsyncSession = Depends(get_async_session)):
     return JSONResponse(await build_demo_payload(db))
+
+
+@router.post("/api/inquiries/{draft_id}/bind")
+async def bind_inquiry(
+    draft_id: str,
+    payload: dict = Body(default={}),
+    db: AsyncSession = Depends(get_async_session),
+):
+    """Operator action: bind an unbound pre-booking inquiry to a property."""
+    code = (payload or {}).get("property_code", "")
+    result = await db.execute(
+        text("""
+            UPDATE pre_booking_inquiries
+               SET property_external_id = :code
+             WHERE draft_id = :draft_id
+               AND (company_id = CAST(:t AS uuid) OR tenant_id = CAST(:t AS uuid))
+        """),
+        {"code": code, "draft_id": draft_id, "t": DEMO_TENANT_ID},
+    )
+    await db.commit()
+    return JSONResponse({"ok": result.rowcount > 0, "draft_id": draft_id, "property_code": code})

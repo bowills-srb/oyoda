@@ -90,6 +90,18 @@
   .ai-route.low{border-color:rgba(239,68,68,.4)} .ai-route.hi{border-color:rgba(16,185,129,.4)}
   .ai-gap{margin-top:8px;font-size:12.5px;padding:7px 10px;border-radius:8px;background:rgba(239,68,68,.12);
           border:1px solid rgba(239,68,68,.4);color:#f3a3a3}
+  /* confidence breakdown ("why this confidence") */
+  .ai-conf{margin:6px 0;padding:9px 11px;background:#131d29;border:1px solid var(--line);border-radius:9px}
+  .cf{display:flex;align-items:center;gap:9px;margin:4px 0}
+  .cf .cfl{width:48px;color:var(--text);font-size:11.5px;font-weight:600}
+  .cf .cfn{color:var(--muted);font-size:11px}
+  .cf-why{margin-top:6px;font-size:11.5px;color:#9fb4c6;font-style:italic}
+  /* bindable matched-property buttons + bound tag */
+  button.cand.bind{cursor:pointer;font:inherit;font-size:12px;line-height:1.3}
+  button.cand.bind:hover{background:rgba(59,130,246,.3);border-color:#3b82f6;color:#fff}
+  .cand.bind em{font-style:normal;color:#93c5fd;font-weight:700;margin-left:4px}
+  .cand.bind:hover em{color:#fff}
+  .bound-tag{font-size:10.5px;color:#34d399;border:1px solid rgba(16,185,129,.4);border-radius:999px;padding:1px 8px;margin-left:6px}
 </style>
 </head>
 <body>
@@ -126,21 +138,28 @@ const fmt = iso => { if(!iso) return ""; const d=new Date(iso); if(isNaN(d)) ret
 const chBadge = c => c==="email" ? '<span class="badge b-email">✉ Email</span>'
                                  : '<span class="badge b-text">💬 Text</span>';
 
+function cbar(pct){const lvl=pct>=70?'hi':(pct>=45?'mid':'low');
+  return `<span class="bar ${lvl}"><i style="width:${pct}%"></i></span><span class="pct">${pct}%</span>`;}
 function aiCard(c){
-  const a=c.ai, pct=a.confidence, lvl = pct>=70?'hi':(pct>=45?'mid':'low');
+  const a=c.ai;
   const asks = a.asks.map(x=>`<span class="ask">${esc(x)}</span>`).join('') || '<span class="muted">—</span>';
   let match;
-  if(a.bound_property) match=`<div class="ai-row"><span class="k">Property</span><span>${esc(a.bound_property)}</span></div>`;
-  else if(a.candidates.length) match=`<div class="ai-row"><span class="k">Matched</span><span>${a.candidates.map(p=>`<span class="cand">${esc(p.name)} · ${esc(p.note)}</span>`).join('')}</span></div>`;
+  if(a.bound_property) match=`<div class="ai-row"><span class="k">Property</span><span>${esc(a.bound_property)}${c.bound_by_human?' <span class="bound-tag">✓ bound by operator</span>':''}</span></div>`;
+  else if(a.candidates.length) match=`<div class="ai-row"><span class="k">Matched</span><span>${a.candidates.map(p=>`<button class="cand bind" data-code="${esc(p.code||'')}" data-name="${esc(p.name)}">${esc(p.name)} · ${esc(p.note)} <em>+ bind</em></button>`).join('')}</span></div>`;
   else match=`<div class="ai-row"><span class="k">Matched</span><span class="muted">No portfolio match yet</span></div>`;
   const gap = a.gaps.length?`<div class="ai-gap">⚠ Knowledge gap: ${a.gaps.map(esc).join(', ')} — needs your confirmation before replying</div>`:'';
+  const rlvl = a.draft_confidence>=70?'hi':(a.draft_confidence>=45?'mid':'low');
   return `<div class="ai-card">
     <div class="ai-h">🧠 AI analysis</div>
     <div class="ai-row"><span class="k">Intent</span><span>${esc(a.intent)}</span></div>
-    <div class="ai-row"><span class="k">Confidence</span><span class="bar ${lvl}"><i style="width:${pct}%"></i></span><span class="pct">${pct}%</span></div>
+    <div class="ai-conf">
+      <div class="cf"><span class="cfl">Intent</span>${cbar(a.intent_confidence)}<span class="cfn">how sure we read the request</span></div>
+      <div class="cf"><span class="cfl">Draft</span>${cbar(a.draft_confidence)}<span class="cfn">how sure we are of the reply</span></div>
+      <div class="cf-why">Why: ${esc(a.confidence_source)}</div>
+    </div>
     <div class="ai-row"><span class="k">Guest asks</span><span>${asks}</span></div>
     ${match}
-    <div class="ai-route ${lvl}">${esc(a.routing)}</div>
+    <div class="ai-route ${rlvl}">${esc(a.routing)}</div>
     ${gap}
   </div>`;
 }
@@ -213,6 +232,14 @@ function renderPane(){
   pane.querySelectorAll("[data-approve]").forEach(b=>b.onclick=()=>{
     const d=c.messages.find(m=>m.kind==="draft"); if(d){d.kind="message";d.dir="outbound";d.at=new Date().toISOString();}
     renderPane(); renderList();});
+  // Operator action: bind an unbound inquiry to a property
+  pane.querySelectorAll(".cand.bind").forEach(b=>b.onclick=()=>{
+    const name=b.dataset.name, code=b.dataset.code;
+    c.ai.bound_property=name; c.ai.candidates=[]; c.property=name; c.bound_by_human=true;
+    if(c.id.indexOf("inq:")===0){ try{ fetch("/demo/api/inquiries/"+c.id.slice(4)+"/bind",
+      {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({property_code:code})}).catch(()=>{}); }catch(e){} }
+    renderPane(); renderList();
+  });
 }
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
   filter=t.dataset.ch; document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
