@@ -73,6 +73,23 @@
   .composer .send{padding:0 18px;border:none;border-radius:9px;background:var(--accent);color:#fff;font-weight:700;cursor:pointer}
   .empty{margin:auto;color:var(--muted);text-align:center}
   .hint{color:var(--muted);font-size:11px;margin-top:6px}
+  /* AI analysis card (pre-booking intelligence) */
+  .ai-card{align-self:stretch;background:linear-gradient(180deg,#15212f,#131c28);border:1px solid #2a3a4c;
+           border-radius:12px;padding:13px 15px;margin-bottom:4px}
+  .ai-h{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#7da2c4;font-weight:700;margin-bottom:9px}
+  .ai-row{display:flex;align-items:center;gap:10px;margin:5px 0;font-size:13px;flex-wrap:wrap}
+  .ai-row .k{width:90px;min-width:90px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.03em}
+  .ai-card .muted{color:var(--muted)}
+  .ask{display:inline-block;background:#22303f;border:1px solid var(--line);border-radius:999px;padding:2px 9px;font-size:12px;margin:2px 3px 2px 0}
+  .cand{display:inline-block;background:rgba(59,130,246,.14);border:1px solid rgba(59,130,246,.4);color:#93c5fd;border-radius:8px;padding:2px 9px;font-size:12px;margin:2px 3px 2px 0}
+  .bar{position:relative;display:inline-block;width:120px;height:8px;background:#22303f;border-radius:999px;overflow:hidden}
+  .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:999px}
+  .bar.hi i{background:#10b981}.bar.mid i{background:#f0b429}.bar.low i{background:#ef4444}
+  .pct{font-size:12px;color:var(--muted)}
+  .ai-route{margin-top:8px;font-size:12px;padding:6px 10px;border-radius:8px;background:#1b2735;border:1px solid var(--line);color:#c7d6e4}
+  .ai-route.low{border-color:rgba(239,68,68,.4)} .ai-route.hi{border-color:rgba(16,185,129,.4)}
+  .ai-gap{margin-top:8px;font-size:12.5px;padding:7px 10px;border-radius:8px;background:rgba(239,68,68,.12);
+          border:1px solid rgba(239,68,68,.4);color:#f3a3a3}
 </style>
 </head>
 <body>
@@ -109,6 +126,24 @@ const fmt = iso => { if(!iso) return ""; const d=new Date(iso); if(isNaN(d)) ret
 const chBadge = c => c==="email" ? '<span class="badge b-email">✉ Email</span>'
                                  : '<span class="badge b-text">💬 Text</span>';
 
+function aiCard(c){
+  const a=c.ai, pct=a.confidence, lvl = pct>=70?'hi':(pct>=45?'mid':'low');
+  const asks = a.asks.map(x=>`<span class="ask">${esc(x)}</span>`).join('') || '<span class="muted">—</span>';
+  let match;
+  if(a.bound_property) match=`<div class="ai-row"><span class="k">Property</span><span>${esc(a.bound_property)}</span></div>`;
+  else if(a.candidates.length) match=`<div class="ai-row"><span class="k">Matched</span><span>${a.candidates.map(p=>`<span class="cand">${esc(p.name)} · ${esc(p.note)}</span>`).join('')}</span></div>`;
+  else match=`<div class="ai-row"><span class="k">Matched</span><span class="muted">No portfolio match yet</span></div>`;
+  const gap = a.gaps.length?`<div class="ai-gap">⚠ Knowledge gap: ${a.gaps.map(esc).join(', ')} — needs your confirmation before replying</div>`:'';
+  return `<div class="ai-card">
+    <div class="ai-h">🧠 AI analysis</div>
+    <div class="ai-row"><span class="k">Intent</span><span>${esc(a.intent)}</span></div>
+    <div class="ai-row"><span class="k">Confidence</span><span class="bar ${lvl}"><i style="width:${pct}%"></i></span><span class="pct">${pct}%</span></div>
+    <div class="ai-row"><span class="k">Guest asks</span><span>${asks}</span></div>
+    ${match}
+    <div class="ai-route ${lvl}">${esc(a.routing)}</div>
+    ${gap}
+  </div>`;
+}
 function renderChips(){
   const s = DATA.stats;
   document.getElementById("company").textContent = DATA.company;
@@ -154,7 +189,7 @@ function renderPane(){
       <div class="meta"><span>${esc(c.property)}</span><span class="badge b-stage">${esc(c.stage_label)}</span>
            <span>·</span><span>${esc(c.status_label)}</span>${c.dates?'<span>· '+esc(c.dates)+'</span>':''}</div>
     </div>
-    <div class="thread" id="thread">${msgs}</div>
+    <div class="thread" id="thread">${c.ai?aiCard(c):''}${msgs}</div>
     <div class="composer">
       <div class="ctoggle"><span>Reply via</span>
         <div class="seg">

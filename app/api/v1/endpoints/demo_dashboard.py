@@ -41,10 +41,36 @@ _STATUS_LABELS = {
     "pending_review": "AI draft · pending review", "replied": "Replied", "rejected": "Rejected",
     "active": "Active", "closed": "Closed", "expired": "Expired", "feedback_pending": "Awaiting feedback",
 }
+_INTENT_LABELS = {
+    "availability": "Availability", "amenity": "Amenity / feature", "policy": "Policy",
+    "booking": "Booking", "general": "General",
+}
+_ROUTING_LABELS = {
+    "auto_sent": "Auto-sent — high confidence",
+    "routed_to_action_below_threshold": "Routed to you — confidence below auto-send threshold",
+    "routed_to_action_auto_off": "Routed to you — autonomy off",
+    "routed_to_action_kb_gap": "Routed to you — knowledge gap detected",
+    "routed_to_action_policy_review": "Routed to you — policy review needed",
+}
 
 
 def _iso(v):
     return v.isoformat() if v is not None else None
+
+
+def _coerce_list(v):
+    """jsonb may arrive as a Python list or a JSON string depending on the driver."""
+    if not v:
+        return []
+    if isinstance(v, list):
+        return v
+    if isinstance(v, str):
+        try:
+            out = json.loads(v)
+            return out if isinstance(out, list) else []
+        except Exception:
+            return []
+    return []
 
 
 @lru_cache(maxsize=1)
@@ -59,39 +85,69 @@ async def build_demo_payload(db: AsyncSession) -> dict:
         text("SELECT display_name FROM tenants WHERE id = CAST(:t AS uuid)"), {"t": DEMO_TENANT_ID}
     )).scalar() or "Emerald Shores Stays"
 
-    prop_names = {
-        r["property_code"]: r["address_street"]
-        for r in (await db.execute(
-            text("SELECT property_code, address_street FROM properties WHERE tenant_id = CAST(:t AS uuid)"),
-            {"t": DEMO_TENANT_ID},
-        )).mappings().all()
-    }
+    prop_info: dict[str, dict] = {}
+    for r in (await db.execute(
+        text("SELECT property_code, address_street, sleeps, max_occupancy FROM properties WHERE tenant_id = CAST(:t AS uuid)"),
+        {"t": DEMO_TENANT_ID},
+    )).mappings().all():
+        prop_info[r["property_code"]] = {
+            "name": (r["address_street"] or r["property_code"]).split(",")[0].strip(),
+            "sleeps": r["sleeps"],
+            "cap": r["max_occupancy"] or r["sleeps"] or 0,
+        }
 
     conversations: list[dict] = []
 
-    # ── Email pre-booking inquiries ──────────────────────────────────────────
+    # ── Pre-booking inquiries (Text + Email) with AI parse/route signals ──────
     inq_rows = (await db.execute(text("""
         SELECT draft_id, platform, guest_name, message_text, draft_text, final_reply, status,
-               property_external_id, requested_check_in, requested_check_out, received_at
+               property_external_id, requested_check_in, requested_check_out, requested_guests,
+               received_at, intent, confidence, intent_confidence, draft_confidence,
+               autonomy_decision, confidence_source, extracted_asks, blocked_by_gap_topics
         FROM pre_booking_inquiries
         WHERE company_id = CAST(:t AS uuid) OR tenant_id = CAST(:t AS uuid)
     """), {"t": DEMO_TENANT_ID})).mappings().all()
     for r in inq_rows:
         channel = "email" if (r["platform"] or "email") != "sms" else "text"
+        code = r["property_external_id"] or ""
+        bound = bool(code) and code in prop_info
+        prop_label = prop_info[code]["name"] if bound else "Portfolio inquiry — no property yet"
+        asks = _coerce_list(r["extracted_asks"])
+        gaps = list(r["blocked_by_gap_topics"] or [])
+        conf = float(r["draft_confidence"] if r["draft_confidence"] is not None else (r["confidence"] or 0))
+        guests = r["requested_guests"]
+
+        # Portfolio matching: when no property is named, match on beds (sleeps)
+        # for the requested party size, best-fit (smallest that fits) first.
+        candidates = []
+        if not bound and guests:
+            fits = [info for info in prop_info.values() if (info["sleeps"] or 0) >= guests]
+            for info in sorted(fits, key=lambda i: i["sleeps"] or 0):
+                candidates.append({"name": info["name"], "note": f"sleeps {info['sleeps']}"})
+
         messages = [{"dir": "inbound", "text": r["message_text"] or "", "at": _iso(r["received_at"]), "kind": "message"}]
         if r["final_reply"]:
             messages.append({"dir": "outbound", "text": r["final_reply"], "at": _iso(r["received_at"]), "kind": "message"})
         elif r["draft_text"]:
             messages.append({"dir": "outbound", "text": r["draft_text"], "at": None, "kind": "draft"})
+
         conversations.append({
             "id": f"inq:{r['draft_id']}", "channel": channel, "stage": "pre_booking",
             "stage_label": _STAGE_LABELS["pre_booking"],
             "status": r["status"], "status_label": _STATUS_LABELS.get(r["status"], r["status"] or ""),
-            "guest": r["guest_name"] or "Guest",
-            "property": prop_names.get(r["property_external_id"], r["property_external_id"] or "Unknown"),
+            "guest": r["guest_name"] or "Guest", "property": prop_label,
             "dates": f"{r['requested_check_in']} → {r['requested_check_out']}" if r["requested_check_in"] else "",
             "escalated": False, "priority": None,
             "last_preview": r["message_text"] or "", "last_at": _iso(r["received_at"]),
+            "ai": {
+                "intent": _INTENT_LABELS.get(r["intent"], (r["intent"] or "—").title()),
+                "confidence": round(conf * 100),
+                "asks": asks,
+                "bound_property": prop_label if bound else None,
+                "candidates": candidates,
+                "routing": _ROUTING_LABELS.get(str(r["autonomy_decision"]), str(r["autonomy_decision"] or "")),
+                "gaps": gaps,
+            },
             "messages": messages,
         })
 

@@ -24,7 +24,7 @@ import argparse
 import asyncio
 import json
 import sys
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from uuid import UUID, uuid4
 
@@ -48,25 +48,90 @@ PROPERTIES = {
     "ES-DUNEDRIFT": (UUID("2a000000-0000-0000-0000-000000000003"), "Dune Drift Bungalow", "Grayton Beach, FL", 2, 2.0),
 }
 
-# ── Email conversations → pre_booking_inquiries (platform='email') ───────────
-EMAIL_INQUIRIES = [
+# ── Pre-booking inquiries → pre_booking_inquiries ─────────────────────────────
+# These exercise the hard pre-booking cases and carry the parser/router signals
+# (intent, confidences, extracted asks, autonomy decision, KB gaps) so the
+# dashboard can show HOW the intelligence handled each one.
+#   channel: "text" → platform 'sms';  "email" → platform 'email'
+#   code:    bound property_code, or None for an UNBOUND portfolio inquiry
+INQUIRIES = [
+    # 1) Bound availability + pet policy (email)
     {
-        "draft_id": "demo-email-0001", "code": "ES-SANDPIPER",
+        "draft_id": "demo-inq-0001", "channel": "email", "code": "ES-SANDPIPER",
         "guest": "Priya Nair", "email": "priya.nair@example.com",
         "msg": ("Hello! We're interested in The Sandpiper for Aug 9–14 (2 adults, 2 kids). "
                 "Is it available, and is it okay to bring a small, well-behaved dog?"),
         "draft": ("Hi Priya! The Sandpiper is available Aug 9–14 and is a great fit for a family of four. "
                   "We're happy to welcome one small dog with our $150 pet fee. Shall I send a booking link?"),
-        "cin": 57, "cout": 62, "guests": 4, "status": "pending_review",
+        "intent": "availability", "conf": 0.66, "intent_conf": 0.90,
+        "autonomy": "routed_to_action_below_threshold", "csource": "model_composer",
+        "asks": ["Aug 9–14", "2 adults + 2 kids", "Bringing a small dog"], "gaps": [],
+        "cin": 57, "cout": 62, "guests": 4,
     },
+    # 2) Bound group inquiry: discount + parking (email)
     {
-        "draft_id": "demo-email-0002", "code": "ES-PELICAN",
+        "draft_id": "demo-inq-0002", "channel": "email", "code": "ES-PELICAN",
         "guest": "Greg & Tom Halvorsen", "email": "halvorsen.party@example.com",
         "msg": ("Looking at Pelican Perch for a group of 10 over Labor Day weekend. Do you offer any "
                 "multi-night discount, and how does parking work for 3 cars?"),
         "draft": ("Hi Greg! Pelican Perch sleeps 12 and is perfect for a group of 10. For 4+ nights we can apply "
                   "a 10% stay discount, and the property has driveway space for 3 vehicles. Want me to hold the dates?"),
-        "cin": 79, "cout": 83, "guests": 10, "status": "pending_review",
+        "intent": "availability", "conf": 0.71, "intent_conf": 0.88,
+        "autonomy": "routed_to_action_below_threshold", "csource": "model_composer",
+        "asks": ["Labor Day weekend", "Group of 10", "Multi-night discount?", "Parking for 3 cars"], "gaps": [],
+        "cin": 79, "cout": 83, "guests": 10,
+    },
+    # 3) OPEN / UNBOUND availability search — no property named (text)
+    {
+        "draft_id": "demo-inq-0003", "channel": "text", "code": None,
+        "guest": "Tasha Brooks", "email": "tasha.brooks@example.com",
+        "msg": ("Hey! What do y'all have open for 6 people July 18–23? Somewhere with a pool would be ideal 🙏"),
+        "draft": ("Hi Tasha! For 6 guests Jul 18–23, two of our pool homes fit well: Pelican Perch (sleeps 12, "
+                  "large private pool) or The Sandpiper (sleeps 6, heated pool, steps to Rosemary Beach). Want me "
+                  "to send availability and a quote for both?"),
+        "intent": "availability", "conf": 0.58, "intent_conf": 0.83,
+        "autonomy": "routed_to_action_below_threshold", "csource": "model_composer",
+        "asks": ["Jul 18–23", "6 guests", "Pool preferred"], "gaps": [],
+        "cin": 35, "cout": 40, "guests": 6,
+    },
+    # 4) Bound property FEATURE question — "I saw this house, does it have X" (email)
+    {
+        "draft_id": "demo-inq-0004", "channel": "email", "code": "ES-PELICAN",
+        "guest": "Martin Feldt", "email": "martin.feldt@example.com",
+        "msg": ("Hi — I saw Pelican Perch on your site. Does it have a hot tub, and can it fit 3 cars "
+                "in the driveway?"),
+        "draft": ("Hi Martin! Yes — Pelican Perch has a private hot tub on the back deck, and the driveway "
+                  "comfortably fits 3 vehicles. Happy to answer anything else or hold dates for you."),
+        "intent": "amenity", "conf": 0.82, "intent_conf": 0.93,
+        "autonomy": "routed_to_action_below_threshold", "csource": "deterministic_known_fact",
+        "asks": ["Hot tub?", "Parking for 3 cars?"], "gaps": [],
+        "cin": None, "cout": None, "guests": None,
+    },
+    # 5) OBSCURE / vague — fuzzy dates + soft criteria, UNBOUND (text)
+    {
+        "draft_id": "demo-inq-0005", "channel": "text", "code": None,
+        "guest": "Sloane Whitaker", "email": "sloane.whitaker@example.com",
+        "msg": ("Heyy planning a girls trip on 30A sometime this fall, walkable to the beach, sleeps 8ish — "
+                "what would you recommend? 🍷"),
+        "draft": ("Love a girls' trip! Pelican Perch (sleeps 12, short walk to the WaterColor beach access) would "
+                  "be perfect for ~8. To check availability and pricing, what dates in the fall are you eyeing — "
+                  "even a rough week helps!"),
+        "intent": "availability", "conf": 0.39, "intent_conf": 0.71,
+        "autonomy": "routed_to_action_below_threshold", "csource": "model_composer",
+        "asks": ["Fall — exact dates TBD", "Sleeps ~8", "Walkable to beach"], "gaps": [],
+        "cin": None, "cout": None, "guests": 8,
+    },
+    # 6) KNOWLEDGE GAP — system defers rather than guessing (email)
+    {
+        "draft_id": "demo-inq-0006", "channel": "email", "code": "ES-SANDPIPER",
+        "guest": "Helen Ortiz", "email": "helen.ortiz@example.com",
+        "msg": ("Is the beach access near The Sandpiper wheelchair accessible? My mother uses a walker."),
+        "draft": ("Hi Helen — great question, and I want to get this exactly right for your mother. Let me confirm "
+                  "the nearest accessible beach access and boardwalk details with our local team and follow up shortly."),
+        "intent": "amenity", "conf": 0.24, "intent_conf": 0.70,
+        "autonomy": "routed_to_action_kb_gap", "csource": "gap_blocked",
+        "asks": ["Wheelchair-accessible beach access?"], "gaps": ["beach_accessibility"],
+        "cin": None, "cout": None, "guests": 4,
     },
 ]
 
@@ -196,9 +261,13 @@ async def seed_properties(db) -> None:
     await db.commit()
 
 
-async def seed_email_inquiries(db) -> None:
-    for q in EMAIL_INQUIRIES:
-        _, name, *_ = PROPERTIES[q["code"]]
+async def seed_inquiries(db) -> tuple[int, int]:
+    """Seed pre-booking inquiries with parser/router signals. Returns (text, email)."""
+    n_text = n_email = 0
+    for i, q in enumerate(INQUIRIES):
+        is_text = q["channel"] == "text"
+        platform = "sms" if is_text else "email"
+        n_text, n_email = (n_text + 1, n_email) if is_text else (n_text, n_email + 1)
         await db.execute(
             text(
                 """
@@ -206,27 +275,40 @@ async def seed_email_inquiries(db) -> None:
                     draft_id, thread_id, company_id, tenant_id, platform,
                     guest_name, guest_email, message_text, draft_text,
                     property_external_id, intent, confidence, intent_confidence, draft_confidence,
-                    status, send_decision, approval_mode, autonomy_decision, confidence_source,
-                    requested_check_in, requested_check_out, requested_guests, triggered_by
+                    status, send_decision, approval_mode,
+                    autonomy_decision, confidence_source,
+                    requested_check_in, requested_check_out, requested_guests, triggered_by,
+                    extracted_asks, blocked_by_gap_topics, received_at, created_at
                 ) VALUES (
-                    :draft_id, :thread_id, :t, :t, 'email',
+                    :draft_id, :thread_id, :t, :t, :platform,
                     :guest, :email, :msg, :draft,
-                    :code, 'availability', 0.66, 0.84, 0.66,
-                    :status, 'review', 'required', 'routed_to_action_below_threshold', 'model_composer',
-                    :cin, :cout, :guests, 'inbound_email'
+                    :code, :intent, :conf, :intent_conf, :conf,
+                    'pending_review', 'review', 'required',
+                    CAST(:autonomy AS autonomy_decision), CAST(:csource AS confidence_source),
+                    :cin, :cout, :guests, :trigger,
+                    CAST(:asks AS jsonb),
+                    COALESCE(string_to_array(NULLIF(:gaps, ''), '|'), ARRAY[]::text[]),
+                    :rec, :rec
                 )
                 """
             ),
             {
                 "draft_id": q["draft_id"], "thread_id": f"thr-{q['draft_id']}",
-                "t": str(TENANT_ID), "guest": q["guest"], "email": q["email"],
-                "msg": q["msg"], "draft": q["draft"], "code": q["code"],
-                "status": q["status"],
-                "cin": TODAY + timedelta(days=q["cin"]), "cout": TODAY + timedelta(days=q["cout"]),
+                "t": str(TENANT_ID), "platform": platform,
+                "guest": q["guest"], "email": q["email"], "msg": q["msg"], "draft": q["draft"],
+                "code": q["code"] or "",
+                "intent": q["intent"], "conf": q["conf"], "intent_conf": q["intent_conf"],
+                "autonomy": q["autonomy"], "csource": q["csource"],
+                "cin": (TODAY + timedelta(days=q["cin"])) if q["cin"] is not None else None,
+                "cout": (TODAY + timedelta(days=q["cout"])) if q["cout"] is not None else None,
                 "guests": q["guests"],
+                "trigger": "inbound_sms" if is_text else "inbound_email",
+                "asks": json.dumps(q["asks"]), "gaps": "|".join(q["gaps"]),
+                "rec": datetime.utcnow() - timedelta(minutes=7 * i),
             },
         )
     await db.commit()
+    return n_text, n_email
 
 
 async def seed_session(db, svc, spec) -> object:
@@ -256,8 +338,8 @@ async def main(wipe_only: bool) -> None:
         await seed_properties(db)
         print(f"✓ Company + {len(PROPERTIES)} properties")
 
-        await seed_email_inquiries(db)
-        print(f"✓ {len(EMAIL_INQUIRIES)} email pre-booking inquiries")
+        nt, ne = await seed_inquiries(db)
+        print(f"✓ {len(INQUIRIES)} pre-booking inquiries ({nt} text, {ne} email)")
 
         svc = DatabaseSessionService(TENANT_ID)
         for spec in EMAIL_SESSIONS:
