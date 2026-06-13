@@ -87,6 +87,7 @@ from app.api.v1.endpoints.public_landing import router as public_landing_router 
 from app.api.v1.endpoints.group_join import router as group_join_router  # /c/join/{token} multi-guest
 from app.api.v1.endpoints.operator_signup import router as operator_signup_router  # /signup + /onboarding + /app/gmail-callback
 from app.api.v1.endpoints.admin_seed import router as admin_seed_router  # /app/api/admin/seed-beach-habitats
+from app.api.v1.endpoints.demo_dashboard import router as demo_dashboard_router  # /demo — text+email demo console
 from app.api.v1.endpoints.engine import router as engine_router  # /engine — architecture page
 from app.api.v1.endpoints.privacy import router as privacy_router  # /privacy + /security
 from app.api.v1.endpoints.audit import router as audit_router      # /api/v1/audit/*
@@ -879,6 +880,8 @@ app.include_router(operator_signup_router)
 app.include_router(admin_seed_router)
 app.include_router(engine_router)
 app.include_router(privacy_router)
+# Self-contained Text + Email demo console at /demo (fictitious company)
+app.include_router(demo_dashboard_router)
 app.include_router(audit_router)
 app.include_router(market_router)
 if billing_router:
