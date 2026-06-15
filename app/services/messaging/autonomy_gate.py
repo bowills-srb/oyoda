@@ -164,6 +164,51 @@ async def resolve_autonomy_settings(
     return AutonomySettings.safe_default()
 
 
+# Readiness bands (from operator_property_autonomy_snapshots.inquiry_band, computed
+# by autonomy_score_service) that are mature enough to allow auto-send. Anything
+# below this — "Emerging" / "Insufficient Signal" — caps a property to REVIEW even
+# when the operator has toggled auto mode on. This is how knowledge readiness
+# gates autonomy: a property graduates to auto-send only once its documented
+# coverage is good enough. Absence of any snapshot is NOT treated as a failure
+# (no cap), so this can only ever make auto-send more conservative, never less.
+_AUTO_READINESS_BANDS = {"developing", "autonomous"}
+
+
+async def _latest_property_readiness_band(
+    db: AsyncSession,
+    property_id: Optional[UUID],
+) -> Optional[str]:
+    """Most recent computed inquiry-readiness band for a property, or None.
+
+    Reads the latest operator_property_autonomy_snapshots row. Defensive: any
+    error (missing table, bad row) returns None so the gate never crashes and
+    simply skips the cap.
+    """
+    if property_id is None:
+        return None
+    try:
+        row = (await db.execute(
+            text("""
+                SELECT inquiry_band
+                FROM operator_property_autonomy_snapshots
+                WHERE property_id = :pid
+                ORDER BY snapshot_date DESC
+                LIMIT 1
+            """),
+            {"pid": str(property_id)},
+        )).fetchone()
+        # Only treat a genuine string as a band — guards against mocked DB
+        # sessions in unit tests and any non-text row value.
+        return row[0] if (row and isinstance(row[0], str)) else None
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("[AutonomyGate] readiness-band lookup failed (skipping cap): %s", exc)
+        try:
+            await db.rollback()
+        except Exception:
+            pass
+        return None
+
+
 async def evaluate(
     db: AsyncSession,
     *,
@@ -227,6 +272,21 @@ async def evaluate(
             reason=(
                 f"Auto mode on, but confidence {confidence:.2f} is below "
                 f"threshold {settings.min_confidence_for_auto:.2f}."
+            ),
+            approval_mode_at_decision="auto",
+        )
+
+    # --- Step 4.5: knowledge-readiness cap ---
+    # Even on auto mode with sufficient confidence, a property only auto-sends
+    # once its documented coverage is mature. If the latest computed readiness
+    # band is below "Developing", hold for review. No snapshot → no cap.
+    band = await _latest_property_readiness_band(db, property_id)
+    if band is not None and band.strip().lower() not in _AUTO_READINESS_BANDS:
+        return GateResult(
+            decision=AutonomyDecision.REVIEW,
+            reason=(
+                f"Property readiness is '{band}' (below Developing) — auto-send "
+                f"paused until knowledge coverage improves."
             ),
             approval_mode_at_decision="auto",
         )

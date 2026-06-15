@@ -926,6 +926,25 @@ class GuestMessageBrainOrchestrator:
 
             record.final_response = draft
 
+            # ── 6c. Adversarial review gate (safety parity for AUTO_SEND) ──
+            # The policy gate decided AUTO_SEND from confidence + per-property
+            # autonomy alone. Before anything actually sends, challenge the
+            # composed draft against the guest message + source context with
+            # the grounding reviewer. A non-approve verdict downgrades the
+            # action so a human reviews first (block → ESCALATE, otherwise →
+            # DRAFT_ONLY). This gives the brain path parity with the legacy
+            # reviewer and is the precondition for trusting auto-send. Mirrors
+            # the answerability gate (5.6); fails safe to DRAFT_ONLY.
+            if policy.final_action == RecommendedAction.AUTO_SEND:
+                policy = await self._review_before_auto_send(
+                    policy=policy,
+                    message=message,
+                    draft=draft,
+                    context=context,
+                    record=record,
+                )
+                record.policy = policy
+
             # ── 7. Module dispatch — only on policy approval ───────────
             if policy.final_action != RecommendedAction.ESCALATE:
                 await self._dispatch_modules(
@@ -1435,6 +1454,92 @@ class GuestMessageBrainOrchestrator:
         )
         logger.warning("[MessagingBrain] %s", msg)
         record.notes.append(f"evidence-violation: {msg}")
+
+    @staticmethod
+    def _build_review_source_context(context: Any, record: Any) -> str:
+        """Best-effort grounding text for the adversarial reviewer.
+
+        Defensive (getattr only): pulls any property/knowledge context off the
+        bundle plus the specialists' own draft text, so the reviewer can check
+        the response against what we actually know. Capped to keep the review
+        prompt bounded.
+        """
+        parts: List[str] = []
+        for attr in (
+            "property_facts", "knowledge_context", "property_summary",
+            "facts_text", "context_text",
+        ):
+            val = getattr(context, attr, None)
+            if isinstance(val, str) and val.strip():
+                parts.append(val.strip())
+        for d in (getattr(record, "decisions", None) or []):
+            dt = getattr(d, "draft_text", "") or ""
+            if dt.strip():
+                parts.append(dt.strip())
+        return "\n\n".join(parts)[:6000]
+
+    async def _review_before_auto_send(
+        self,
+        *,
+        policy: ResponsePolicyDecision,
+        message: Any,
+        draft: Any,
+        context: Any,
+        record: Any,
+    ) -> ResponsePolicyDecision:
+        """Challenge an AUTO_SEND draft with the grounding reviewer.
+
+        Returns the (possibly downgraded) policy:
+          - verdict "block"                  → ESCALATE
+          - verdict "revise" | "human_review"→ DRAFT_ONLY
+          - verdict "approve"                → unchanged (auto-send proceeds)
+        Fails safe: any reviewer error downgrades to DRAFT_ONLY so nothing
+        auto-sends unreviewed. The reviewer (response_reviewer) is imported
+        locally to avoid an import cycle and to keep its LLM deps off the hot
+        import path.
+        """
+        try:
+            from uuid import UUID as _UUID
+            from app.services.messaging_brain.grounding.response_reviewer import (
+                review_concierge_response,
+            )
+
+            try:
+                tenant_uuid = _UUID(str(getattr(message, "tenant_id", "") or ""))
+            except (ValueError, TypeError):
+                tenant_uuid = None
+
+            result = await review_concierge_response(
+                guest_message=getattr(message, "text", "") or "",
+                draft_response=getattr(draft, "response_text", "") or "",
+                source_context=self._build_review_source_context(context, record),
+                lifecycle_stage=str(getattr(getattr(context, "lifecycle", None), "value", "") or ""),
+                property_name=str(getattr(context, "property_name", "") or ""),
+                tenant_id=tenant_uuid,
+            )
+            verdict = (getattr(result, "verdict", "approve") or "approve").lower()
+            if verdict == "approve":
+                record.notes.append("adversarial_review: approve (auto-send allowed)")
+                return policy
+
+            new_action = (
+                RecommendedAction.ESCALATE if verdict == "block"
+                else RecommendedAction.DRAFT_ONLY
+            )
+            record.notes.append(
+                f"adversarial_review: AUTO_SEND→{new_action.value} "
+                f"verdict={verdict} flags={getattr(result, 'flags', [])}"
+            )
+            return policy.model_copy(update={"final_action": new_action})
+        except Exception as exc:  # noqa: BLE001
+            logger.warning(
+                "[MessagingBrain] adversarial review gate error; downgrading "
+                "AUTO_SEND→DRAFT_ONLY (fail-safe): %s", exc
+            )
+            record.notes.append(
+                f"adversarial_review: error → DRAFT_ONLY (fail-safe): {type(exc).__name__}"
+            )
+            return policy.model_copy(update={"final_action": RecommendedAction.DRAFT_ONLY})
 
     @staticmethod
     def _compose_response(
